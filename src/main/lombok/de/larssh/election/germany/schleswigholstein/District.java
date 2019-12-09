@@ -43,7 +43,7 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 
 	public abstract C createChild(final String name);
 
-	public Set<District<?>> getChildren() {
+	public Set<C> getChildren() {
 		return Collections.unmodifiableSet(children);
 	}
 }

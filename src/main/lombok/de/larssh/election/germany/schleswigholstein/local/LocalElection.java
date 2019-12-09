@@ -80,10 +80,6 @@ public class LocalElection implements Election {
 	}
 
 	// TODO
-	// default int getNumOfListenvertreter() {
-	// return getNumOfVertreter() - getNumOfUnmittelbareVertreter();
-	// }
-	//
 	// @Override
 	// default int getNumOfStimmen() {
 	// return getNumOfUnmittelbareVertreterPerWahlkreis();
@@ -91,7 +87,9 @@ public class LocalElection implements Election {
 	//
 	// int getNumOfUnmittelbareVertreter();
 	//
-	// int getNumOfUnmittelbareVertreterPerWahlkreis();
+	// int getNumOfUnmittelbareVertreterPerWahlkreis(); // wtf
 	//
-	// int getNumOfVertreter();
+	// int getNumOfVertreter(); // max. anzahl sitze
+
+	// TODO: wahlbeteiligung
 }
