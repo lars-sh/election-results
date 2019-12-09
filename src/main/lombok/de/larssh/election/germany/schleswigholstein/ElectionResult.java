@@ -1,15 +1,15 @@
 package de.larssh.election.germany.schleswigholstein;
 
+import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
-public interface ElectionResult {
-	int getNumberOfBallots();
+public interface ElectionResult<B extends Ballot> {
+	Election getElection();
 
-	int getNumberOfInvalidBallots();
+	List<B> getBallots();
 
-	int getNumberOfValidBallots();
+	Set<? extends NominationResult<B>> getNominationResults();
 
-	int getNumberOfPostalVoters();
-
-	Set<? extends NominationResult> getNominationResults();
+	ElectionResult<B> filter(Predicate<B> filter);
 }

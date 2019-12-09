@@ -1,9 +1,11 @@
 package de.larssh.election.germany.schleswigholstein;
 
-public interface NominationResult {
+import java.util.List;
+
+public interface NominationResult<B extends Ballot> {
 	Nomination getNomination();
 
-	int getNumberOfVotes();
+	List<B> getBallots();
 
 	boolean isElected();
 }

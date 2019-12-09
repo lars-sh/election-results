@@ -1,53 +1,97 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import java.awt.Color;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
 
+import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
-import de.larssh.election.germany.schleswigholstein.DistrictType;
-import lombok.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.NonFinal;
 
-public interface LocalElection extends Election {
-	
-	LocalListNomination createListenvorschlag();
+@Getter
+@ToString
+@RequiredArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+public class LocalElection implements Election {
+	LocalDistrictSuper district;
 
-	
-	LocalNominationDirect createUnmittelbarenVorschlag();
+	@EqualsAndHashCode.Include
+	LocalDate date;
 
-	
+	@EqualsAndHashCode.Include
+	String name;
+
+	@NonFinal
+	@Getter(AccessLevel.NONE)
+	Map<District<?>, OptionalInt> population = new HashMap<>();// TODO: getter
+
+	@NonFinal
+	@Getter(AccessLevel.NONE)
+	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();// TODO: getter
+
+	List<LocalNomination> nominations = new ArrayList<>(); // TODO: getter
+
+	OptionalInt numberOfAllBallots;
+
+	List<LocalBallot> ballots = new ArrayList<>(); // TODO: getter
+
 	@Override
-	default Color getColorOfStimmzettel() {
-		return getGebiet().getType() == DistrictType.KREIS ? Color.RED : Color.WHITE;
+	public Color getColorOfBallots() {
+		return getDistrict().getType() == LocalDistrictType.KREIS ? Color.RED : Color.WHITE;
 	}
 
-	
 	@Override
-	LocalElectionResult getErgebnis();
-
-	
-	Set<LocalListNomination> getListenvorschlaege();
-
-	default int getNumOfListenvertreter() {
-		return getNumOfVertreter() - getNumOfUnmittelbareVertreter();
+	public OptionalInt getPopulation(final District<?> district) {
+		throw new UnsupportedOperationException(); // TODO: implement
 	}
 
 	@Override
-	default int getNumOfStimmen() {
-		return getNumOfUnmittelbareVertreterPerWahlkreis();
+	public void setPopulation(final District<?> district, final OptionalInt population) {
+		throw new UnsupportedOperationException(); // TODO: implement
 	}
 
-	int getNumOfUnmittelbareVertreter();
-
-	int getNumOfUnmittelbareVertreterPerWahlkreis();
-
-	int getNumOfVertreter();
-
-	int getNumOfWahlkreise();
-
-	
-	Set<LocalNominationDirect> getUnmittelbareVorschlaege();
-
-	
 	@Override
-	Set<LocalNomination> getVorschlaege();
+	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
+		throw new UnsupportedOperationException(); // TODO: implement
+	}
+
+	@Override
+	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
+		throw new UnsupportedOperationException(); // TODO: implement
+	}
+
+	public LocalNomination createNomination() {
+		throw new UnsupportedOperationException(); // TODO: implement
+	}
+
+	@Override
+	public LocalElectionResult getResult() {
+		return new LocalElectionResult(this, getBallots());
+	}
+
+	// TODO
+	// default int getNumOfListenvertreter() {
+	// return getNumOfVertreter() - getNumOfUnmittelbareVertreter();
+	// }
+	//
+	// @Override
+	// default int getNumOfStimmen() {
+	// return getNumOfUnmittelbareVertreterPerWahlkreis();
+	// }
+	//
+	// int getNumOfUnmittelbareVertreter();
+	//
+	// int getNumOfUnmittelbareVertreterPerWahlkreis();
+	//
+	// int getNumOfVertreter();
 }

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import de.larssh.utils.Optionals;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class Party implements Comparable<Party> {
 	private static final Comparator<Party> COMPARATOR
 			= Comparator.comparing(Party::getShortName, Optionals.createComparator()).thenComparing(Party::getName);
@@ -30,7 +31,7 @@ public class Party implements Comparable<Party> {
 	Color fontColor;
 
 	@Override
-	public int compareTo(final Party party) {
+	public int compareTo(@Nullable final Party party) {
 		return COMPARATOR.compare(this, party);
 	}
 }

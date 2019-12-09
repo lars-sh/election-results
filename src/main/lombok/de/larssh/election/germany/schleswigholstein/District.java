@@ -7,14 +7,17 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.larssh.utils.Optionals;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public abstract class District<C extends District<C>> implements Comparable<District<?>> {
+@RequiredArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+public abstract class District<C extends District<?>> implements Comparable<District<?>> {
 	private static final Comparator<District<?>> COMPARATOR = Comparator
 			.<District<?>, Optional<District<?>>>comparing(District::getParent, Optionals.createComparator())
 			.thenComparing(District::getName);
@@ -28,18 +31,8 @@ public abstract class District<C extends District<C>> implements Comparable<Dist
 	@ToString.Exclude
 	Set<C> children = new TreeSet<>();
 
-	public District(final String name) {
-		parent = Optional.empty();
-		this.name = name;
-	}
-
-	public District(final District<C> parent, final String name) {
-		this.parent = Optional.of(parent);
-		this.name = name;
-	}
-
 	@Override
-	public int compareTo(final District<?> district) {
+	public int compareTo(@Nullable final District<?> district) {
 		return COMPARATOR.compare(this, district);
 	}
 
@@ -50,7 +43,7 @@ public abstract class District<C extends District<C>> implements Comparable<Dist
 
 	public abstract C createChild(final String name);
 
-	public Set<District<C>> getChildren() {
+	public Set<District<?>> getChildren() {
 		return Collections.unmodifiableSet(children);
 	}
 }

@@ -10,4 +10,6 @@ public interface Ballot {
 	boolean isValid();
 
 	Set<? extends Nomination> getNominations();
+
+	boolean isPostalVoter();
 }

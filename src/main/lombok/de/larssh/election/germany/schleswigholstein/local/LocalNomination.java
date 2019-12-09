@@ -1,40 +1,38 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import java.util.Comparator;
 import java.util.Optional;
-import java.util.Set;
 
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
-import de.larssh.utils.Either;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public interface LocalNomination extends Nomination {
-	Either<LocalNominationDirect, LocalListNomination> either();
+@Getter
+@ToString
+@EqualsAndHashCode(onParam_ = { @Nullable })
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public class LocalNomination implements Nomination, Comparable<LocalNomination> {
+	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
+			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
+
+	LocalElection election;
+
+	LocalDistrict district;
+
+	LocalNominationType type;
+
+	Person person;
+
+	Optional<Party> party;
 
 	@Override
-	LocalElection getWahl();
-
-	public interface LocalListNomination extends LocalNomination {
-		@Override
-		default Either<LocalNominationDirect, LocalListNomination> either() {
-			return Either.ofSecond(this);
-		}
-
-		Party getGruppierung();
-
-		Set<Person> getPersonen();
-	}
-
-	public interface LocalNominationDirect extends LocalNomination {
-		@Override
-		default Either<LocalNominationDirect, LocalListNomination> either() {
-			return Either.ofFirst(this);
-		}
-
-		Optional<Party> getGruppierung();
-
-		Person getPerson();
-
-		Wahlkreis getWahlkreis();
+	public int compareTo(@Nullable final LocalNomination nomination) {
+		return COMPARATOR.compare(this, nomination);
 	}
 }

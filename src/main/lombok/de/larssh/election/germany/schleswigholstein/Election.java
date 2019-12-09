@@ -1,13 +1,12 @@
 package de.larssh.election.germany.schleswigholstein;
 
-import static java.util.function.Predicate.isEqual;
-
 import java.awt.Color;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.OptionalInt;
-import java.util.Set;
-import java.util.function.Predicate;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface Election extends Comparable<Election> {
 	Comparator<Election> COMPARATOR = Comparator.<Election, District<?>>comparing(Election::getDistrict)
@@ -20,8 +19,8 @@ public interface Election extends Comparable<Election> {
 
 	String getName();
 
-	default int getPopulation() {
-		return getPopulation(getDistrict()).orElseThrow(RuntimeException::new); // TODO: Exception
+	default OptionalInt getPopulation() {
+		return getPopulation(getDistrict());
 	}
 
 	OptionalInt getPopulation(District<?> district);
@@ -32,10 +31,8 @@ public interface Election extends Comparable<Election> {
 
 	void setPopulation(District<?> district, OptionalInt population);
 
-	DistrictType getElectionType();
-
-	default int getNumberOfEligibleVoters() {
-		return getNumberOfEligibleVoters(getDistrict()).orElseThrow(RuntimeException::new); // TODO: Exception
+	default OptionalInt getNumberOfEligibleVoters() {
+		return getNumberOfEligibleVoters(getDistrict());
 	}
 
 	OptionalInt getNumberOfEligibleVoters(District<?> district);
@@ -46,20 +43,18 @@ public interface Election extends Comparable<Election> {
 
 	void setNumberOfEligibleVoters(District<?> district, OptionalInt numberOfEligibleVoters);
 
-	Set<? extends Nomination> getNominations();
+	List<? extends Nomination> getNominations();
 
 	Color getColorOfBallots();
 
-	Set<? extends Ballot> getBallots();
+	OptionalInt getNumberOfAllBallots();
 
-	default ElectionResult getResult() {
-		return getResult(isEqual(true));
-	}
+	List<? extends Ballot> getBallots();
 
-	ElectionResult getResult(Predicate<? extends Ballot> filter);
+	ElectionResult<?> getResult();
 
 	@Override
-	default int compareTo(final Election election) {
+	default int compareTo(@Nullable final Election election) {
 		return COMPARATOR.compare(this, election);
 	}
 }

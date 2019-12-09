@@ -5,19 +5,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
-import lombok.NonNull;
 
 public interface Buergermeisterwahlstimmzettel extends Ballot {
-	
 	Buergermeisterwahlvorschlag getVorschlag();
 
-	
 	@Override
-	default Set<Buergermeisterwahlvorschlag> getVorschlaege() {
+	default Set<Buergermeisterwahlvorschlag> getNominations() {
 		return new HashSet<>(Arrays.asList(getVorschlag()));
 	}
 
-	
 	@Override
-	Buergermeisterwahl getWahl();
+	Buergermeisterwahl getElection();
 }

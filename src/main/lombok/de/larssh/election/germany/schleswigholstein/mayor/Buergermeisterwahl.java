@@ -1,28 +1,22 @@
 package de.larssh.election.germany.schleswigholstein.mayor;
 
-import java.util.Set;
+import java.util.List;
 
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.utils.Either;
-import lombok.NonNull;
 
 public interface Buergermeisterwahl extends Election {
-	
 	Buergermeisterwahlvorschlag createVorschlag();
 
-	
 	Either<Buergermeistermehrheitswahl, Buergermeisterstichwahl> either();
 
-	
 	@Override
-	Buergermeisterwahlergebnis getErgebnis();
+	Buergermeisterwahlergebnis getResult();
 
-	@Override
 	default int getNumOfStimmen() {
 		return 1;
 	}
 
-	
 	@Override
-	Set<Buergermeisterwahlvorschlag> getVorschlaege();
+	List<Buergermeisterwahlvorschlag> getNominations();
 }

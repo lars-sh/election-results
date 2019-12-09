@@ -2,6 +2,7 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.Comparator;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(onParam_ = { @Nullable })
 @RequiredArgsConstructor
 public class Address implements Comparable<Address> {
 	private static final Comparator<Address> COMPARATOR = Comparator.comparing(Address::getZip)
@@ -26,7 +27,7 @@ public class Address implements Comparable<Address> {
 	String city;
 
 	@Override
-	public int compareTo(final Address address) {
+	public int compareTo(@Nullable final Address address) {
 		return COMPARATOR.compare(this, address);
 	}
 }
