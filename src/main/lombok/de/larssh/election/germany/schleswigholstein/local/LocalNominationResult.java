@@ -2,6 +2,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 
 import static java.util.Collections.unmodifiableList;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -32,17 +33,19 @@ public class LocalNominationResult implements NominationResult<LocalBallot>, Com
 
 	LocalNominationResultType type;
 
-	// TODO: BigDecimal sainteLague
+	BigDecimal sainteLagueValue;
 
 	@PackagePrivate
 	public LocalNominationResult(final LocalElectionResult electionResult,
 			final LocalNomination nomination,
 			final List<LocalBallot> ballots,
-			final LocalNominationResultType type) {
+			final LocalNominationResultType type,
+			final BigDecimal sainteLagueValue) {
 		this.electionResult = electionResult;
 		this.nomination = nomination;
 		this.ballots = unmodifiableList(new ArrayList<>(ballots));
 		this.type = type;
+		this.sainteLagueValue = sainteLagueValue;
 	}
 
 	@Override

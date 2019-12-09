@@ -9,9 +9,14 @@ public enum LocalNominationResultType {
 	DIRECT,
 
 	/**
-	 * TODO: Loskandidat
+	 * Loskandidat für Direktmandat
 	 */
-	DRAW,
+	DIRECT_DRAW,
+
+	/**
+	 * Mehrsitz
+	 */
+	DIRECT_BALANCE_SEAT,
 
 	/**
 	 * Listenmandat
@@ -19,12 +24,12 @@ public enum LocalNominationResultType {
 	LIST,
 
 	/**
-	 * Überhangmandat
+	 * Loskandidat für Listenmandat
 	 */
-	OVERHANG_SEAT,
+	LIST_DRAW,
 
 	/**
-	 * Mehrsitz
+	 * Überhangmandat
 	 */
-	BALANCE_SEAT;
+	LIST_OVERHANG_SEAT;
 }

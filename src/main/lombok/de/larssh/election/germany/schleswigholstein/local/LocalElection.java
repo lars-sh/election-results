@@ -1,12 +1,16 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static java.util.Collections.unmodifiableNavigableMap;
+
 import java.awt.Color;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.OptionalInt;
+import java.util.TreeMap;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
@@ -23,6 +27,24 @@ import lombok.experimental.NonFinal;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
+	private static final NavigableMap<Integer, Integer> NUMBER_OF_DIRECT_SEATS;
+
+	static {
+		final NavigableMap<Integer, Integer> numberOfDirectSeats = new TreeMap<>();
+		numberOfDirectSeats.put(0, 4);
+		numberOfDirectSeats.put(200, 5);
+		numberOfDirectSeats.put(750, 6);
+		numberOfDirectSeats.put(1250, 7);
+		numberOfDirectSeats.put(2500, 9);
+		numberOfDirectSeats.put(5000, 10);
+		numberOfDirectSeats.put(10_000, 12);
+		numberOfDirectSeats.put(15_000, 14);
+		numberOfDirectSeats.put(25_000, 16);
+		numberOfDirectSeats.put(35_000, 18);
+		numberOfDirectSeats.put(45_000, 20);
+		NUMBER_OF_DIRECT_SEATS = unmodifiableNavigableMap(numberOfDirectSeats);
+	}
+
 	LocalDistrictSuper district;
 
 	@EqualsAndHashCode.Include
@@ -45,6 +67,8 @@ public class LocalElection implements Election {
 
 	List<LocalBallot> ballots = new ArrayList<>(); // TODO: getter
 
+	int sainteLagueScale;
+
 	@Override
 	public Color getColorOfBallots() {
 		return getDistrict().getType() == LocalDistrictType.KREIS ? Color.RED : Color.WHITE;
@@ -58,6 +82,22 @@ public class LocalElection implements Election {
 	@Override
 	public void setPopulation(final District<?> district, final OptionalInt population) {
 		throw new UnsupportedOperationException(); // TODO: implement
+	}
+
+	public int getNumberOfSeats() {
+		return 2 * getNumberOfDirectSeats() - 1;
+	}
+
+	public int getNumberOfDirectSeats() {
+		final int population = getPopulation();
+
+		if (getDistrict().getType() == LocalDistrictType.KREIS) {
+			return population > 200_000 ? 25 : 23;
+		}
+		if (getDistrict().getType() == LocalDistrictType.KREISFREIE_STADT) {
+			return population > 150_000 ? 25 : 22;
+		}
+		return NUMBER_OF_DIRECT_SEATS.floorEntry(population - 1).getValue();
 	}
 
 	@Override

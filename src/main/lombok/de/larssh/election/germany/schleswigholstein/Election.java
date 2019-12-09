@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 
+import de.larssh.election.germany.schleswigholstein.local.ElectionException;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface Election extends Comparable<Election> {
@@ -19,8 +20,8 @@ public interface Election extends Comparable<Election> {
 
 	String getName();
 
-	default OptionalInt getPopulation() {
-		return getPopulation(getDistrict());
+	default int getPopulation() {
+		return getPopulation(getDistrict()).orElseThrow(() -> new ElectionException("Missing population information."));
 	}
 
 	OptionalInt getPopulation(District<?> district);
@@ -31,8 +32,9 @@ public interface Election extends Comparable<Election> {
 
 	void setPopulation(District<?> district, OptionalInt population);
 
-	default OptionalInt getNumberOfEligibleVoters() {
-		return getNumberOfEligibleVoters(getDistrict());
+	default int getNumberOfEligibleVoters() {
+		return getNumberOfEligibleVoters(getDistrict())
+				.orElseThrow(() -> new ElectionException("Missing eligible voters information."));
 	}
 
 	OptionalInt getNumberOfEligibleVoters(District<?> district);
