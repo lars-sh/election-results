@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>de.lars-sh.election-results</groupId>
 		<artifactId>election-results-parent</artifactId>
-		<version>0.9.6-SNAPSHOT</version>
-		<relativePath></relativePath>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>election-results-core</artifactId>
@@ -55,7 +54,6 @@
 	</distributionManagement>
 
 	<properties>
-		<parent-pom.create-gitignore>false</parent-pom.create-gitignore>
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>

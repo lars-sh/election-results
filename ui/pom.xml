@@ -3,18 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>de.lars-sh</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.9.6-SNAPSHOT</version>
-		<relativePath></relativePath>
+		<groupId>de.lars-sh.election-results</groupId>
+		<artifactId>election-results-parent</artifactId>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>de.lars-sh.election-results</groupId>
-	<artifactId>election-results-parent</artifactId>
-	<version>0.9.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<artifactId>election-results-ui</artifactId>
 
-	<name>Election Results</name>
+	<name>Election Results UI</name>
 	<url>https://github.com/lars-sh/election-results</url>
 	<licenses>
 		<license>
@@ -30,11 +26,6 @@
 			<url>https://lars-sh.de/</url>
 		</developer>
 	</developers>
-
-	<modules>
-		<module>core</module>
-		<module>ui</module>
-	</modules>
 
 	<scm>
 		<connection>scm:git:git@github.com:lars-sh/election-results.git</connection>
@@ -61,4 +52,10 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
+
+	<properties>
+		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
+		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
+		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
+	</properties>
 </project>
