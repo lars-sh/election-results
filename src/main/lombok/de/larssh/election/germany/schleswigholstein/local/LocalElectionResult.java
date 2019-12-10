@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toMap;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 	Set<LocalNominationResult> nominationResults;
 
-	// TODO: anzahl der gemachten gültigen kreuze
+	Set<LocalPartyResult> partyResults;
 
 	@PackagePrivate
 	LocalElectionResult(final LocalElection election, final List<LocalBallot> ballots) {
@@ -56,7 +57,8 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 			final Predicate<LocalBallot> filter) {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
-		nominationResults = unmodifiableSet(calculateNominationResults());
+		nominationResults = unmodifiableSet(createNominationResults());
+		partyResults = unmodifiableSet(createPartyResults());
 	}
 
 	@Override
@@ -64,7 +66,22 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 		return new LocalElectionResult(getElection(), getBallots(), filter);
 	}
 
-	private Set<LocalNominationResult> calculateNominationResults() {
+	public int getNumberOfVotes() {
+		return (int) getBallots().stream()
+				.filter(Ballot::isValid)
+				.map(Ballot::getNominations)
+				.flatMap(Collection::stream)
+				.count();
+	}
+
+	public BigDecimal getTurnout(final int scale) {
+		return BigDecimal.valueOf(getNumberOfVotes())
+				.multiply(BigDecimal.TEN)
+				.multiply(BigDecimal.TEN)
+				.divide(BigDecimal.valueOf(getNumberOfVotes()), scale, RoundingMode.HALF_UP);
+	}
+
+	private Set<LocalNominationResult> createNominationResults() {
 		final Map<LocalNomination, Integer> votes = getVotes();
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();
 
@@ -83,17 +100,23 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.forEach(nomination -> resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST));
 
 		// Result Type: Direct Balance Seat
-		// TODO
+		// TODO: Direct Balance Seat
 
 		// Result Type: List Overhang Seat
-		// TODO
+		// TODO: List Overhang Seat
 
 		// Result Type: List Draw
 		getDrawNominations(sainteLague, resultTypes)
 				.forEach(nomination -> resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW));
 
 		// Result Type: Not Elected
-		return createNominationResults(sainteLague, resultTypes);
+		return getElection().getNominations()
+				.stream()
+				.map(nomination -> new LocalNominationResult(this,
+						nomination,
+						resultTypes.getOrDefault(nomination, LocalNominationResultType.NOT_ELECTED),
+						sainteLague.getOrDefault(nomination, BigDecimal.ZERO)))
+				.collect(toCollection(TreeSet::new));
 	}
 
 	private Map<LocalNomination, Integer> getVotes() {
@@ -199,13 +222,13 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.stream()
 				.filter(entry -> entry.getValue().equals(lastNomination.get()))
 				.map(Entry::getKey)
-				.collect(toLinkedHashSet());
+				.collect(toCollection(TreeSet::new));
 		// TODO: Ergebnis des Losverfahrens
 
 		return probablyDirectNominations.size() > 1 ? probablyDirectNominations : emptySet();
 	}
 
-	public Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
+	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
 			final Map<LocalNomination, BigDecimal> sainteLague) {
 		final Set<LocalNomination> directNominations = getDirectNominations(votes);
 		final int numberOfSeats = getElection().getNumberOfSeats();
@@ -220,17 +243,10 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 		return nominations;
 	}
 
-	private Set<LocalNominationResult> createNominationResults(final Map<LocalNomination, BigDecimal> sainteLague,
-			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
-		return getElection().getNominations()
+	private Set<LocalPartyResult> createPartyResults() {
+		return getElection().getParties()
 				.stream()
-				.map(nomination -> new LocalNominationResult(this,
-						nomination,
-						getBallots().stream()
-								.filter(ballot -> ballot.getNominations().contains(nomination))
-								.collect(toList()),
-						resultTypes.getOrDefault(nomination, LocalNominationResultType.NOT_ELECTED),
-						sainteLague.getOrDefault(nomination, BigDecimal.ZERO)))
+				.map(party -> new LocalPartyResult(this, party))
 				.collect(toCollection(TreeSet::new));
 	}
 }

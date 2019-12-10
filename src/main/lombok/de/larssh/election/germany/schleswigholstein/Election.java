@@ -1,6 +1,5 @@
 package de.larssh.election.germany.schleswigholstein;
 
-import java.awt.Color;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -46,8 +45,6 @@ public interface Election extends Comparable<Election> {
 	void setNumberOfEligibleVoters(District<?> district, OptionalInt numberOfEligibleVoters);
 
 	List<? extends Nomination> getNominations();
-
-	Color getColorOfBallots();
 
 	OptionalInt getNumberOfAllBallots();
 

@@ -11,5 +11,7 @@ public interface ElectionResult<B extends Ballot> {
 
 	Set<? extends NominationResult<B>> getNominationResults();
 
+	Set<? extends PartyResult<B>> getPartyResults();
+
 	ElectionResult<B> filter(Predicate<B> filter);
 }

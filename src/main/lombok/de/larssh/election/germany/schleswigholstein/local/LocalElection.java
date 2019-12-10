@@ -1,19 +1,27 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableNavigableMap;
+import static java.util.stream.Collectors.toCollection;
 
-import java.awt.Color;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
+import de.larssh.election.germany.schleswigholstein.Nomination;
+import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.Person;
+import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,17 +39,17 @@ public class LocalElection implements Election {
 
 	static {
 		final NavigableMap<Integer, Integer> numberOfDirectSeats = new TreeMap<>();
-		numberOfDirectSeats.put(0, 4);
-		numberOfDirectSeats.put(200, 5);
-		numberOfDirectSeats.put(750, 6);
-		numberOfDirectSeats.put(1250, 7);
-		numberOfDirectSeats.put(2500, 9);
-		numberOfDirectSeats.put(5000, 10);
-		numberOfDirectSeats.put(10_000, 12);
-		numberOfDirectSeats.put(15_000, 14);
-		numberOfDirectSeats.put(25_000, 16);
-		numberOfDirectSeats.put(35_000, 18);
-		numberOfDirectSeats.put(45_000, 20);
+		numberOfDirectSeats.put(0, 3);
+		numberOfDirectSeats.put(200, 4);
+		numberOfDirectSeats.put(750, 5);
+		numberOfDirectSeats.put(1250, 6);
+		numberOfDirectSeats.put(2500, 8);
+		numberOfDirectSeats.put(5000, 9);
+		numberOfDirectSeats.put(10_000, 11);
+		numberOfDirectSeats.put(15_000, 13);
+		numberOfDirectSeats.put(25_000, 15);
+		numberOfDirectSeats.put(35_000, 17);
+		numberOfDirectSeats.put(45_000, 19);
 		NUMBER_OF_DIRECT_SEATS = unmodifiableNavigableMap(numberOfDirectSeats);
 	}
 
@@ -55,81 +63,102 @@ public class LocalElection implements Election {
 
 	@NonFinal
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> population = new HashMap<>();// TODO: getter
+	Map<District<?>, OptionalInt> population = new HashMap<>();
 
 	@NonFinal
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();// TODO: getter
+	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();
 
-	List<LocalNomination> nominations = new ArrayList<>(); // TODO: getter
+	List<LocalNomination> nominations = new ArrayList<>();
 
 	OptionalInt numberOfAllBallots;
 
-	List<LocalBallot> ballots = new ArrayList<>(); // TODO: getter
+	List<LocalBallot> ballots = new ArrayList<>();
 
 	int sainteLagueScale;
 
 	@Override
-	public Color getColorOfBallots() {
-		return getDistrict().getType() == LocalDistrictType.KREIS ? Color.RED : Color.WHITE;
-	}
-
-	@Override
 	public OptionalInt getPopulation(final District<?> district) {
-		throw new UnsupportedOperationException(); // TODO: implement
+		return Nullables.orElseGet(population.get(district), OptionalInt::empty);
 	}
 
 	@Override
 	public void setPopulation(final District<?> district, final OptionalInt population) {
-		throw new UnsupportedOperationException(); // TODO: implement
+		this.population.put(district, population);
 	}
 
 	public int getNumberOfSeats() {
-		return 2 * getNumberOfDirectSeats() - 1;
+		return 2 * getNumberOfListSeats() + 1;
 	}
 
 	public int getNumberOfDirectSeats() {
+		return getNumberOfListSeats() + 1;
+	}
+
+	public int getNumberOfListSeats() {
 		final int population = getPopulation();
 
 		if (getDistrict().getType() == LocalDistrictType.KREIS) {
-			return population > 200_000 ? 25 : 23;
+			return population > 200_000 ? 24 : 22;
 		}
 		if (getDistrict().getType() == LocalDistrictType.KREISFREIE_STADT) {
-			return population > 150_000 ? 25 : 22;
+			return population > 150_000 ? 24 : 21;
 		}
 		return NUMBER_OF_DIRECT_SEATS.floorEntry(population - 1).getValue();
 	}
 
+	public int getNumberOfVotes() {
+		return getNumberOfDirectSeats();
+	}
+
 	@Override
 	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
-		throw new UnsupportedOperationException(); // TODO: implement
+		return Nullables.orElseGet(numberOfEligibleVoters.get(district), OptionalInt::empty);
 	}
 
 	@Override
 	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
-		throw new UnsupportedOperationException(); // TODO: implement
+		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
 	}
 
-	public LocalNomination createNomination() {
-		throw new UnsupportedOperationException(); // TODO: implement
+	public LocalNomination createNomination(final LocalDistrict district,
+			final LocalNominationType type,
+			final Person person,
+			final Optional<Party> party) {
+		final LocalNomination nomination = new LocalNomination(this, district, type, person, party);
+		nominations.add(nomination);
+		return nomination;
+	}
+
+	@Override
+	public List<LocalNomination> getNominations() {
+		return unmodifiableList(nominations);
+	}
+
+	public Set<Party> getParties() {
+		return getNominations().stream()
+				.map(Nomination::getParty)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(toCollection(TreeSet::new));
+	}
+
+	public LocalBallot createBallot(final LocalPollingStation pollingStation,
+			final boolean valid,
+			final Set<LocalNomination> nominations,
+			final boolean postalVoter) {
+		final LocalBallot ballot = new LocalBallot(this, pollingStation, valid, nominations, postalVoter);
+		ballots.add(ballot);
+		return ballot;
+	}
+
+	@Override
+	public List<LocalBallot> getBallots() {
+		return unmodifiableList(ballots);
 	}
 
 	@Override
 	public LocalElectionResult getResult() {
 		return new LocalElectionResult(this, getBallots());
 	}
-
-	// TODO
-	// @Override
-	// default int getNumOfStimmen() {
-	// return getNumOfUnmittelbareVertreterPerWahlkreis();
-	// }
-	//
-	// int getNumOfUnmittelbareVertreter();
-	//
-	// int getNumOfUnmittelbareVertreterPerWahlkreis(); // wtf
-	//
-	// int getNumOfVertreter(); // max. anzahl sitze
-
-	// TODO: wahlbeteiligung
 }

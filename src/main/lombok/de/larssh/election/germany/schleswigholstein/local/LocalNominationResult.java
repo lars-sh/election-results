@@ -1,12 +1,12 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.NominationResult;
 import de.larssh.utils.annotations.PackagePrivate;
@@ -21,15 +21,12 @@ import lombok.ToString;
 public class LocalNominationResult implements NominationResult<LocalBallot>, Comparable<LocalNominationResult> {
 	private static final Comparator<LocalNominationResult> COMPARATOR
 			= Comparator.<LocalNominationResult, Election>comparing(result -> result.getElectionResult().getElection())
-					.thenComparing(NominationResult::isElected)
-					.thenComparing(result -> result.getBallots().size())
+					.thenComparing(LocalNominationResult::getSainteLagueValue)
 					.thenComparing(LocalNominationResult::getNomination);
 
 	LocalElectionResult electionResult;
 
 	LocalNomination nomination;
-
-	List<LocalBallot> ballots;
 
 	LocalNominationResultType type;
 
@@ -38,12 +35,10 @@ public class LocalNominationResult implements NominationResult<LocalBallot>, Com
 	@PackagePrivate
 	public LocalNominationResult(final LocalElectionResult electionResult,
 			final LocalNomination nomination,
-			final List<LocalBallot> ballots,
 			final LocalNominationResultType type,
 			final BigDecimal sainteLagueValue) {
 		this.electionResult = electionResult;
 		this.nomination = nomination;
-		this.ballots = unmodifiableList(new ArrayList<>(ballots));
 		this.type = type;
 		this.sainteLagueValue = sainteLagueValue;
 	}
@@ -54,7 +49,11 @@ public class LocalNominationResult implements NominationResult<LocalBallot>, Com
 	}
 
 	@Override
-	public boolean isElected() {
-		return type != LocalNominationResultType.NOT_ELECTED;
+	public List<LocalBallot> getBallots() {
+		return getElectionResult().getBallots()
+				.stream()
+				.filter(Ballot::isValid)
+				.filter(ballot -> ballot.getNominations().contains(getNomination()))
+				.collect(toList());
 	}
 }
