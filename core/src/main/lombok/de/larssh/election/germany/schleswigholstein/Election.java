@@ -9,6 +9,9 @@ import de.larssh.election.germany.schleswigholstein.local.ElectionException;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface Election extends Comparable<Election> {
+	// TODO: Import
+	// TODO: UI
+	// TODO: Export
 	Comparator<Election> COMPARATOR = Comparator.<Election, District<?>>comparing(Election::getDistrict)
 			.thenComparing(Election::getName)
 			.thenComparing(Election::getDate);
