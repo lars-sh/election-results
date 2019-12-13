@@ -71,8 +71,6 @@ public class LocalElection implements Election {
 
 	List<LocalNomination> nominations = new ArrayList<>();
 
-	OptionalInt numberOfAllBallots;
-
 	List<LocalBallot> ballots = new ArrayList<>();
 
 	int sainteLagueScale;
@@ -158,7 +156,7 @@ public class LocalElection implements Election {
 	}
 
 	@Override
-	public LocalElectionResult getResult() {
-		return new LocalElectionResult(this, getBallots());
+	public LocalElectionResult getResult(final OptionalInt numberOfBallots) {
+		return new LocalElectionResult(this, numberOfBallots, getBallots());
 	}
 }

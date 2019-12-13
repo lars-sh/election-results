@@ -49,11 +49,9 @@ public interface Election extends Comparable<Election> {
 
 	List<? extends Nomination> getNominations();
 
-	OptionalInt getNumberOfAllBallots();
-
 	List<? extends Ballot> getBallots();
 
-	ElectionResult<?> getResult();
+	ElectionResult<?> getResult(OptionalInt numberOfBallots);
 
 	@Override
 	default int compareTo(@Nullable final Election election) {

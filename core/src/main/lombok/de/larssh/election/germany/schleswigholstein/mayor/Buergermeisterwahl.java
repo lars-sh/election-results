@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.mayor;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.utils.Either;
@@ -11,7 +12,7 @@ public interface Buergermeisterwahl extends Election {
 	Either<Buergermeistermehrheitswahl, Buergermeisterstichwahl> either();
 
 	@Override
-	Buergermeisterwahlergebnis getResult();
+	Buergermeisterwahlergebnis getResult(OptionalInt numberOfBallots);
 
 	default int getNumOfStimmen() {
 		return 1;

@@ -11,17 +11,24 @@ public enum LocalDistrictType {
 	/**
 	 * Kreisangehörige Gemeinde
 	 */
-	KREISANGEHOERIGE_GEMEINDE(Color.WHITE),
+	KREISANGEHOERIGE_GEMEINDE("Kreisangehörige Gemeinde", Color.WHITE),
 
 	/**
 	 * Kreisfreie Stadt
 	 */
-	KREISFREIE_STADT(Color.WHITE),
+	KREISFREIE_STADT("Kreisfreie Stadt", Color.WHITE),
 
 	/**
 	 * Kreis
 	 */
-	KREIS(Color.RED);
+	KREIS("Kreis", Color.RED);
+
+	String name;
 
 	Color colorOfBallots;
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

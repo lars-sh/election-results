@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -57,10 +59,15 @@
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
-		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.ui.Main</jar.manifest.mainClass>
+		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.Main</jar.manifest.mainClass>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>de.lars-sh.election-results</groupId>
+			<artifactId>election-results-core</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>javafx</groupId>
 			<artifactId>jfxrt</artifactId>

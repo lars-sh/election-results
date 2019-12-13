@@ -2,6 +2,7 @@ package de.larssh.election.germany.schleswigholstein.mayor;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import de.larssh.utils.Either;
 
@@ -12,7 +13,7 @@ public interface Buergermeistermehrheitswahl extends Buergermeisterwahl {
 	}
 
 	@Override
-	Buergermeistermehrheitswahlergebnis getResult();
+	Buergermeistermehrheitswahlergebnis getResult(OptionalInt numberOfBallots);
 
 	LocalDate getStichwahlDatum();
 

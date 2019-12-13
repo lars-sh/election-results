@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -41,6 +42,8 @@ import lombok.ToString;
 public class LocalElectionResult implements ElectionResult<LocalBallot> {
 	LocalElection election;
 
+	OptionalInt numberOfAllBallots;
+
 	List<LocalBallot> ballots;
 
 	Set<LocalNominationResult> nominationResults;
@@ -48,22 +51,26 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 	Set<LocalPartyResult> partyResults;
 
 	@PackagePrivate
-	LocalElectionResult(final LocalElection election, final List<LocalBallot> ballots) {
-		this(election, ballots, isEqual(true));
+	LocalElectionResult(final LocalElection election,
+			final OptionalInt numberOfAllBallots,
+			final List<LocalBallot> ballots) {
+		this(election, numberOfAllBallots, ballots, isEqual(true));
 	}
 
 	private LocalElectionResult(final LocalElection election,
+			final OptionalInt numberOfAllBallots,
 			final List<LocalBallot> ballots,
 			final Predicate<LocalBallot> filter) {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
+		this.numberOfAllBallots = numberOfAllBallots;
 		nominationResults = unmodifiableSet(createNominationResults());
 		partyResults = unmodifiableSet(createPartyResults());
 	}
 
 	@Override
 	public ElectionResult<LocalBallot> filter(final Predicate<LocalBallot> filter) {
-		return new LocalElectionResult(getElection(), getBallots(), filter);
+		return new LocalElectionResult(getElection(), OptionalInt.empty(), getBallots(), filter);
 	}
 
 	public int getNumberOfVotes() {
