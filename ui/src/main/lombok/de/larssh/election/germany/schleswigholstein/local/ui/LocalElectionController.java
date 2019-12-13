@@ -7,6 +7,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrictSuper;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
+import de.larssh.utils.javafx.JavaFxUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -114,18 +115,19 @@ public class LocalElectionController implements Controller {
 		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
 
 		// Election
-		getSainteLagueScale().setValueFactory(new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
+		JavaFxUtils.initializeEditableSpinner(getSainteLagueScale(),
+				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
 
 		// Population
 		getPopulationIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
-
-		getPopulation().setValueFactory(new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
+		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
 
 		// Number of Eligible Voters
-		getNumberOfEligibleVoters().setValueFactory(new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
 		getNumberOfEligibleVotersIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
+		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
+				new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
 
 		reset();
 	}
