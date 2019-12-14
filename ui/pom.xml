@@ -59,10 +59,25 @@
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
-		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.Main</jar.manifest.mainClass>
+		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.MainApplication</jar.manifest.mainClass>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.10.1</version>
+		</dependency>
 		<dependency>
 			<groupId>de.lars-sh.election-results</groupId>
 			<artifactId>election-results-core</artifactId>

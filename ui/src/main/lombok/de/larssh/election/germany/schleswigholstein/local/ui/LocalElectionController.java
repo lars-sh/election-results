@@ -6,130 +6,14 @@ import java.util.OptionalInt;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictSuper;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
-import de.larssh.utils.Nullables;
 import de.larssh.utils.javafx.JavaFxUtils;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.control.TextField;
-import lombok.Getter;
-import lombok.experimental.NonFinal;
 
-@Getter
-public class LocalElectionController implements Controller {
-	UiController uiController;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	TextField district = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	ChoiceBox<LocalDistrictType> districtType = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	TextField name = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	DatePicker date = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	Spinner<Integer> sainteLagueScale = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	CheckBox populationIsPresent = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	Spinner<Integer> population = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	CheckBox numberOfEligibleVotersIsPresent = null;
-
-	@FXML
-	@NonFinal
-	@Nullable
-	Spinner<Integer> numberOfEligibleVoters = null;
-
-	public LocalElectionController(final UiController uiController) {
-		this.uiController = uiController;
-	}
-
-	private TextField getDistrict() {
-		return Nullables.orElseThrow(district);
-	}
-
-	private ChoiceBox<LocalDistrictType> getDistrictType() {
-		return Nullables.orElseThrow(districtType);
-	}
-
-	private TextField getName() {
-		return Nullables.orElseThrow(name);
-	}
-
-	private DatePicker getDate() {
-		return Nullables.orElseThrow(date);
-	}
-
-	private Spinner<Integer> getSainteLagueScale() {
-		return Nullables.orElseThrow(sainteLagueScale);
-	}
-
-	private CheckBox getPopulationIsPresent() {
-		return Nullables.orElseThrow(populationIsPresent);
-	}
-
-	private Spinner<Integer> getPopulation() {
-		return Nullables.orElseThrow(population);
-	}
-
-	private CheckBox getNumberOfEligibleVotersIsPresent() {
-		return Nullables.orElseThrow(numberOfEligibleVotersIsPresent);
-	}
-
-	private Spinner<Integer> getNumberOfEligibleVoters() {
-		return Nullables.orElseThrow(numberOfEligibleVoters);
-	}
-
-	@FXML
-	private void initialize() {
-		// District
-		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
-
-		// Election
-		JavaFxUtils.initializeEditableSpinner(getSainteLagueScale(),
-				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
-
-		// Population
-		getPopulationIsPresent().selectedProperty()
-				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
-		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
-
-		// Number of Eligible Voters
-		getNumberOfEligibleVotersIsPresent().selectedProperty()
-				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
-		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
-				new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
-
-		reset();
+public class LocalElectionController extends LocalElectionUiController {
+	public LocalElectionController(final MainController parent) {
+		super(parent);
 	}
 
 	public LocalElection getElection() {
@@ -153,6 +37,29 @@ public class LocalElectionController implements Controller {
 			election.setPopulation(district, getNumberOfEligibleVoters().getValue());
 		}
 		return election;
+	}
+
+	@FXML
+	private void initialize() {
+		// District
+		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
+	
+		// Election
+		JavaFxUtils.initializeEditableSpinner(getSainteLagueScale(),
+				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
+	
+		// Population
+		getPopulationIsPresent().selectedProperty()
+				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
+		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
+	
+		// Number of Eligible Voters
+		getNumberOfEligibleVotersIsPresent().selectedProperty()
+				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
+		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
+				new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
+	
+		reset();
 	}
 
 	public void reset() {
