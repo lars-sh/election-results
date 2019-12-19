@@ -2,6 +2,8 @@ package de.larssh.election.germany.schleswigholstein.local;
 
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.utils.annotations.PackagePrivate;
 
@@ -17,6 +19,13 @@ public class LocalPollingStation extends District<District<?>> {
 	}
 
 	@Override
+	@JsonIgnore
+	public Optional<District<?>> getParent() {
+		return super.getParent();
+	}
+
+	@Override
+	@JsonIgnore
 	public LocalDistrictRoot getRoot() {
 		return (LocalDistrictRoot) super.getRoot();
 	}

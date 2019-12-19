@@ -28,6 +28,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
@@ -39,14 +41,17 @@ import lombok.ToString;
 @Getter
 @ToString
 public class LocalElectionResult implements ElectionResult<LocalBallot> {
+	@JsonIgnore
 	LocalElection election;
 
 	OptionalInt numberOfAllBallots;
 
 	List<LocalBallot> ballots;
 
+	@JsonIgnore
 	Set<LocalNominationResult> nominationResults;
 
+	@JsonIgnore
 	Set<LocalPartyResult> partyResults;
 
 	public LocalElectionResult(final LocalElection election,
@@ -92,17 +97,20 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 		// Result Type: Direct
 		final Map<LocalNomination, LocalNominationResultType> resultTypes = new LinkedHashMap<>();
-		getDirectNominations(votes)
-				.forEach(nomination -> resultTypes.put(nomination, LocalNominationResultType.DIRECT));
+		for (final LocalNomination nomination : getDirectNominations(votes)) {
+			resultTypes.put(nomination, LocalNominationResultType.DIRECT);
+		}
 
 		// Result Type: Direct Draw
-		getDrawNominations(votes, resultTypes)
-				.forEach(nomination -> resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW));
+		for (final LocalNomination nomination : getDrawNominations(votes, resultTypes)) {
+			resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW);
+		}
 
 		// Result Type: List
 		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes, votesOfParties);
-		getListNominations(votes, sainteLague)
-				.forEach(nomination -> resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST));
+		for (final LocalNomination nomination : getListNominations(votes, sainteLague)) {
+			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
+		}
 
 		// Result Type: Direct Balance Seat
 		// TODO: Direct Balance Seat
@@ -111,8 +119,9 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 		// TODO: List Overhang Seat
 
 		// Result Type: List Draw
-		getDrawNominations(sainteLague, resultTypes)
-				.forEach(nomination -> resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW));
+		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes)) {
+			resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
+		}
 
 		// Result Type: Not Elected
 		return getElection().getNominations()

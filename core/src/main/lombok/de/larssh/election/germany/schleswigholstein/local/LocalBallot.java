@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
@@ -19,6 +21,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(onParam_ = { @Nullable })
 public class LocalBallot implements Ballot {
+	@JsonIgnore
 	LocalElection election;
 
 	LocalPollingStation pollingStation;
@@ -42,6 +45,7 @@ public class LocalBallot implements Ballot {
 		this.postalVoter = postalVoter;
 	}
 
+	@JsonIgnore
 	public boolean isBlockwahl() {
 		final Optional<Party> anyParty = getNominations().stream() //
 				.findAny()

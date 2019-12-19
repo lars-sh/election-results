@@ -3,6 +3,9 @@ package de.larssh.election.germany.schleswigholstein.local;
 import java.util.Comparator;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
@@ -21,6 +24,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
+	@JsonIgnore
 	LocalElection election;
 
 	LocalDistrict district;
@@ -34,5 +38,15 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 	@Override
 	public int compareTo(@Nullable final LocalNomination nomination) {
 		return COMPARATOR.compare(this, nomination);
+	}
+
+	@JsonProperty("district")
+	private String getDistrictForJackson() {
+		return getDistrict().getName();
+	}
+
+	@JsonProperty("party")
+	private Optional<String> getPartyForJackson() {
+		return getParty().map(Party::getShortName);
 	}
 }

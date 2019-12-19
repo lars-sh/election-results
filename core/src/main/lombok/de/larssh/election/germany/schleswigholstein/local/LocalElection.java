@@ -1,25 +1,32 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.constant;
+import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableNavigableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toCollection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -29,8 +36,6 @@ import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
-import de.larssh.election.germany.schleswigholstein.local.json.LocalElectionSerializer;
-import de.larssh.election.germany.schleswigholstein.local.json.LocalElectionDeserializer;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
@@ -42,8 +47,6 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@JsonDeserialize(using = LocalElectionDeserializer.class)
-@JsonSerialize(using = LocalElectionSerializer.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
 	private static final ObjectMapper JACKSON_OBJECT_MAPPER
@@ -93,9 +96,39 @@ public class LocalElection implements Election {
 
 	int sainteLagueScale;
 
+	Supplier<Set<District<?>>> districts = lazy(() -> {
+		Set<District<?>> districts = new HashSet<>();
+
+		// Root
+		districts.add(getDistrict());
+
+		// Districts
+		districts.addAll(getDistrict().getChildren());
+
+		// Polling Stations
+		for (LocalDistrict district : getDistrict().getChildren()) {
+			districts.addAll(district.getChildren());
+		}
+
+		return unmodifiableSet(districts);
+	});
+
+	public LocalElection(ParsableLocalElection parsable) {
+		this(parsable.getDistrict(), parsable.getDate(), parsable.getName(), parsable.getSainteLagueScale());
+
+		parsable.createPopulationFor(this);
+		parsable.createNumberOfEligibleVotersFor(this);
+		parsable.createNominationsFor(this);
+	}
+
 	@Override
 	public OptionalInt getPopulation(final District<?> district) {
 		return Nullables.orElseGet(population.get(district), OptionalInt::empty);
+	}
+
+	@JsonProperty("population")
+	private Map<String, OptionalInt> getPopulationForJackson() {
+		return population.entrySet().stream().collect(toMap(entry -> entry.getKey().getName(), Entry::getValue));
 	}
 
 	@Override
@@ -107,14 +140,17 @@ public class LocalElection implements Election {
 		this.population.put(district, population);
 	}
 
+	@JsonIgnore
 	public int getNumberOfSeats() {
 		return 2 * getNumberOfListSeats() + 1;
 	}
 
+	@JsonIgnore
 	public int getNumberOfDirectSeats() {
 		return getNumberOfListSeats() + 1;
 	}
 
+	@JsonIgnore
 	public int getNumberOfListSeats() {
 		final int population = getPopulation();
 
@@ -127,6 +163,7 @@ public class LocalElection implements Election {
 		return NUMBER_OF_DIRECT_SEATS.floorEntry(population - 1).getValue();
 	}
 
+	@JsonIgnore
 	public int getNumberOfVotes() {
 		return getNumberOfDirectSeats();
 	}
@@ -134,6 +171,13 @@ public class LocalElection implements Election {
 	@Override
 	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
 		return Nullables.orElseGet(numberOfEligibleVoters.get(district), OptionalInt::empty);
+	}
+
+	@JsonProperty("numberOfEligibleVoters")
+	private Map<String, OptionalInt> getNumberOfEligibleVotersForJackson() {
+		return numberOfEligibleVoters.entrySet()
+				.stream()
+				.collect(toMap(entry -> entry.getKey().getName(), Entry::getValue));
 	}
 
 	@Override
@@ -159,11 +203,103 @@ public class LocalElection implements Election {
 		return unmodifiableList(nominations);
 	}
 
+	@JsonIgnore
+	public Set<District<?>> getDistricts() {
+		return districts.get();
+	}
+
 	public Set<Party> getParties() {
 		return getNominations().stream()
 				.map(Nomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toCollection(TreeSet::new));
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	private static class ParsableLocalElection {
+		LocalDistrictRoot district;
+
+		LocalDate date;
+
+		String name;
+
+		Map<String, OptionalInt> population;
+
+		Map<String, OptionalInt> numberOfEligibleVoters;
+
+		List<ParsableLocalNomination> nominations;
+
+		int sainteLagueScale;
+
+		Set<Party> parties;
+
+		public void createPopulationFor(LocalElection election) {
+			Map<String, OptionalInt> population = getPopulation();
+
+			for (District<?> district : election.getDistricts()) {
+				election.setPopulation(district, population.getOrDefault(district.getName(), OptionalInt.empty()));
+			}
+		}
+
+		public void createNumberOfEligibleVotersFor(LocalElection election) {
+			Map<String, OptionalInt> numberOfEligibleVoters = getNumberOfEligibleVoters();
+
+			for (District<?> district : election.getDistricts()) {
+				election.setNumberOfEligibleVoters(district,
+						numberOfEligibleVoters.getOrDefault(district.getName(), OptionalInt.empty()));
+			}
+		}
+
+		public void createNominationsFor(LocalElection election) {
+			Map<String, District<?>> districts
+					= election.getDistricts().stream().collect(toMap(District::getName, Function.identity()));
+			Map<String, Party> parties = getParties().stream().collect(toMap(Party::getShortName, Function.identity()));
+
+			for (ParsableLocalNomination nomination : getNominations()) {
+				District<?> district = districts.get(nomination.getDistrict());
+				if (district == null) {
+					throw new ElectionException("District \"%s\" of nomination \"%s, %s\" does not exist.",
+							nomination.getDistrict(),
+							nomination.getPerson().getGivenName(),
+							nomination.getPerson().getFamilyName());
+				}
+				if (!(district instanceof LocalDistrict)) {
+					throw new ElectionException(
+							"District \"%s\" of nomination \"%s, %s\" is of type %s. Expecting type %s for nominations.",
+							nomination.getDistrict(),
+							nomination.getPerson().getGivenName(),
+							nomination.getPerson().getFamilyName(),
+							district.getClass().getSimpleName(),
+							LocalDistrict.class.getSimpleName());
+				}
+
+				Optional<Party> party = nomination.getParty().map(parties::get);
+				if (nomination.getParty().isPresent() && !party.isPresent()) {
+					throw new ElectionException("Party \"%s\" of nomination \"%s, %s\" does not exist.",
+							nomination.getParty().get(),
+							nomination.getPerson().getGivenName(),
+							nomination.getPerson().getFamilyName());
+				}
+
+				election.createNomination((LocalDistrict) district,
+						nomination.getType(),
+						nomination.getPerson(),
+						party);
+			}
+		}
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	private static class ParsableLocalNomination {
+		String district;
+
+		LocalNominationType type;
+
+		Person person;
+
+		Optional<String> party;
 	}
 }
