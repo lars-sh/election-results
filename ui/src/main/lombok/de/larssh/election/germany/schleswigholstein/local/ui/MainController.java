@@ -5,16 +5,10 @@ import static de.larssh.utils.javafx.JavaFxUtils.alertOnException;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
@@ -37,9 +31,6 @@ import lombok.Getter;
 @Getter(AccessLevel.PRIVATE)
 public class MainController extends MainUiController {
 	private static final Manifest MANIFEST;
-
-	private static final ObjectMapper OBJECT_MAPPER
-			= new ObjectMapper().registerModule(new JavaTimeModule()).registerModule(new Jdk8Module());
 
 	static {
 		try {
@@ -107,7 +98,8 @@ public class MainController extends MainUiController {
 			if (file != null) {
 				Nullables.ifNonNull(file.getParentFile(), fileChooser::setInitialDirectory);
 				try {
-					getElectionController().setElection(OBJECT_MAPPER.readValue(file, LocalElection.class));
+					getElectionController()
+							.setElection(LocalElection.getJacksonObjectMapper().readValue(file, LocalElection.class));
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -121,10 +113,9 @@ public class MainController extends MainUiController {
 		alertOnException(getStage(), () -> {
 			if (getPath().getValue().isPresent()) {
 				try {
-					Files.write(getPath().getValue().get(),
-							OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
-									.writeValueAsString(getElectionController().getElection())
-									.getBytes(StandardCharsets.UTF_8));
+					LocalElection.getJacksonObjectMapper()
+							.writerWithDefaultPrettyPrinter()
+							.writeValue(getPath().getValue().get().toFile(), getElectionController().getElection());
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);
 				}

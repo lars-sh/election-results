@@ -16,6 +16,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
@@ -34,6 +38,9 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
+	private static final ObjectMapper JACKSON_OBJECT_MAPPER
+			= new ObjectMapper().registerModule(new JavaTimeModule()).registerModule(new Jdk8Module());
+
 	private static final NavigableMap<Integer, Integer> NUMBER_OF_DIRECT_SEATS;
 
 	static {
@@ -50,6 +57,10 @@ public class LocalElection implements Election {
 		numberOfDirectSeats.put(35_000, 17);
 		numberOfDirectSeats.put(45_000, 19);
 		NUMBER_OF_DIRECT_SEATS = unmodifiableNavigableMap(numberOfDirectSeats);
+	}
+
+	public static ObjectMapper getJacksonObjectMapper() {
+		return JACKSON_OBJECT_MAPPER;
 	}
 
 	LocalDistrictSuper district;
