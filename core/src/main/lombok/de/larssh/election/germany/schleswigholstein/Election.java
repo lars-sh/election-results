@@ -9,9 +9,6 @@ import de.larssh.election.germany.schleswigholstein.local.ElectionException;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface Election extends Comparable<Election> {
-	// TODO: Import
-	// TODO: UI
-	// TODO: Export
 	Comparator<Election> COMPARATOR = Comparator.<Election, District<?>>comparing(Election::getDistrict)
 			.thenComparing(Election::getName)
 			.thenComparing(Election::getDate);
@@ -48,10 +45,6 @@ public interface Election extends Comparable<Election> {
 	void setNumberOfEligibleVoters(District<?> district, OptionalInt numberOfEligibleVoters);
 
 	List<? extends Nomination> getNominations();
-
-	List<? extends Ballot> getBallots();
-
-	ElectionResult<?> getResult(OptionalInt numberOfBallots);
 
 	@Override
 	default int compareTo(@Nullable final Election election) {

@@ -13,39 +13,39 @@
    <children>
       <MenuBar>
         <menus>
-          <Menu mnemonicParsing="false" text="Datei">
+          <Menu text="_Datei">
             <items>
-                  <MenuItem fx:id="open" mnemonicParsing="false" onAction="#onOpen" text="Öffnen...">
+                  <MenuItem fx:id="open" onAction="#onOpen" text="Ö_ffnen...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem fx:id="save" mnemonicParsing="false" onAction="#onSave" text="Speichern">
+                  <MenuItem fx:id="save" onAction="#onSave" text="_Speichern">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem fx:id="saveAs" mnemonicParsing="false" onAction="#onSaveAs" text="Speichern unter...">
+                  <MenuItem fx:id="saveAs" onAction="#onSaveAs" text="Speichern _unter...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem fx:id="close" mnemonicParsing="false" onAction="#onClose" text="Schließen">
+                  <MenuItem fx:id="close" onAction="#onClose" text="S_chließen">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem fx:id="exit" mnemonicParsing="false" onAction="#onExit" text="Beenden">
+              <MenuItem fx:id="exit" onAction="#onExit" text="B_eenden">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Hilfe">
+          <Menu text="_Hilfe">
             <items>
-              <MenuItem fx:id="about" mnemonicParsing="false" onAction="#onAbout" text="Über...">
+              <MenuItem fx:id="about" onAction="#onAbout" text="Ü_ber...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="F1" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>

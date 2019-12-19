@@ -7,10 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.experimental.NonFinal;
 
-@Getter
 public class MainUiController extends Controller {
 	@FXML
 	@NonFinal

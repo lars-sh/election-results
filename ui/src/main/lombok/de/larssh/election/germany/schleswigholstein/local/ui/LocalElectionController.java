@@ -43,22 +43,22 @@ public class LocalElectionController extends LocalElectionUiController {
 	private void initialize() {
 		// District
 		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
-	
+
 		// Election
 		JavaFxUtils.initializeEditableSpinner(getSainteLagueScale(),
 				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
-	
+
 		// Population
 		getPopulationIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
 		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
-	
+
 		// Number of Eligible Voters
 		getNumberOfEligibleVotersIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
 		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
 				new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
-	
+
 		reset();
 	}
 
@@ -73,12 +73,12 @@ public class LocalElectionController extends LocalElectionUiController {
 		getSainteLagueScale().getValueFactory().setValue(2);
 
 		// Population
-		getPopulationIsPresent().setSelected(true); // TODO
+		getPopulationIsPresent().setSelected(true);
 		getPopulation().getValueFactory().setValue(71);
 		getPopulation().setDisable(false);
 
 		// Number of Eligible Voters
-		getNumberOfEligibleVotersIsPresent().setSelected(true); // TODO
+		getNumberOfEligibleVotersIsPresent().setSelected(true);
 		getNumberOfEligibleVoters().getValueFactory().setValue(1);
 		getNumberOfEligibleVoters().setDisable(false);
 	}
@@ -96,11 +96,11 @@ public class LocalElectionController extends LocalElectionUiController {
 		// Population
 		final OptionalInt population = election.getPopulation(election.getDistrict());
 		getPopulation().getValueFactory().setValue(population.orElse(71));
-		getPopulationIsPresent().setSelected(population.isPresent()); // TODO
+		getPopulationIsPresent().setSelected(population.isPresent());
 
 		// Number of Eligible Voters
 		final OptionalInt numberOfEligibleVoters = election.getNumberOfEligibleVoters(election.getDistrict());
 		getNumberOfEligibleVoters().getValueFactory().setValue(numberOfEligibleVoters.orElse(1));
-		getNumberOfEligibleVotersIsPresent().setSelected(numberOfEligibleVoters.isPresent()); // TODO
+		getNumberOfEligibleVotersIsPresent().setSelected(numberOfEligibleVoters.isPresent());
 	}
 }

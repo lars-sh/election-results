@@ -32,7 +32,6 @@ import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
-import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
 import lombok.Getter;
 import lombok.ToString;
@@ -50,8 +49,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 	Set<LocalPartyResult> partyResults;
 
-	@PackagePrivate
-	LocalElectionResult(final LocalElection election,
+	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final List<LocalBallot> ballots) {
 		this(election, numberOfAllBallots, ballots, isEqual(true));

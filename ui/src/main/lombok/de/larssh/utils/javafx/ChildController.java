@@ -1,8 +1,9 @@
 package de.larssh.utils.javafx;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter
+@Getter(AccessLevel.PROTECTED)
 public abstract class ChildController<T extends Controller> extends Controller {
 	T parent;
 

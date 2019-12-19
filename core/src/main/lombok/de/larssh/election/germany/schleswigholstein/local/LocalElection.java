@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.NonFinal;
 
 @Getter
 @ToString
@@ -61,17 +60,13 @@ public class LocalElection implements Election {
 	@EqualsAndHashCode.Include
 	String name;
 
-	@NonFinal
 	@Getter(AccessLevel.NONE)
 	Map<District<?>, OptionalInt> population = new HashMap<>();
 
-	@NonFinal
 	@Getter(AccessLevel.NONE)
 	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();
 
 	List<LocalNomination> nominations = new ArrayList<>();
-
-	List<LocalBallot> ballots = new ArrayList<>();
 
 	int sainteLagueScale;
 
@@ -139,24 +134,5 @@ public class LocalElection implements Election {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toCollection(TreeSet::new));
-	}
-
-	public LocalBallot createBallot(final LocalPollingStation pollingStation,
-			final boolean valid,
-			final Set<LocalNomination> nominations,
-			final boolean postalVoter) {
-		final LocalBallot ballot = new LocalBallot(this, pollingStation, valid, nominations, postalVoter);
-		ballots.add(ballot);
-		return ballot;
-	}
-
-	@Override
-	public List<LocalBallot> getBallots() {
-		return unmodifiableList(ballots);
-	}
-
-	@Override
-	public LocalElectionResult getResult(final OptionalInt numberOfBallots) {
-		return new LocalElectionResult(this, numberOfBallots, getBallots());
 	}
 }
