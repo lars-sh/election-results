@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import de.larssh.utils.Optionals;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
@@ -16,6 +18,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
+@JsonIgnoreProperties({ "parent", "root" })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public abstract class District<C extends District<?>> implements Comparable<District<?>> {
 	private static final Comparator<District<?>> COMPARATOR = Comparator
@@ -45,5 +48,9 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 
 	public Set<C> getChildren() {
 		return Collections.unmodifiableSet(children);
+	}
+
+	public District<?> getRoot() {
+		return getParent().<District<?>>map(District::getRoot).orElse(this);
 	}
 }

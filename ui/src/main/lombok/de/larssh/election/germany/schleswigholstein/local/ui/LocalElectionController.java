@@ -3,7 +3,7 @@ package de.larssh.election.germany.schleswigholstein.local.ui;
 import java.time.LocalDate;
 import java.util.OptionalInt;
 
-import de.larssh.election.germany.schleswigholstein.local.LocalDistrictSuper;
+import de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.javafx.JavaFxUtils;
@@ -17,8 +17,8 @@ public class LocalElectionController extends LocalElectionUiController {
 
 	public LocalElection getElection() {
 		// District
-		final LocalDistrictSuper district
-				= new LocalDistrictSuper(getDistrict().getText(), getDistrictType().getValue());
+		final LocalDistrictRoot district
+				= new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
 
 		// Election
 		final LocalElection election = new LocalElection(district,
@@ -33,7 +33,7 @@ public class LocalElectionController extends LocalElectionUiController {
 
 		// Number of Eligible Voters
 		if (getNumberOfEligibleVotersIsPresent().isSelected()) {
-			election.setPopulation(district, getNumberOfEligibleVoters().getValue());
+			election.setNumberOfEligibleVoters(district, getNumberOfEligibleVoters().getValue());
 		}
 		return election;
 	}

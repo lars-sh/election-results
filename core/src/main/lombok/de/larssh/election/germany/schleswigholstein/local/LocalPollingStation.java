@@ -15,4 +15,9 @@ public class LocalPollingStation extends District<District<?>> {
 	public District<?> createChild(@SuppressWarnings("unused") final String name) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public LocalDistrictRoot getRoot() {
+		return (LocalDistrictRoot) super.getRoot();
+	}
 }

@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Finals.constant;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableNavigableMap;
 import static java.util.stream.Collectors.toCollection;
@@ -17,14 +18,19 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
+import de.larssh.election.germany.schleswigholstein.local.json.LocalElectionSerializer;
+import de.larssh.election.germany.schleswigholstein.local.json.LocalElectionDeserializer;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
@@ -36,12 +42,18 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
+@JsonDeserialize(using = LocalElectionDeserializer.class)
+@JsonSerialize(using = LocalElectionSerializer.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
 	private static final ObjectMapper JACKSON_OBJECT_MAPPER
-			= new ObjectMapper().registerModule(new JavaTimeModule()).registerModule(new Jdk8Module());
+			= new ObjectMapper().registerModule(new ParameterNamesModule())
+					.registerModule(new JavaTimeModule())
+					.registerModule(new Jdk8Module());
 
 	private static final NavigableMap<Integer, Integer> NUMBER_OF_DIRECT_SEATS;
+
+	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
 
 	static {
 		final NavigableMap<Integer, Integer> numberOfDirectSeats = new TreeMap<>();
@@ -63,7 +75,7 @@ public class LocalElection implements Election {
 		return JACKSON_OBJECT_MAPPER;
 	}
 
-	LocalDistrictSuper district;
+	LocalDistrictRoot district;
 
 	@EqualsAndHashCode.Include
 	LocalDate date;
@@ -88,6 +100,10 @@ public class LocalElection implements Election {
 
 	@Override
 	public void setPopulation(final District<?> district, final OptionalInt population) {
+		if (!district.getRoot().equals(getDistrict())) {
+			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
+					district.getName());
+		}
 		this.population.put(district, population);
 	}
 
@@ -122,6 +138,10 @@ public class LocalElection implements Election {
 
 	@Override
 	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
+		if (!district.getRoot().equals(getDistrict())) {
+			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
+					district.getName());
+		}
 		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
 	}
 

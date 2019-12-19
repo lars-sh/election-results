@@ -57,6 +57,8 @@
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
+		
+		<maven.compiler.parameters>true</maven.compiler.parameters>
 	</properties>
 
 	<dependencies>
@@ -83,6 +85,11 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-parameter-names</artifactId>
 			<version>2.10.1</version>
 		</dependency>
 	</dependencies>
