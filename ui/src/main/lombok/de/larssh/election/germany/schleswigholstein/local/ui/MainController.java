@@ -84,8 +84,8 @@ public class MainController extends MainUiController {
 				getManifestValue(Name.IMPLEMENTATION_VERSION));
 	}
 
-	@FXML
-	private void initialize() {
+	@Override
+	protected void initialize() {
 		alertOnException(getStage(), () -> {
 			getPath().addListener((observer, oldValue, newValue) -> updateStageTitle(newValue));
 			getPath().addListener((observer, oldValue, newValue) -> getClose().setDisable(!newValue.isPresent()));

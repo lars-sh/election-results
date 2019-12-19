@@ -8,7 +8,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.javafx.JavaFxUtils;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 
 public class LocalElectionController extends LocalElectionUiController {
@@ -39,8 +38,8 @@ public class LocalElectionController extends LocalElectionUiController {
 		return election;
 	}
 
-	@FXML
-	private void initialize() {
+	@Override
+	protected void initialize() {
 		// District
 		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
 

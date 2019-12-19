@@ -1,5 +1,10 @@
 package de.larssh.election.germany.schleswigholstein.local.ui;
 
+import static de.larssh.utils.javafx.JavaFxUtils.alertOnException;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javafx.application.Application;
@@ -11,8 +16,13 @@ public class MainApplication extends Application {
 	}
 
 	@Override
-	@SuppressWarnings("unused")
 	public void start(@Nullable final Stage primaryStage) {
-		new MainController(this, Nullables.orElseThrow(primaryStage));
+		alertOnException(primaryStage, () -> {
+			try {
+				new MainController(this, Nullables.orElseThrow(primaryStage));
+			} catch (final IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
 	}
 }

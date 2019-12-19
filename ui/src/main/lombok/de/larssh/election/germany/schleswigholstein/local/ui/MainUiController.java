@@ -9,7 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.stage.Stage;
 import lombok.experimental.NonFinal;
 
-public class MainUiController extends Controller {
+public abstract class MainUiController extends Controller {
 	@FXML
 	@NonFinal
 	@Nullable

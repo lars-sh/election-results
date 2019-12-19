@@ -15,21 +15,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class JavaFxUtils {
-	public static <T> void initializeEditableSpinner(final Spinner<T> spinner,
-			final SpinnerValueFactory<T> spinnerValueFactory) {
-		spinner.setValueFactory(spinnerValueFactory);
-
-		// String Converter
-		final StringConverter<T> stringConverter
-				= new SafeStringConverter<>(spinner, spinnerValueFactory.getConverter());
-		spinnerValueFactory.setConverter(stringConverter);
-
-		// Text Formatter
-		final TextFormatter<T> textFormatter = new TextFormatter<>(stringConverter);
-		textFormatter.valueProperty().bindBidirectional(spinnerValueFactory.valueProperty());
-		spinner.getEditor().setTextFormatter(textFormatter);
-	}
-
 	public static void alertOnException(@Nullable final Stage stage, final Runnable runnable) {
 		try {
 			runnable.run();
@@ -44,6 +29,21 @@ public class JavaFxUtils {
 			// TODO: Show throwable as part of the alert
 			e.printStackTrace();
 		}
+	}
+
+	public static <T> void initializeEditableSpinner(final Spinner<T> spinner,
+			final SpinnerValueFactory<T> spinnerValueFactory) {
+		spinner.setValueFactory(spinnerValueFactory);
+
+		// String Converter
+		final StringConverter<T> stringConverter
+				= new SafeStringConverter<>(spinner, spinnerValueFactory.getConverter());
+		spinnerValueFactory.setConverter(stringConverter);
+
+		// Text Formatter
+		final TextFormatter<T> textFormatter = new TextFormatter<>(stringConverter);
+		textFormatter.valueProperty().bindBidirectional(spinnerValueFactory.valueProperty());
+		spinner.getEditor().setTextFormatter(textFormatter);
 	}
 
 	@Getter
