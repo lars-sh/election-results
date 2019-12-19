@@ -34,7 +34,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	public LocalDistrict createChild(final String name) {
 		return addChild(new LocalDistrict(this, name));
 	}
-	
+
 	@Override
 	@JsonIgnore
 	public Optional<District<?>> getParent() {

@@ -49,10 +49,10 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
-	private static final ObjectMapper JACKSON_OBJECT_MAPPER
-			= new ObjectMapper().registerModule(new ParameterNamesModule())
-					.registerModule(new JavaTimeModule())
-					.registerModule(new Jdk8Module());
+	private static final ObjectMapper JACKSON_OBJECT_MAPPER = new ObjectMapper() //
+			.registerModule(new JavaTimeModule())
+			.registerModule(new Jdk8Module())
+			.registerModule(new ParameterNamesModule());
 
 	private static final NavigableMap<Integer, Integer> NUMBER_OF_DIRECT_SEATS;
 

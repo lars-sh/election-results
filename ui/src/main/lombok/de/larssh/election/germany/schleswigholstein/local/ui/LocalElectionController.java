@@ -17,8 +17,7 @@ public class LocalElectionController extends LocalElectionUiController {
 
 	public LocalElection getElection() {
 		// District
-		final LocalDistrictRoot district
-				= new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
+		final LocalDistrictRoot district = new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
 
 		// Election
 		final LocalElection election = new LocalElection(district,
