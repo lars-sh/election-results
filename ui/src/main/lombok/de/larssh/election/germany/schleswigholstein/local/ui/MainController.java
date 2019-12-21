@@ -79,7 +79,6 @@ public class MainController extends MainUiController {
 	protected void initialize() {
 		alertOnException(getStage(), () -> {
 			getPath().addListener((observer, oldValue, newValue) -> updateStageTitle(newValue));
-			getPath().addListener((observer, oldValue, newValue) -> getClose().setDisable(!newValue.isPresent()));
 
 			try {
 				getElection().setContent(getElectionController().loadFxml());
