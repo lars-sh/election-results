@@ -200,7 +200,7 @@ public class LocalElection implements Election {
 			final LocalNominationType type,
 			final Person person,
 			final Optional<Party> party) {
-		final LocalNomination nomination = new LocalNomination(this, district, type, person, party);
+		final LocalNomination nomination = new LocalNomination(this, district, type, party, person);
 		nominations.add(nomination);
 		return nomination;
 	}

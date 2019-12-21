@@ -4,9 +4,8 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
@@ -54,10 +53,6 @@
           </Menu>
         </menus>
       </MenuBar>
-      <TabPane tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab fx:id="election" text="Wahl" />
-        </tabs>
-      </TabPane>
+      <Pane fx:id="pane" />
    </children>
 </VBox>

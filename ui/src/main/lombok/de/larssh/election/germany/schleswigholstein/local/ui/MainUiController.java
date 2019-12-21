@@ -5,7 +5,7 @@ import de.larssh.utils.javafx.Controller;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lombok.experimental.NonFinal;
 
@@ -43,7 +43,7 @@ public abstract class MainUiController extends Controller {
 	@FXML
 	@NonFinal
 	@Nullable
-	Tab election;
+	Pane pane;
 
 	public MainUiController(final MainApplication application, final Stage stage) {
 		super(application, stage);
@@ -73,7 +73,7 @@ public abstract class MainUiController extends Controller {
 		return Nullables.orElseThrow(about);
 	}
 
-	protected Tab getElection() {
-		return Nullables.orElseThrow(election);
+	protected Pane getPane() {
+		return Nullables.orElseThrow(pane);
 	}
 }

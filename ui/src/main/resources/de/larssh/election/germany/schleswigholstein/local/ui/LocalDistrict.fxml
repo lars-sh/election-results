@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Name" />
+      <TextField fx:id="name" />
+      <Label text="Wahllokale" />
+      <ListView fx:id="localPollingStations" editable="true" />
+      <Label text="Kandidaten" />
+      <ChoiceBox fx:id="localNominations" maxWidth="1.7976931348623157E308" />
+      <Label text="Ausgewählter Kandidat" />
+      <Pane fx:id="localNomination" />
+   </children>
+</VBox>

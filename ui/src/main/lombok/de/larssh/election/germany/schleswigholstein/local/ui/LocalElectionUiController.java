@@ -1,5 +1,10 @@
 package de.larssh.election.germany.schleswigholstein.local.ui;
 
+import java.util.Optional;
+
+import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.javafx.ChildController;
@@ -10,6 +15,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 
 public abstract class LocalElectionUiController extends ChildController<MainController> {
@@ -58,6 +68,26 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 	@Nullable
 	Spinner<Integer> numberOfEligibleVoters = null;
 
+	@FXML
+	@NonFinal
+	@Nullable
+	ChoiceBox<LocalDistrictChoiceEntry> localDistricts = null;
+
+	@FXML
+	@NonFinal
+	@Nullable
+	Pane localDistrict = null;
+
+	@FXML
+	@NonFinal
+	@Nullable
+	ChoiceBox<PartyChoiceEntry> parties = null;
+
+	@FXML
+	@NonFinal
+	@Nullable
+	Pane party = null;
+
 	public LocalElectionUiController(final MainController parent) {
 		super(parent);
 	}
@@ -96,5 +126,66 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 
 	protected Spinner<Integer> getNumberOfEligibleVoters() {
 		return Nullables.orElseThrow(numberOfEligibleVoters);
+	}
+
+	protected ChoiceBox<PartyChoiceEntry> getParties() {
+		return Nullables.orElseThrow(parties);
+	}
+
+	protected Pane getParty() {
+		return Nullables.orElseThrow(party);
+	}
+
+	protected ChoiceBox<LocalDistrictChoiceEntry> getLocalDistricts() {
+		return Nullables.orElseThrow(localDistricts);
+	}
+
+	protected Pane getLocalDistrict() {
+		return Nullables.orElseThrow(localDistrict);
+	}
+
+	@Getter
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@EqualsAndHashCode(onParam_ = { @Nullable })
+	public static class PartyChoiceEntry {
+		private static final PartyChoiceEntry EMPTY = new PartyChoiceEntry(Optional.empty());
+
+		public static PartyChoiceEntry empty() {
+			return EMPTY;
+		}
+
+		public static PartyChoiceEntry of(final Party party) {
+			return new PartyChoiceEntry(Optional.of(party));
+		}
+
+		Optional<Party> party;
+
+		@Override
+		public String toString() {
+			return getParty().map(party -> String.format("%s (%s)", party.getName(), party.getShortName()))
+					.orElse("<neue Gruppierung>");
+		}
+	}
+
+	@Getter
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@EqualsAndHashCode(onParam_ = { @Nullable })
+	public static class LocalDistrictChoiceEntry {
+		private static final LocalDistrictChoiceEntry EMPTY = new LocalDistrictChoiceEntry(Optional.empty());
+
+		public static LocalDistrictChoiceEntry empty() {
+			return EMPTY;
+		}
+
+		public static LocalDistrictChoiceEntry of(final LocalDistrict district) {
+			return new LocalDistrictChoiceEntry(Optional.of(district));
+		}
+
+		Optional<LocalDistrict> district;
+
+		@Override
+		public String toString() {
+			return getDistrict().map(District::getName).orElse("<neuer Wahlkreis>");
+		}
 	}
 }

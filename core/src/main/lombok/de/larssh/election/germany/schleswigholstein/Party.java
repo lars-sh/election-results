@@ -1,9 +1,9 @@
 package de.larssh.election.germany.schleswigholstein;
 
-import java.awt.Color;
 import java.util.Comparator;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ public class Party implements Comparable<Party> {
 	private static final Comparator<Party> COMPARATOR
 			= Comparator.comparing(Party::getType).thenComparing(Party::getShortName).thenComparing(Party::getName);
 
+	@EqualsAndHashCode.Include
+	String shortName;
+
 	String name;
 
 	PartyType type;
-
-	@EqualsAndHashCode.Include
-	String shortName;
 
 	Color backgroundColor;
 

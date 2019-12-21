@@ -1,5 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local.ui;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.OptionalInt;
 
@@ -9,96 +11,116 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.javafx.JavaFxUtils;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
+import lombok.AccessLevel;
+import lombok.Getter;
 
+@Getter(AccessLevel.PRIVATE)
 public class LocalElectionController extends LocalElectionUiController {
+	PartyController partyController;
+
+	LocalDistrictController localDistrictController;
+
 	public LocalElectionController(final MainController parent) {
 		super(parent);
+
+		partyController = new PartyController(this);
+		localDistrictController = new LocalDistrictController(this);
 	}
 
 	public LocalElection getElection() {
-		// District
-		final LocalDistrictRoot district = new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
-
 		// Election
+		final LocalDistrictRoot district = new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
 		final LocalElection election = new LocalElection(district,
 				getDate().getValue(),
 				getName().getText(),
 				getSainteLagueScale().getValue());
-
-		// Population
 		if (getPopulationIsPresent().isSelected()) {
 			election.setPopulation(district, getPopulation().getValue());
 		}
-
-		// Number of Eligible Voters
 		if (getNumberOfEligibleVotersIsPresent().isSelected()) {
 			election.setNumberOfEligibleVoters(district, getNumberOfEligibleVoters().getValue());
 		}
+
+		// Districts
+		// TODO
+
 		return election;
 	}
 
 	@Override
 	protected void initialize() {
-		// District
-		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
-
 		// Election
+		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
 		JavaFxUtils.initializeEditableSpinner(getSainteLagueScale(),
 				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
-
-		// Population
 		getPopulationIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
 		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
-
-		// Number of Eligible Voters
 		getNumberOfEligibleVotersIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
 		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
 				new IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
 
+		// Parties
+		try {
+			getParty().getChildren().add(getPartyController().loadFxml());
+		} catch (final IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		// Districts
+		try {
+			getLocalDistrict().getChildren().add(getLocalDistrictController().loadFxml());
+		} catch (final IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 		reset();
 	}
 
 	public void reset() {
-		// District
+		// Election
+		// TODO: select first tab
 		getDistrict().setText("");
 		getDistrictType().setValue(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
-
-		// Election
 		getName().setText("");
 		getDate().setValue(LocalDate.now());
 		getSainteLagueScale().getValueFactory().setValue(2);
-
-		// Population
 		getPopulationIsPresent().setSelected(true);
 		getPopulation().getValueFactory().setValue(71);
 		getPopulation().setDisable(false);
-
-		// Number of Eligible Voters
 		getNumberOfEligibleVotersIsPresent().setSelected(true);
 		getNumberOfEligibleVoters().getValueFactory().setValue(1);
 		getNumberOfEligibleVoters().setDisable(false);
+
+		// Parties
+		getParties().setItems(FXCollections.observableArrayList(PartyChoiceEntry.empty()));
+		getParties().setValue(PartyChoiceEntry.empty());
+		getPartyController().reset();
+		getLocalDistrictController().reset();
+
+		// Districts
+		// TODO
 	}
 
 	public void setElection(final LocalElection election) {
-		// District
+		// Election
 		getDistrict().setText(election.getDistrict().getName());
 		getDistrictType().setValue(election.getDistrict().getType());
-
-		// Election
 		getDate().setValue(election.getDate());
 		getName().setText(election.getName());
 		getSainteLagueScale().getValueFactory().setValue(election.getSainteLagueScale());
-
-		// Population
 		final OptionalInt population = election.getPopulation(election.getDistrict());
 		getPopulation().getValueFactory().setValue(population.orElse(71));
 		getPopulationIsPresent().setSelected(population.isPresent());
-
-		// Number of Eligible Voters
 		final OptionalInt numberOfEligibleVoters = election.getNumberOfEligibleVoters(election.getDistrict());
 		getNumberOfEligibleVoters().getValueFactory().setValue(numberOfEligibleVoters.orElse(1));
 		getNumberOfEligibleVotersIsPresent().setSelected(numberOfEligibleVoters.isPresent());
+
+		// Parties
+		// TODO
+
+		// Districts
+		// TODO
 	}
 }

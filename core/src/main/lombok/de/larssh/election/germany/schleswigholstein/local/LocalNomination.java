@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
+import de.larssh.utils.Optionals;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNomination implements Nomination, Comparable<LocalNomination> {
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
+			.thenComparing(LocalNomination::getParty, Optionals.createComparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	@JsonIgnore
@@ -31,9 +33,9 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	LocalNominationType type;
 
-	Person person;
-
 	Optional<Party> party;
+
+	Person person;
 
 	@Override
 	public int compareTo(@Nullable final LocalNomination nomination) {

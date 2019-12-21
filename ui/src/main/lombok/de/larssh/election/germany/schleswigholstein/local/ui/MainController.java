@@ -81,7 +81,7 @@ public class MainController extends MainUiController {
 			getPath().addListener((observer, oldValue, newValue) -> updateStageTitle(newValue));
 
 			try {
-				getElection().setContent(getElectionController().loadFxml());
+				getPane().getChildren().add(getElectionController().loadFxml());
 			} catch (final IOException e) {
 				throw new UncheckedIOException(e);
 			}

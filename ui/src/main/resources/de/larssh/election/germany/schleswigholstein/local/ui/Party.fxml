@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Short Name" />
+      <TextField fx:id="shortName" />
+      <Label text="Name" />
+      <TextField fx:id="name" />
+      <Label text="Type" />
+      <ChoiceBox fx:id="type" maxWidth="1.7976931348623157E308" />
+      <Label text="Background Color" />
+      <ColorPicker fx:id="backgroundColor" maxWidth="1.7976931348623157E308" />
+      <Label text="Font Color" />
+      <ColorPicker fx:id="fontColor" maxWidth="1.7976931348623157E308" />
+   </children>
+</VBox>

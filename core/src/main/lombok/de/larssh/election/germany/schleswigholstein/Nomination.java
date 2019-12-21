@@ -7,7 +7,7 @@ public interface Nomination {
 
 	District<?> getDistrict();
 
-	Person getPerson();
-
 	Optional<Party> getParty();
+
+	Person getPerson();
 }
