@@ -7,9 +7,9 @@ public interface Ballot {
 
 	District<?> getPollingStation();
 
+	boolean isPostalVoter();
+
 	boolean isValid();
 
 	Set<? extends Nomination> getNominations();
-
-	boolean isPostalVoter();
 }

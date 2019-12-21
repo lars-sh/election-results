@@ -2,6 +2,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 
 import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Collectors.toLinkedHashSet;
+import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
@@ -26,6 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -54,6 +56,13 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 	@JsonIgnore
 	Set<LocalPartyResult> partyResults;
 
+	@JsonIgnore
+	Supplier<Integer> numberOfVotes = lazy(() -> (int) getBallots().stream()
+			.filter(Ballot::isValid)
+			.map(Ballot::getNominations)
+			.flatMap(Collection::stream)
+			.count());
+
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final List<LocalBallot> ballots) {
@@ -67,6 +76,15 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
 		this.numberOfAllBallots = numberOfAllBallots;
+
+		for (final LocalBallot ballot : ballots) {
+			if (!ballot.getElection().equals(election)) {
+				throw new ElectionException("Election \"%s\" of ballot does not match given election \"%s\".",
+						ballot.getElection().getName(),
+						election.getName());
+			}
+		}
+
 		nominationResults = unmodifiableSet(createNominationResults());
 		partyResults = unmodifiableSet(createPartyResults());
 	}
@@ -77,11 +95,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 	}
 
 	public int getNumberOfVotes() {
-		return (int) getBallots().stream()
-				.filter(Ballot::isValid)
-				.map(Ballot::getNominations)
-				.flatMap(Collection::stream)
-				.count();
+		return numberOfVotes.get();
 	}
 
 	public BigDecimal getTurnout(final int scale) {

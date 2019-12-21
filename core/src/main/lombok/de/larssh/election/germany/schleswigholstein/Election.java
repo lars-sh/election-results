@@ -20,7 +20,9 @@ public interface Election extends Comparable<Election> {
 	String getName();
 
 	default int getPopulation() {
-		return getPopulation(getDistrict()).orElseThrow(() -> new ElectionException("Missing population information."));
+		return getPopulation(getDistrict())
+				.orElseThrow(() -> new ElectionException("Missing population information for root district \"%s\".",
+						getDistrict().getName()));
 	}
 
 	OptionalInt getPopulation(District<?> district);
@@ -32,8 +34,9 @@ public interface Election extends Comparable<Election> {
 	void setPopulation(District<?> district, OptionalInt population);
 
 	default int getNumberOfEligibleVoters() {
-		return getNumberOfEligibleVoters(getDistrict())
-				.orElseThrow(() -> new ElectionException("Missing eligible voters information."));
+		return getNumberOfEligibleVoters(getDistrict()).orElseThrow(
+				() -> new ElectionException("Missing eligible voters information for root district \"%s\".",
+						getDistrict().getName()));
 	}
 
 	OptionalInt getNumberOfEligibleVoters(District<?> district);

@@ -137,6 +137,9 @@ public class LocalElection implements Election {
 			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
 					district.getName());
 		}
+		if (this.population.containsKey(district)) {
+			throw new ElectionException("The population has already been set for district \"%s\".", district.getName());
+		}
 		this.population.put(district, population);
 	}
 
@@ -184,6 +187,10 @@ public class LocalElection implements Election {
 	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
 		if (!district.getRoot().equals(getDistrict())) {
 			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
+					district.getName());
+		}
+		if (this.numberOfEligibleVoters.containsKey(district)) {
+			throw new ElectionException("The number of eligible voters has already been set for district \"%s\".",
 					district.getName());
 		}
 		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
@@ -262,15 +269,15 @@ public class LocalElection implements Election {
 				if (district == null) {
 					throw new ElectionException("District \"%s\" of nomination \"%s, %s\" does not exist.",
 							nomination.getDistrict(),
-							nomination.getPerson().getGivenName(),
-							nomination.getPerson().getFamilyName());
+							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName());
 				}
 				if (!(district instanceof LocalDistrict)) {
 					throw new ElectionException(
 							"District \"%s\" of nomination \"%s, %s\" is of type %s. Expecting type %s for nominations.",
 							nomination.getDistrict(),
-							nomination.getPerson().getGivenName(),
 							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName(),
 							district.getClass().getSimpleName(),
 							LocalDistrict.class.getSimpleName());
 				}
@@ -279,8 +286,8 @@ public class LocalElection implements Election {
 				if (nomination.getParty().isPresent() && !party.isPresent()) {
 					throw new ElectionException("Party \"%s\" of nomination \"%s, %s\" does not exist.",
 							nomination.getParty().get(),
-							nomination.getPerson().getGivenName(),
-							nomination.getPerson().getFamilyName());
+							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName());
 				}
 
 				election.createNomination((LocalDistrict) district,
