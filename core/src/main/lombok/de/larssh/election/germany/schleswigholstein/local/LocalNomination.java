@@ -1,7 +1,9 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Finals.lazy;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,11 +33,14 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	LocalDistrict district;
 
-	LocalNominationType type;
-
 	Optional<Party> party;
 
 	Person person;
+
+	@JsonIgnore
+	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
+			|| getElection().getNominationsOfParty(getParty().get()).indexOf(this) < getElection()
+					.getNumberOfDirectSeats() ? LocalNominationType.DIRECT : LocalNominationType.LIST);
 
 	@Override
 	public int compareTo(@Nullable final LocalNomination nomination) {
@@ -45,6 +50,10 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 	@JsonProperty("district")
 	private String getDistrictForJackson() {
 		return getDistrict().getName();
+	}
+
+	public LocalNominationType getType() {
+		return type.get();
 	}
 
 	@JsonProperty("party")

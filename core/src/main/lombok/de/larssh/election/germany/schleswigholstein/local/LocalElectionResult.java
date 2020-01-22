@@ -218,10 +218,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.forEach(nominations::add);
 
 		// others
-		getElection().getNominations()
-				.stream()
-				.filter(nomination -> nomination.getParty().map(party::equals).orElse(false))
-				.forEach(nominations::add);
+		nominations.addAll(getElection().getNominationsOfParty(party));
 
 		return nominations;
 	}

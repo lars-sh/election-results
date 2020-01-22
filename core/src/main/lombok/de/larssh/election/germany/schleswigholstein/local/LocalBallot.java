@@ -64,10 +64,8 @@ public class LocalBallot implements Ballot {
 			return false;
 		}
 
-		// TODO: Party.getNumberOfDirectNominations()
-		final long directNominationsOfThatParty = getElection().getNominations()
+		final long directNominationsOfThatParty = getElection().getNominationsOfParty(firstParty.get())
 				.stream()
-				.filter(nomination -> nomination.getParty().equals(firstParty))
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
 				.count();
 		return getNominations().size() == directNominationsOfThatParty;

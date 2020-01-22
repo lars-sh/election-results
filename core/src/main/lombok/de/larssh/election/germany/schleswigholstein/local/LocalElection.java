@@ -197,10 +197,9 @@ public class LocalElection implements Election {
 	}
 
 	public LocalNomination createNomination(final LocalDistrict district,
-			final LocalNominationType type,
 			final Person person,
 			final Optional<Party> party) {
-		final LocalNomination nomination = new LocalNomination(this, district, type, party, person);
+		final LocalNomination nomination = new LocalNomination(this, district, party, person);
 		nominations.add(nomination);
 		return nomination;
 	}
@@ -208,6 +207,12 @@ public class LocalElection implements Election {
 	@Override
 	public List<LocalNomination> getNominations() {
 		return unmodifiableList(nominations);
+	}
+
+	public List<LocalNomination> getNominationsOfParty(Party party) {
+		return getNominations().stream()
+				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
+				.collect(toList());
 	}
 
 	@JsonIgnore
@@ -290,10 +295,7 @@ public class LocalElection implements Election {
 							nomination.getPerson().getGivenName());
 				}
 
-				election.createNomination((LocalDistrict) district,
-						nomination.getType(),
-						nomination.getPerson(),
-						party);
+				election.createNomination((LocalDistrict) district, nomination.getPerson(), party);
 			}
 		}
 	}
@@ -302,8 +304,6 @@ public class LocalElection implements Election {
 	@RequiredArgsConstructor
 	private static class ParsableLocalNomination {
 		String district;
-
-		LocalNominationType type;
 
 		Person person;
 
