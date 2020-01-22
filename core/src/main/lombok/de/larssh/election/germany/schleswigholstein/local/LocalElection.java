@@ -7,6 +7,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableNavigableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
-import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -123,7 +123,25 @@ public class LocalElection implements Election {
 
 	@Override
 	public OptionalInt getPopulation(final District<?> district) {
-		return Nullables.orElseGet(population.get(district), OptionalInt::empty);
+		final OptionalInt population = this.population.get(district);
+		if (population != null) {
+			return population;
+		}
+
+		Set<? extends District<?>> children = district.getChildren();
+		if (children.isEmpty()) {
+			return OptionalInt.empty();
+		}
+
+		int calculated = 0;
+		for (District<?> child : children) {
+			OptionalInt populationOfChild = getPopulation(child);
+			if (!populationOfChild.isPresent()) {
+				return OptionalInt.empty();
+			}
+			calculated += populationOfChild.getAsInt();
+		}
+		return OptionalInt.of(calculated);
 	}
 
 	@JsonProperty("population")
@@ -173,7 +191,25 @@ public class LocalElection implements Election {
 
 	@Override
 	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
-		return Nullables.orElseGet(numberOfEligibleVoters.get(district), OptionalInt::empty);
+		final OptionalInt numberOfEligibleVoters = this.numberOfEligibleVoters.get(district);
+		if (numberOfEligibleVoters != null) {
+			return numberOfEligibleVoters;
+		}
+
+		Set<? extends District<?>> children = district.getChildren();
+		if (children.isEmpty()) {
+			return OptionalInt.empty();
+		}
+
+		int calculated = 0;
+		for (District<?> child : children) {
+			OptionalInt numberOfEligibleVotersOfChild = getNumberOfEligibleVoters(child);
+			if (!numberOfEligibleVotersOfChild.isPresent()) {
+				return OptionalInt.empty();
+			}
+			calculated += numberOfEligibleVotersOfChild.getAsInt();
+		}
+		return OptionalInt.of(calculated);
 	}
 
 	@JsonProperty("numberOfEligibleVoters")
