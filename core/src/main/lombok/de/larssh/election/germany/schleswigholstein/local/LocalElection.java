@@ -38,6 +38,7 @@ import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import javafx.scene.paint.Color;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -52,7 +53,8 @@ public class LocalElection implements Election {
 	private static final ObjectMapper JACKSON_OBJECT_MAPPER = new ObjectMapper() //
 			.registerModule(new JavaTimeModule())
 			.registerModule(new Jdk8Module())
-			.registerModule(new ParameterNamesModule());
+			.registerModule(new ParameterNamesModule())
+			.addMixIn(Color.class, ColorMixIn.class);
 
 	private static final NavigableMap<Integer, Integer> NUMBER_OF_DIRECT_SEATS;
 
@@ -262,6 +264,20 @@ public class LocalElection implements Election {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toCollection(TreeSet::new));
+	}
+
+	private static abstract class ColorMixIn {
+		@JsonIgnore
+		abstract double getHue();
+
+		@JsonIgnore
+		abstract double getSaturation();
+
+		@JsonIgnore
+		abstract double getBrightness();
+
+		@JsonIgnore
+		abstract boolean isOpaque();
 	}
 
 	@Getter
