@@ -82,7 +82,7 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 	@EqualsAndHashCode(onParam_ = { @Nullable })
 	public static class DisplayableLocalNomination implements Nomination, Comparable<DisplayableLocalNomination> {
 		private static final Comparator<DisplayableLocalNomination> COMPARATOR
-				= Comparator.comparing(DisplayableLocalNomination::getParty, Optionals.createComparator())
+				= Comparator.comparing(DisplayableLocalNomination::getParty, Optionals.comparator())
 						.thenComparing(DisplayableLocalNomination::getOrderValue)
 						.thenComparing(DisplayableLocalNomination::getPerson);
 

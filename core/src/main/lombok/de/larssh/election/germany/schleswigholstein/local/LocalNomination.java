@@ -23,7 +23,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNomination implements Nomination, Comparable<LocalNomination> {
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
-			.thenComparing(LocalNomination::getParty, Optionals.createComparator())
+			.thenComparing(LocalNomination::getParty, Optionals.comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	@JsonIgnore
