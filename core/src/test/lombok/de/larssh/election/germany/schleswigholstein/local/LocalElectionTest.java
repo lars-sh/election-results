@@ -38,7 +38,6 @@ public class LocalElectionTest {
 
 		// Save
 		objectMapper.writerWithDefaultPrettyPrinter().writeValue(path.toFile(), electionCreated);
-		// TODO: Color
 
 		// Open
 		final LocalElection electionOpened = objectMapper.readValue(path.toFile(), LocalElection.class);

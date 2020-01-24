@@ -23,6 +23,7 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 					.thenComparing(District::getName);
 
 	@EqualsAndHashCode.Include
+	@ToString.Include(rank = -1)
 	Optional<District<?>> parent;
 
 	@EqualsAndHashCode.Include

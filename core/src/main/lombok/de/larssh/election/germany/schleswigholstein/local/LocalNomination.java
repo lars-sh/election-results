@@ -29,6 +29,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	@JsonIgnore
+	@ToString.Exclude
 	LocalElection election;
 
 	LocalDistrict district;
