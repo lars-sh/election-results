@@ -3,8 +3,8 @@ package de.larssh.election.germany.schleswigholstein.local;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,6 +13,7 @@ import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.Gender;
 import de.larssh.election.germany.schleswigholstein.Party;
@@ -28,38 +29,45 @@ import lombok.NoArgsConstructor;
 public class LocalElectionTest {
 	@Test
 	public void testJacksonForElection() throws IOException {
-		final Path path = Paths.get("testObjectMapper.json");
-		final ObjectMapper objectMapper = LocalElection.getJacksonObjectMapper();
+		final ObjectMapper objectMapper = LocalElection.createJacksonObjectMapper();
+		final ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
+		final Path path = Files.createTempFile("", "");
 
 		// Create
 		final LocalElection electionCreated = createElection();
 		addDistricts(electionCreated);
 		addPersons(electionCreated);
-
-		// Save
-		objectMapper.writerWithDefaultPrettyPrinter().writeValue(path.toFile(), electionCreated);
+		objectWriter.writeValue(path.toFile(), electionCreated);
 
 		// Open
 		final LocalElection electionOpened = objectMapper.readValue(path.toFile(), LocalElection.class);
 
 		// Compare
-		assertEquals(electionCreated, electionOpened);
+		final String electionCreatedToString = electionCreated.toString();
+		final String electionOpenedToString = electionOpened.toString();
+		assertEquals(electionCreatedToString, electionOpenedToString);
 	}
 
 	private LocalElection createElection() {
 		final LocalDistrictRoot districtRoot
 				= new LocalDistrictRoot("Gemeinde Rethwisch", LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
-		return new LocalElection(districtRoot, LocalDate.of(2018, 5, 6), "Gemeindewahl", 2);
+		final LocalElection election = new LocalElection(districtRoot, LocalDate.of(2018, 5, 6), "Gemeindewahl", 2);
+		election.setPopulation(districtRoot, OptionalInt.empty());
+		election.setNumberOfEligibleVoters(districtRoot, OptionalInt.empty());
+		return election;
 	}
 
 	private void addDistricts(final LocalElection election) {
 		final LocalDistrict districtLocal = election.getDistrict().createChild("Rethwisch");
 		election.setPopulation(districtLocal, 1186);
+		election.setNumberOfEligibleVoters(districtLocal, OptionalInt.empty());
 
 		final LocalPollingStation pollingStationRethwischdorf = districtLocal.createChild("Rethwischdorf");
+		election.setPopulation(pollingStationRethwischdorf, OptionalInt.empty());
 		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 720);
 
 		final LocalPollingStation pollingStationKleinBoden = districtLocal.createChild("Klein Boden");
+		election.setPopulation(pollingStationKleinBoden, OptionalInt.empty());
 		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 270);
 	}
 
@@ -263,14 +271,14 @@ public class LocalElectionTest {
 				Optional.empty(),
 				Optional.empty());
 		election.createNomination(district, personMartinWinter, Optional.of(partyAwg));
-		final Person personHenningGäde = new Person("Henning",
+		final Person personHenningGaede = new Person("Henning",
 				"Gäde",
 				Optional.of(Gender.MALE),
 				OptionalInt.empty(),
 				Optional.of(Locale.GERMAN),
 				Optional.empty(),
 				Optional.empty());
-		election.createNomination(district, personHenningGäde, Optional.of(partyAwg));
+		election.createNomination(district, personHenningGaede, Optional.of(partyAwg));
 		final Person personAlbertStapelfeldt = new Person("Albert",
 				"Stapelfeldt",
 				Optional.of(Gender.MALE),

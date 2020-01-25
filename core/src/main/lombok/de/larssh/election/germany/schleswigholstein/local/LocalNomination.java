@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import static de.larssh.utils.Finals.lazy;
+
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Supplier;

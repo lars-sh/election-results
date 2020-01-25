@@ -3,10 +3,12 @@ package de.larssh.election.germany.schleswigholstein.local;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.utils.annotations.PackagePrivate;
 
+@JsonIgnoreProperties("children")
 public class LocalPollingStation extends District<District<?>> {
 	@PackagePrivate
 	LocalPollingStation(final LocalDistrict parent, final String name) {

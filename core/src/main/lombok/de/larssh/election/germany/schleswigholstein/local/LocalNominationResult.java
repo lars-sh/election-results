@@ -1,7 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import static de.larssh.utils.Finals.lazy;
-
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 

@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.Resources;
@@ -31,6 +33,8 @@ import lombok.Getter;
 @Getter(AccessLevel.PRIVATE)
 public class MainController extends MainUiController {
 	private static final Manifest MANIFEST;
+
+	private static final ObjectMapper OBJECT_MAPPER = LocalElection.createJacksonObjectMapper();
 
 	static {
 		try {
@@ -97,8 +101,7 @@ public class MainController extends MainUiController {
 			if (file != null) {
 				Nullables.ifNonNull(file.getParentFile(), fileChooser::setInitialDirectory);
 				try {
-					getElectionController()
-							.setElection(LocalElection.getJacksonObjectMapper().readValue(file, LocalElection.class));
+					getElectionController().setElection(OBJECT_MAPPER.readValue(file, LocalElection.class));
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -112,8 +115,7 @@ public class MainController extends MainUiController {
 		alertOnException(getStage(), () -> {
 			if (getPath().getValue().isPresent()) {
 				try {
-					LocalElection.getJacksonObjectMapper()
-							.writerWithDefaultPrettyPrinter()
+					OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
 							.writeValue(getPath().getValue().get().toFile(), getElectionController().getElection());
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);

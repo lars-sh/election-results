@@ -62,10 +62,8 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.count());
 
 	@JsonIgnore
-	Supplier<Integer> numberOfBlockVotings = lazy(() -> (int) getBallots()
-			.stream()
-			.filter(LocalBallot::isBlockVoting)
-			.count());
+	Supplier<Integer> numberOfBlockVotings
+			= lazy(() -> (int) getBallots().stream().filter(LocalBallot::isBlockVoting).count());
 
 	@Override
 	public int compareTo(@Nullable final LocalPartyResult nominationResult) {
