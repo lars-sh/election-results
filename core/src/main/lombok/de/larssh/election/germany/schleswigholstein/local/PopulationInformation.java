@@ -13,19 +13,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class PopulationInformation {
-	public static void main(final String[] args) {
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(-1));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(0));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(1));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(2));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(2499));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(2500));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(2511));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(9999));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(10000));
-		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(10001));
-	}
-
 	private static final Map<LocalDistrictType, PopulationInformation> INSTANCES
 			= Maps.<LocalDistrictType, PopulationInformation>builder()
 					.put(LocalDistrictType.KREIS, createKreis())

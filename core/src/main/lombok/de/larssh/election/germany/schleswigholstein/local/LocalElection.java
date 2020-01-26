@@ -137,58 +137,7 @@ public class LocalElection implements Election {
 
 	@Override
 	public void setPopulation(final District<?> district, final OptionalInt population) {
-		if (!district.getRoot().equals(getDistrict())) {
-			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
-					district.getName());
-		}
-		if (this.population.containsKey(district)) {
-			throw new ElectionException("The population has already been set for district \"%s\".", district.getName());
-		}
-		this.population.put(district, population);
-	}
-
-	public LocalNomination createNomination(final LocalDistrict district,
-			final Person person,
-			final Optional<Party> party) {
-		final LocalNomination nomination = new LocalNomination(this, district, party, person);
-		nominations.add(nomination);
-		return nomination;
-	}
-
-	@Override
-	public List<LocalNomination> getNominations() {
-		return unmodifiableList(nominations);
-	}
-
-	public List<LocalNomination> getNominationsOfParty(final Party party) {
-		return getNominations().stream()
-				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
-				.collect(toList());
-	}
-
-	@JsonIgnore
-	public Set<District<?>> getDistricts() {
-		return districts.get();
-	}
-
-	@JsonIgnore
-	public int getMaximalNumberOfVotesPerBallot() {
-		return getNumberOfDirectSeatsPerLocalDistrict();
-	}
-
-	@JsonIgnore
-	public int getNumberOfDirectSeats() {
-		return PopulationInformation.get(getDistrict().getType()).getNumberOfDirectSeats(getPopulation());
-	}
-
-	@JsonIgnore
-	public int getNumberOfDirectSeatsPerLocalDistrict() {
-		return getNumberOfDirectSeats() / getNumberOfDistricts();
-	}
-
-	@JsonIgnore
-	public int getNumberOfDistricts() {
-		return PopulationInformation.get(getDistrict().getType()).getNumberOfDistricts(getPopulation());
+		setDistrictsMap(this.population, "population", district, population);
 	}
 
 	@Override
@@ -223,15 +172,46 @@ public class LocalElection implements Election {
 
 	@Override
 	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
-		if (!district.getRoot().equals(getDistrict())) {
-			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
-					district.getName());
-		}
-		if (this.numberOfEligibleVoters.containsKey(district)) {
-			throw new ElectionException("The number of eligible voters has already been set for district \"%s\".",
-					district.getName());
-		}
-		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
+		setDistrictsMap(this.numberOfEligibleVoters, "number of eligible voters", district, numberOfEligibleVoters);
+	}
+
+	public LocalNomination createNomination(final LocalDistrict district,
+			final Person person,
+			final Optional<Party> party) {
+		final LocalNomination nomination = new LocalNomination(this, district, party, person);
+		nominations.add(nomination);
+		return nomination;
+	}
+
+	@Override
+	public List<LocalNomination> getNominations() {
+		return unmodifiableList(nominations);
+	}
+
+	public List<LocalNomination> getNominationsOfParty(final Party party) {
+		return getNominations().stream()
+				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
+				.collect(toList());
+	}
+
+	@JsonIgnore
+	public Set<District<?>> getDistricts() {
+		return districts.get();
+	}
+
+	@JsonIgnore
+	public int getNumberOfDirectSeats() {
+		return PopulationInformation.get(getDistrict().getType()).getNumberOfDirectSeats(getPopulation());
+	}
+
+	@JsonIgnore
+	public int getNumberOfDirectSeatsPerLocalDistrict() {
+		return getNumberOfDirectSeats() / getNumberOfDistricts();
+	}
+
+	@JsonIgnore
+	public int getNumberOfDistricts() {
+		return PopulationInformation.get(getDistrict().getType()).getNumberOfDistricts(getPopulation());
 	}
 
 	@JsonIgnore
@@ -244,12 +224,31 @@ public class LocalElection implements Election {
 		return getNumberOfDirectSeats() + getNumberOfListSeats();
 	}
 
+	@JsonIgnore
+	public int getNumberOfVotesPerBallot() {
+		return getNumberOfDirectSeatsPerLocalDistrict();
+	}
+
 	public Set<Party> getParties() {
 		return getNominations().stream()
 				.map(Nomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toCollection(TreeSet::new));
+	}
+
+	private void setDistrictsMap(final Map<District<?>, OptionalInt> map,
+			final String type,
+			final District<?> district,
+			final OptionalInt value) {
+		if (!district.getRoot().equals(getDistrict())) {
+			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
+					district.getName());
+		}
+		if (map.containsKey(district)) {
+			throw new ElectionException("The %s has already been set for district \"%s\".", type, district.getName());
+		}
+		map.put(district, value);
 	}
 
 	private abstract static class ColorMixIn {
@@ -292,6 +291,7 @@ public class LocalElection implements Election {
 
 		Set<Party> parties;
 
+		@SuppressWarnings("checkstyle:ParameterNumber")
 		private ParsableLocalElection(@Nullable final LocalDistrictRoot district,
 				@Nullable final LocalDate date,
 				@Nullable final String name,
