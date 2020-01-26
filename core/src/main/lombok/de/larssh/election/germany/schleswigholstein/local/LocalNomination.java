@@ -51,6 +51,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 	}
 
 	@JsonProperty("district")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	private String getDistrictForJackson() {
 		return getDistrict().getKey();
 	}
@@ -68,6 +69,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 	}
 
 	@JsonProperty("party")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	private Optional<String> getPartyForJackson() {
 		return getParty().map(Party::getKey);
 	}

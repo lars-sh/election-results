@@ -25,7 +25,8 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode(onParam_ = { @Nullable })
-public class LocalBallot implements Ballot {
+@SuppressWarnings("PMD.DataClass")
+public final class LocalBallot implements Ballot {
 	@PackagePrivate
 	static LocalBallot createInvalidBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,

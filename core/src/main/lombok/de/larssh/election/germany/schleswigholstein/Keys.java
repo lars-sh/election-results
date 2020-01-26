@@ -3,6 +3,7 @@ package de.larssh.election.germany.schleswigholstein;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings("PMD.ShortClassName")
 public class Keys {
 	public static String escape(final String value, final char leftCharacter, final char rightCharacter) {
 		return escape(value, leftCharacter, rightCharacter, '\\');
@@ -12,7 +13,12 @@ public class Keys {
 			final char leftCharacter,
 			final char rightCharacter,
 			final char escapeCharacter) {
-		return value.replace("" + escapeCharacter, "" + escapeCharacter + escapeCharacter)
-				.replace("" + leftCharacter + rightCharacter, "" + leftCharacter + escapeCharacter + rightCharacter);
+		return value
+				.replace(Character.toString(escapeCharacter),
+						Character.toString(escapeCharacter) + Character.toString(escapeCharacter))
+				.replace(Character.toString(leftCharacter) + Character.toString(rightCharacter),
+						Character.toString(leftCharacter)
+								+ Character.toString(escapeCharacter)
+								+ Character.toString(rightCharacter));
 	}
 }

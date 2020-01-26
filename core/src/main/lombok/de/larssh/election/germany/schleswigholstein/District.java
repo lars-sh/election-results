@@ -24,6 +24,8 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 			= Comparator.<District<?>, Optional<District<?>>>comparing(District::getParent, Optionals.comparator())
 					.thenComparing(District::getName);
 
+	private static final String KEY_SEPARATOR = ", ";
+
 	@EqualsAndHashCode.Include
 	@ToString.Include(rank = -1)
 	Optional<District<?>> parent;
@@ -56,18 +58,19 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	}
 
 	private String getFullKey() {
-		return getParent().map(District::getFullKey).map(fullKey -> fullKey + ", ").orElse("")
+		return getParent().map(District::getFullKey).map(fullKey -> fullKey + KEY_SEPARATOR).orElse("")
 				+ Keys.escape(getName(), ',', ' ');
 	}
 
 	@JsonIgnore
 	public String getKey() {
 		return getParent().map(parent -> {
-			String parentKey = parent.getKey();
-			if (!parentKey.isEmpty() || getName().isEmpty()) {
-				parentKey += ", ";
+			final StringBuilder builder = new StringBuilder(parent.getKey());
+			if (builder.length() > 0 || getName().isEmpty()) {
+				builder.append(KEY_SEPARATOR);
 			}
-			return parentKey + Keys.escape(getName(), ',', ' ');
+			builder.append(Keys.escape(getName(), ',', ' '));
+			return builder.toString();
 		}).orElse("");
 	}
 

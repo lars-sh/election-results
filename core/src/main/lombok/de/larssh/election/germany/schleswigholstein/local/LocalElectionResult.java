@@ -6,6 +6,7 @@ import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -25,7 +26,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -43,6 +43,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
+@SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
 public class LocalElectionResult implements ElectionResult<LocalBallot> {
 	@JsonIgnore
 	LocalElection election;
@@ -154,7 +155,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.filter(Ballot::isValid)
 				.map(LocalBallot::getNominations)
 				.flatMap(Set::stream)
-				.collect(toMap(Function.identity(), nomination -> 1, (oldValue, thisValue) -> oldValue + thisValue));
+				.collect(toMap(identity(), nomination -> 1, (oldValue, thisValue) -> oldValue + thisValue));
 
 		// Sort
 		return Maps.sort(votes,
@@ -171,7 +172,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.map(Nomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.collect(toMap(Function.identity(), party -> 1, (oldValue, thisValue) -> oldValue + thisValue));
+				.collect(toMap(identity(), party -> 1, (oldValue, thisValue) -> oldValue + thisValue));
 
 		// Sort
 		return Maps.sort(votes,
@@ -206,7 +207,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 		return IntStream.range(0, nominationsOfParty.size())
 				.mapToObj(step -> getSainteLagueValue(votesOfPartyAsBigDecimal, step))
-				.collect(toLinkedHashMap(step -> iterator.next(), Function.identity()));
+				.collect(toLinkedHashMap(step -> iterator.next(), identity()));
 	}
 
 	private Set<LocalNomination> getSainteLagueNominationsOfParty(final Map<LocalNomination, Integer> votes,
@@ -250,7 +251,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.filter(entry -> entry.getValue().equals(lastNomination.get()))
 				.map(Entry::getKey)
 				.collect(toCollection(TreeSet::new));
-		// TODO: Ergebnis des Losverfahrens
+		// TODO: Result of the draws
 
 		return probablyDirectNominations.size() > 1 ? probablyDirectNominations : emptySet();
 	}

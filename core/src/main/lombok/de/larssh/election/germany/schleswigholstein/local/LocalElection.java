@@ -35,7 +35,6 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
-import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Nullables;
@@ -49,6 +48,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
+@SuppressWarnings("PMD.ExcessiveImports")
 @RequiredArgsConstructor(onConstructor_ = { @JsonIgnore })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
@@ -132,6 +132,7 @@ public class LocalElection implements Election {
 	}
 
 	@JsonProperty("population")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	private Map<String, OptionalInt> getPopulationForJackson() {
 		return population.entrySet()
 				.stream()
@@ -167,6 +168,7 @@ public class LocalElection implements Election {
 	}
 
 	@JsonProperty("numberOfEligibleVoters")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	private Map<String, OptionalInt> getNumberOfEligibleVotersForJackson() {
 		return numberOfEligibleVoters.entrySet()
 				.stream()
@@ -239,7 +241,7 @@ public class LocalElection implements Election {
 
 	public Set<Party> getParties() {
 		return getNominations().stream()
-				.map(Nomination::getParty)
+				.map(LocalNomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toCollection(TreeSet::new));
@@ -259,9 +261,10 @@ public class LocalElection implements Election {
 		map.put(district, value);
 	}
 
+	@SuppressWarnings("PMD.CommentDefaultAccessModifier")
 	private abstract static class ColorMixIn {
 		@SuppressWarnings("unused")
-		private ColorMixIn(@JsonProperty("red") final double red,
+		ColorMixIn(@JsonProperty("red") final double red,
 				@JsonProperty("green") final double green,
 				@JsonProperty("blue") final double blue,
 				@JsonProperty("opacity") final double opacity) {
@@ -282,6 +285,7 @@ public class LocalElection implements Election {
 	}
 
 	@Getter
+	@SuppressWarnings("PMD.DataClass")
 	private static class ParsableLocalElection {
 		LocalDistrictRoot district;
 
