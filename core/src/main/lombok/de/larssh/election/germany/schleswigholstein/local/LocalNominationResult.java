@@ -9,8 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.NominationResult;
@@ -39,7 +37,6 @@ public class LocalNominationResult implements NominationResult<LocalBallot>, Com
 
 	BigDecimal sainteLagueValue;
 
-	@JsonIgnore
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)

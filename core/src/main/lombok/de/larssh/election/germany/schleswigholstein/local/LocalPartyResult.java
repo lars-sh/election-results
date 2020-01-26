@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
@@ -49,7 +47,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 					.anyMatch(getParty()::equals))
 			.collect(toList())));
 
-	@JsonIgnore
 	Supplier<Integer> numberOfVotes = lazy(() -> (int) getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
@@ -61,7 +58,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.filter(getParty()::equals)
 			.count());
 
-	@JsonIgnore
 	Supplier<Integer> numberOfBlockVotings
 			= lazy(() -> (int) getBallots().stream().filter(LocalBallot::isBlockVoting).count());
 
