@@ -1,7 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.mayor;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import static java.util.Collections.singleton;
+
 import java.util.Set;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -11,7 +11,7 @@ public interface Buergermeisterwahlstimmzettel extends Ballot {
 
 	@Override
 	default Set<Buergermeisterwahlvorschlag> getNominations() {
-		return new HashSet<>(Arrays.asList(getVorschlag()));
+		return singleton(getVorschlag());
 	}
 
 	@Override

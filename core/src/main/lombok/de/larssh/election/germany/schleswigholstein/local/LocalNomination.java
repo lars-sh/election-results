@@ -15,6 +15,7 @@ import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Optionals;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -52,6 +53,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	@JsonProperty("district")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private String getDistrictForJackson() {
 		return getDistrict().getKey();
 	}
@@ -70,6 +72,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	@JsonProperty("party")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Optional<String> getPartyForJackson() {
 		return getParty().map(Party::getKey);
 	}

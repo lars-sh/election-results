@@ -39,6 +39,7 @@ import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.scene.paint.Color;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -109,6 +110,7 @@ public class LocalElection implements Election {
 	}
 
 	@Override
+	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
 	public OptionalInt getPopulation(final District<?> district) {
 		final OptionalInt population = this.population.get(district);
 		if (population != null && population.isPresent()) {
@@ -133,6 +135,7 @@ public class LocalElection implements Election {
 
 	@JsonProperty("population")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, OptionalInt> getPopulationForJackson() {
 		return population.entrySet()
 				.stream()
@@ -145,9 +148,10 @@ public class LocalElection implements Election {
 	}
 
 	@Override
-	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
+	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
+	public OptionalInt getNumberOfEligibleVoters(final District<?> district) { // TODO: getOrSumByChildren
 		final OptionalInt numberOfEligibleVoters = this.numberOfEligibleVoters.get(district);
-		if (numberOfEligibleVoters != null) {
+		if (numberOfEligibleVoters != null && numberOfEligibleVoters.isPresent()) {
 			return numberOfEligibleVoters;
 		}
 
@@ -169,6 +173,7 @@ public class LocalElection implements Election {
 
 	@JsonProperty("numberOfEligibleVoters")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, OptionalInt> getNumberOfEligibleVotersForJackson() {
 		return numberOfEligibleVoters.entrySet()
 				.stream()

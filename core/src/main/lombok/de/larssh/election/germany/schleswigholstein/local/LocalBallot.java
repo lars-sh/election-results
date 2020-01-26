@@ -58,12 +58,12 @@ public final class LocalBallot implements Ballot {
 		final List<Optional<Party>> parties
 				= getNominations().stream().map(LocalNomination::getParty).distinct().collect(toList());
 		if (parties.size() != 1) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		final Optional<Party> firstParty = parties.get(0);
 		if (!firstParty.isPresent()) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		final long directNominationsOfThatParty = getElection().getNominationsOfParty(firstParty.get())

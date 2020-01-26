@@ -44,7 +44,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
-public class LocalElectionResult implements ElectionResult<LocalBallot> {
+public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	@JsonIgnore
 	LocalElection election;
 
@@ -67,13 +67,13 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
-			final List<LocalBallot> ballots) {
-		this(election, numberOfAllBallots, ballots, isEqual(true));
+			final Collection<LocalBallot> ballots) {
+		this(election, numberOfAllBallots, ballots, isEqual(Boolean.TRUE));
 	}
 
 	private LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
-			final List<LocalBallot> ballots,
+			final Collection<LocalBallot> ballots,
 			final Predicate<LocalBallot> filter) {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
@@ -112,7 +112,8 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();
 
 		// Result Type: Direct
-		final Map<LocalNomination, LocalNominationResultType> resultTypes = new LinkedHashMap<>();
+		final Map<LocalNomination, LocalNominationResultType> resultTypes
+				= new LinkedHashMap<>(getElection().getNominations().size());
 		for (final LocalNomination nomination : getDirectNominations(votes)) {
 			resultTypes.put(nomination, LocalNominationResultType.DIRECT);
 		}
@@ -216,7 +217,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 		// Result Type: Direct and Direct Draw
 		getDirectNominations(votes).stream()
-				.filter(nomination -> nomination.getParty().map(party::equals).orElse(false))
+				.filter(nomination -> nomination.getParty().map(party::equals).orElse(Boolean.FALSE))
 				.forEach(nominations::add);
 
 		// others
@@ -227,7 +228,7 @@ public class LocalElectionResult implements ElectionResult<LocalBallot> {
 
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private BigDecimal getSainteLagueValue(final BigDecimal votesOfParty, final int step) {
-		return votesOfParty.divide(BigDecimal.valueOf(step * 10 + 5L, 1),
+		return votesOfParty.divide(BigDecimal.valueOf(step * 10L + 5, 1),
 				getElection().getSainteLagueScale(),
 				RoundingMode.HALF_UP);
 	}
