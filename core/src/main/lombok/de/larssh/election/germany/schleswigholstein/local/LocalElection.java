@@ -4,7 +4,6 @@ import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableNavigableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -16,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -53,25 +51,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(onConstructor_ = { @JsonIgnore })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
-	private static final NavigableMap<Integer, Integer> DIRECT_SEATS_PER_POPULATION;
-
 	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
-
-	static {
-		final NavigableMap<Integer, Integer> numberOfDirectSeats = new TreeMap<>();
-		numberOfDirectSeats.put(0, 3);
-		numberOfDirectSeats.put(200, 4);
-		numberOfDirectSeats.put(750, 5);
-		numberOfDirectSeats.put(1250, 6);
-		numberOfDirectSeats.put(2500, 8);
-		numberOfDirectSeats.put(5000, 9);
-		numberOfDirectSeats.put(10_000, 11);
-		numberOfDirectSeats.put(15_000, 13);
-		numberOfDirectSeats.put(25_000, 15);
-		numberOfDirectSeats.put(35_000, 17);
-		numberOfDirectSeats.put(45_000, 19);
-		DIRECT_SEATS_PER_POPULATION = unmodifiableNavigableMap(numberOfDirectSeats);
-	}
 
 	public static ObjectMapper createJacksonObjectMapper() {
 		return new ObjectMapper() //
@@ -167,32 +147,48 @@ public class LocalElection implements Election {
 		this.population.put(district, population);
 	}
 
+	public LocalNomination createNomination(final LocalDistrict district,
+			final Person person,
+			final Optional<Party> party) {
+		final LocalNomination nomination = new LocalNomination(this, district, party, person);
+		nominations.add(nomination);
+		return nomination;
+	}
+
+	@Override
+	public List<LocalNomination> getNominations() {
+		return unmodifiableList(nominations);
+	}
+
+	public List<LocalNomination> getNominationsOfParty(final Party party) {
+		return getNominations().stream()
+				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
+				.collect(toList());
+	}
+
 	@JsonIgnore
-	public int getNumberOfSeats() {
-		return 2 * getNumberOfListSeats() + 1;
+	public Set<District<?>> getDistricts() {
+		return districts.get();
+	}
+
+	@JsonIgnore
+	public int getMaximalNumberOfVotesPerBallot() {
+		return getNumberOfDirectSeatsPerLocalDistrict();
 	}
 
 	@JsonIgnore
 	public int getNumberOfDirectSeats() {
-		return getNumberOfListSeats() + 1;
+		return PopulationInformation.get(getDistrict().getType()).getNumberOfDirectSeats(getPopulation());
 	}
 
 	@JsonIgnore
-	public int getNumberOfListSeats() {
-		final int population = getPopulation();
-
-		if (getDistrict().getType() == LocalDistrictType.KREIS) {
-			return population > 200_000 ? 24 : 22;
-		}
-		if (getDistrict().getType() == LocalDistrictType.KREISFREIE_STADT) {
-			return population > 150_000 ? 24 : 21;
-		}
-		return DIRECT_SEATS_PER_POPULATION.floorEntry(population - 1).getValue();
+	public int getNumberOfDirectSeatsPerLocalDistrict() {
+		return getNumberOfDirectSeats() / getNumberOfDistricts();
 	}
 
 	@JsonIgnore
-	public int getNumberOfVotes() {
-		return getNumberOfDirectSeats();
+	public int getNumberOfDistricts() {
+		return PopulationInformation.get(getDistrict().getType()).getNumberOfDistricts(getPopulation());
 	}
 
 	@Override
@@ -238,28 +234,14 @@ public class LocalElection implements Election {
 		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
 	}
 
-	public LocalNomination createNomination(final LocalDistrict district,
-			final Person person,
-			final Optional<Party> party) {
-		final LocalNomination nomination = new LocalNomination(this, district, party, person);
-		nominations.add(nomination);
-		return nomination;
-	}
-
-	@Override
-	public List<LocalNomination> getNominations() {
-		return unmodifiableList(nominations);
-	}
-
-	public List<LocalNomination> getNominationsOfParty(final Party party) {
-		return getNominations().stream()
-				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
-				.collect(toList());
+	@JsonIgnore
+	public int getNumberOfListSeats() {
+		return getNumberOfDirectSeats() - 1;
 	}
 
 	@JsonIgnore
-	public Set<District<?>> getDistricts() {
-		return districts.get();
+	public int getNumberOfSeats() {
+		return getNumberOfDirectSeats() + getNumberOfListSeats();
 	}
 
 	public Set<Party> getParties() {
@@ -272,7 +254,7 @@ public class LocalElection implements Election {
 
 	private abstract static class ColorMixIn {
 		@SuppressWarnings("unused")
-		public ColorMixIn(@JsonProperty("red") final double red,
+		private ColorMixIn(@JsonProperty("red") final double red,
 				@JsonProperty("green") final double green,
 				@JsonProperty("blue") final double blue,
 				@JsonProperty("opacity") final double opacity) {
@@ -310,8 +292,7 @@ public class LocalElection implements Election {
 
 		Set<Party> parties;
 
-		@SuppressWarnings("unused")
-		public ParsableLocalElection(@Nullable final LocalDistrictRoot district,
+		private ParsableLocalElection(@Nullable final LocalDistrictRoot district,
 				@Nullable final LocalDate date,
 				@Nullable final String name,
 				@Nullable final Map<String, OptionalInt> population,
@@ -319,9 +300,12 @@ public class LocalElection implements Election {
 				@Nullable final List<de.larssh.election.germany.schleswigholstein.local.LocalElection.ParsableLocalNomination> nominations,
 				@Nullable final Integer sainteLagueScale,
 				@Nullable final Set<Party> parties) {
-			this.district = Nullables.orElseThrow(district);
-			this.date = Nullables.orElseThrow(date);
-			this.name = Nullables.orElseThrow(name);
+			this.district = Nullables.orElseThrow(district,
+					() -> new ElectionException("Missing required parameter \"district\" for election."));
+			this.date = Nullables.orElseThrow(date,
+					() -> new ElectionException("Missing required parameter \"date\" for election."));
+			this.name = Nullables.orElseThrow(name,
+					() -> new ElectionException("Missing required parameter \"type\" for election."));
 			this.population = Nullables.orElseGet(population, Collections::emptyMap);
 			this.numberOfEligibleVoters = Nullables.orElseGet(numberOfEligibleVoters, Collections::emptyMap);
 			this.nominations = Nullables.orElseGet(nominations, Collections::emptyList);
@@ -384,12 +368,17 @@ public class LocalElection implements Election {
 	}
 
 	@Getter
-	@RequiredArgsConstructor
 	private static class ParsableLocalNomination {
 		String district;
 
 		Person person;
 
 		Optional<String> party;
+
+		private ParsableLocalNomination(final String district, final Person person, final Optional<String> party) {
+			this.district = district;
+			this.person = person;
+			this.party = party;
+		}
 	}
 }

@@ -3,6 +3,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
@@ -49,6 +50,9 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		return (LocalDistrictRoot) super.getRoot();
 	}
 
+	private static final Supplier<ElectionException> PARSABLE_EXCEPTION_SUPPLIER_NAME
+			= () -> new ElectionException("Missing required parameter \"name\" for district.");
+
 	@Getter
 	private static class ParsableLocalDistrictRoot {
 		final String name;
@@ -57,13 +61,13 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 
 		final LocalDistrictType type;
 
-		@SuppressWarnings("unused")
-		public ParsableLocalDistrictRoot(@Nullable final String name,
+		private ParsableLocalDistrictRoot(@Nullable final String name,
 				@Nullable final Set<ParsableLocalDistrict> children,
 				@Nullable final LocalDistrictType type) {
-			this.name = Nullables.orElseThrow(name);
+			this.name = Nullables.orElseThrow(name, PARSABLE_EXCEPTION_SUPPLIER_NAME);
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
-			this.type = Nullables.orElseThrow(type);
+			this.type = Nullables.orElseThrow(type,
+					() -> new ElectionException("Missing required parameter \"type\" for root district."));
 		}
 
 		public void createChildrenFor(final LocalDistrictRoot localDistrictRoot) {
@@ -79,10 +83,9 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 
 		final Set<ParsableLocalPollingStation> children;
 
-		@SuppressWarnings("unused")
-		public ParsableLocalDistrict(@Nullable final String name,
+		private ParsableLocalDistrict(@Nullable final String name,
 				@Nullable final Set<ParsableLocalPollingStation> children) {
-			this.name = Nullables.orElseThrow(name);
+			this.name = Nullables.orElseThrow(name, PARSABLE_EXCEPTION_SUPPLIER_NAME);
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
 		}
 
@@ -100,8 +103,8 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		final String name;
 
 		@JsonCreator(mode = Mode.PROPERTIES)
-		public ParsableLocalPollingStation(@Nullable final String name) {
-			this.name = Nullables.orElseThrow(name);
+		private ParsableLocalPollingStation(@Nullable final String name) {
+			this.name = Nullables.orElseThrow(name, PARSABLE_EXCEPTION_SUPPLIER_NAME);
 		}
 	}
 }
