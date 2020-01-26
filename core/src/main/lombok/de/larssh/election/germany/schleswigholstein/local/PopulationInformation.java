@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class PopulationInformation {
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(-1));
 		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(0));
 		System.out.println(get(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE).getNumberOfDirectSeats(1));
@@ -92,15 +92,15 @@ public class PopulationInformation {
 	NavigableMap<Integer, Integer> numberOfDirectSeatsIfPopulationIsGreater;
 
 	public int getNumberOfDistricts(final int population) {
-		Entry<Integer, Integer> entry = numberOfDistrictsIfPopulationIsLessOrEqual.higherEntry(population);
+		final Entry<Integer, Integer> entry = numberOfDistrictsIfPopulationIsLessOrEqual.higherEntry(population);
 		return entry == null ? getNumberOfDirectSeats(population) : entry.getValue();
 	}
 
 	public int getNumberOfDirectSeats(final int population) {
-		Entry<Integer, Integer> entry = numberOfDirectSeatsIfPopulationIsGreater.lowerEntry(population);
+		final Entry<Integer, Integer> entry = numberOfDirectSeatsIfPopulationIsGreater.lowerEntry(population);
 		if (entry == null) {
 			throw new ElectionException(
-					"Population %d is too low to calculate the number of direct seats for. Increase population to %d to calculat the number of direct seats..",
+					"Population %d is too low to calculate the number of direct seats for. Increase population to %d to calculat the number of direct seats.",
 					population,
 					numberOfDirectSeatsIfPopulationIsGreater.firstKey());
 		}
