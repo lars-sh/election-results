@@ -1,4 +1,4 @@
-package de.larssh.election.germany.schleswigholstein.local;
+package de.larssh.election.germany.schleswigholstein;
 
 import de.larssh.utils.text.Strings;
 

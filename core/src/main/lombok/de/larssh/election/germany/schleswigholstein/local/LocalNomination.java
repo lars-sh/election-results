@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.larssh.election.germany.schleswigholstein.Keys;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
@@ -51,7 +52,15 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	@JsonProperty("district")
 	private String getDistrictForJackson() {
-		return getDistrict().getName();
+		return getDistrict().getKey();
+	}
+
+	@JsonIgnore
+	public String getKey() {
+		return String.format("%s, %s%s",
+				Keys.escape(getPerson().getFamilyName(), ',', ' '),
+				Keys.escape(getPerson().getGivenName(), ' ', '('),
+				getParty().map(Party::getKey).map(key -> " (" + key + ')').orElse(""));
 	}
 
 	public LocalNominationType getType() {
@@ -60,6 +69,6 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	@JsonProperty("party")
 	private Optional<String> getPartyForJackson() {
-		return getParty().map(Party::getShortName);
+		return getParty().map(Party::getKey);
 	}
 }

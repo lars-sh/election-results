@@ -34,6 +34,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Election;
+import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
@@ -132,7 +133,9 @@ public class LocalElection implements Election {
 
 	@JsonProperty("population")
 	private Map<String, OptionalInt> getPopulationForJackson() {
-		return population.entrySet().stream().collect(toMap(entry -> entry.getKey().getName(), Entry::getValue));
+		return population.entrySet()
+				.stream()
+				.collect(toMap(entry -> entry.getKey().getKey(), Entry::getValue, TreeMap::new));
 	}
 
 	@Override
@@ -167,7 +170,7 @@ public class LocalElection implements Election {
 	private Map<String, OptionalInt> getNumberOfEligibleVotersForJackson() {
 		return numberOfEligibleVoters.entrySet()
 				.stream()
-				.collect(toMap(entry -> entry.getKey().getName(), Entry::getValue));
+				.collect(toMap(entry -> entry.getKey().getKey(), Entry::getValue, TreeMap::new));
 	}
 
 	@Override
@@ -179,6 +182,11 @@ public class LocalElection implements Election {
 			final Person person,
 			final Optional<Party> party) {
 		final LocalNomination nomination = new LocalNomination(this, district, party, person);
+		if (nominations.contains(nomination)) {
+			throw new ElectionException("Nomination \"%s\" for district \"%s\" cannot be added twice.",
+					nomination.getKey(),
+					district.getKey());
+		}
 		nominations.add(nomination);
 		return nomination;
 	}
@@ -243,10 +251,10 @@ public class LocalElection implements Election {
 			final OptionalInt value) {
 		if (!district.getRoot().equals(getDistrict())) {
 			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
-					district.getName());
+					district.getKey());
 		}
 		if (map.containsKey(district)) {
-			throw new ElectionException("The %s has already been set for district \"%s\".", type, district.getName());
+			throw new ElectionException("The %s has already been set for district \"%s\".", type, district.getKey());
 		}
 		map.put(district, value);
 	}
@@ -317,7 +325,7 @@ public class LocalElection implements Election {
 			final Map<String, OptionalInt> population = getPopulation();
 
 			for (final District<?> district : election.getDistricts()) {
-				election.setPopulation(district, population.getOrDefault(district.getName(), OptionalInt.empty()));
+				election.setPopulation(district, population.getOrDefault(district.getKey(), OptionalInt.empty()));
 			}
 		}
 
@@ -326,15 +334,14 @@ public class LocalElection implements Election {
 
 			for (final District<?> district : election.getDistricts()) {
 				election.setNumberOfEligibleVoters(district,
-						numberOfEligibleVoters.getOrDefault(district.getName(), OptionalInt.empty()));
+						numberOfEligibleVoters.getOrDefault(district.getKey(), OptionalInt.empty()));
 			}
 		}
 
 		public void createNominationsFor(final LocalElection election) {
 			final Map<String, District<?>> districts
-					= election.getDistricts().stream().collect(toMap(District::getName, Function.identity()));
-			final Map<String, Party> parties
-					= getParties().stream().collect(toMap(Party::getShortName, Function.identity()));
+					= election.getDistricts().stream().collect(toMap(District::getKey, Function.identity()));
+			final Map<String, Party> parties = getParties().stream().collect(toMap(Party::getKey, Function.identity()));
 
 			for (final ParsableLocalNomination nomination : getNominations()) {
 				final District<?> district = districts.get(nomination.getDistrict());

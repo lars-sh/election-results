@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 
-import de.larssh.election.germany.schleswigholstein.local.ElectionException;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface Election extends Comparable<Election> {

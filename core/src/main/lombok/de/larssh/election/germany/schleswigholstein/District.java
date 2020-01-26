@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.larssh.utils.Optionals;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
@@ -38,6 +40,11 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	}
 
 	protected C addChild(final C child) {
+		if (getChildren().stream().map(District::getName).anyMatch(name::equals)) {
+			throw new ElectionException("Another district with name \"%s\" already exists as child of \"%s\".",
+					child.getName(),
+					getFullKey());
+		}
 		children.add(child);
 		return child;
 	}
@@ -46,6 +53,22 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 
 	public Set<C> getChildren() {
 		return Collections.unmodifiableSet(children);
+	}
+
+	private String getFullKey() {
+		return getParent().map(District::getFullKey).map(fullKey -> fullKey + ", ").orElse("")
+				+ Keys.escape(getName(), ',', ' ');
+	}
+
+	@JsonIgnore
+	public String getKey() {
+		return getParent().map(parent -> {
+			String parentKey = parent.getKey();
+			if (!parentKey.isEmpty() || getName().isEmpty()) {
+				parentKey += ", ";
+			}
+			return parentKey + Keys.escape(getName(), ',', ' ');
+		}).orElse("");
 	}
 
 	public District<?> getRoot() {

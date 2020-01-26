@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
+import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;

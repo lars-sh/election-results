@@ -2,6 +2,8 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.Comparator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
@@ -20,6 +22,7 @@ public class Party implements Comparable<Party> {
 	@EqualsAndHashCode.Include
 	String shortName;
 
+	@EqualsAndHashCode.Include
 	String name;
 
 	PartyType type;
@@ -31,5 +34,10 @@ public class Party implements Comparable<Party> {
 	@Override
 	public int compareTo(@Nullable final Party party) {
 		return COMPARATOR.compare(this, party);
+	}
+
+	@JsonIgnore
+	public String getKey() {
+		return String.format("%s (%s)", getName(), Keys.escape(getShortName(), ',', ' '));
 	}
 }
