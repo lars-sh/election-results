@@ -57,7 +57,7 @@
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
-		
+
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 	</properties>
 
@@ -86,6 +86,11 @@
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-parameter-names</artifactId>
 			<version>2.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>13.0.2</version>
 		</dependency>
 	</dependencies>
 </project>
