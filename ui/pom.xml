@@ -87,6 +87,11 @@
 			<dependencies>
 				<dependency>
 					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>13.0.2</version>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-controls</artifactId>
 					<version>13.0.2</version>
 				</dependency>
@@ -107,6 +112,7 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
 							<ignoredUsedUndeclaredDependencies>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-base:jar:13.0.2</ignoredUsedUndeclaredDependency>
 								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-controls:jar:13.0.2</ignoredUsedUndeclaredDependency>
 								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-fxml:jar:13.0.2</ignoredUsedUndeclaredDependency>
 								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:13.0.2</ignoredUsedUndeclaredDependency>
