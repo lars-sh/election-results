@@ -118,6 +118,7 @@
 								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:13.0.2</ignoredUsedUndeclaredDependency>
 							</ignoredUsedUndeclaredDependencies>
 							<usedDependencies>
+								<usedDependency>org.openjfx:javafx-base</usedDependency>
 								<usedDependency>org.openjfx:javafx-controls</usedDependency>
 								<usedDependency>org.openjfx:javafx-fxml</usedDependency>
 								<usedDependency>org.openjfx:javafx-graphics</usedDependency>
