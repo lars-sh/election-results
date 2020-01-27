@@ -3,6 +3,11 @@ jdk:
   - openjdk8
   - openjdk11
 
+addons:
+  apt:
+    packages:
+      - openjfx
+
 install: skip
 script: mvn install -Dgpg.skip=true --batch-mode --show-version --update-snapshots
 
