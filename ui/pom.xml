@@ -55,7 +55,6 @@
 
 	<properties>
 		<checkstyle.skip>true</checkstyle.skip>
-		<mdep.analyze.skip>true</mdep.analyze.skip>
 		<pmd.skip>true</pmd.skip>
 		<spotbugs.skip>true</spotbugs.skip>
 
