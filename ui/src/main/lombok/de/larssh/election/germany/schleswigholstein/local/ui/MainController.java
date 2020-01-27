@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.Resources;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -27,18 +28,23 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter(AccessLevel.PRIVATE)
+@Getter
 public class MainController extends MainUiController {
-	private static final Manifest MANIFEST;
+	private static final Manifest MANIFEST = readManifest();
 
 	private static final ObjectMapper OBJECT_MAPPER = LocalElection.createJacksonObjectMapper();
 
-	static {
+	private static String getManifestValue(final Name name) {
+		return MANIFEST.getMainAttributes().get(name).toString();
+	}
+
+	@SuppressFBWarnings(value = "EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS",
+			justification = "failing to read the manifest is a runtime exception")
+	private static Manifest readManifest() {
 		try {
-			MANIFEST = Resources.readManifest(MainController.class).orElseGet(() -> {
+			return Resources.readManifest(MainController.class).orElseGet(() -> {
 				final Manifest manifest = new Manifest();
 				manifest.getMainAttributes().put(Name.IMPLEMENTATION_TITLE, "Election Results UI");
 				manifest.getMainAttributes().put(Name.IMPLEMENTATION_VERSION, "Development");
@@ -50,17 +56,13 @@ public class MainController extends MainUiController {
 		}
 	}
 
-	private static String getManifestValue(final Name name) {
-		return MANIFEST.getMainAttributes().get(name).toString();
-	}
-
 	LocalElectionController electionController;
 
 	private ObjectProperty<Optional<Path>> path = new SimpleObjectProperty<>(Optional.empty());
 
 	FileChooser fileChooser;
 
-	public MainController(final MainApplication application, final Stage stage) throws IOException {
+	public MainController(final MainApplication application, final Stage stage) {
 		super(application, stage);
 
 		electionController = new LocalElectionController(this);
@@ -68,9 +70,6 @@ public class MainController extends MainUiController {
 		fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Wahl-Definitionsdateien (*.json)", "*.json"));
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Alle Dateien (*.*)", "*.*"));
-
-		getStage().setScene(new Scene(loadFxml()));
-		getStage().show();
 	}
 
 	private String getApplicationTitle() {
@@ -95,6 +94,9 @@ public class MainController extends MainUiController {
 	}
 
 	@FXML
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = { "UP_UNUSED_PARAMETER", "UPM_UNCALLED_PRIVATE_METHOD" },
+			justification = "JavaFX event")
 	private void onOpen(@SuppressWarnings("unused") final ActionEvent event) {
 		alertOnException(getStage(), () -> {
 			final File file = fileChooser.showOpenDialog(getStage());
@@ -139,6 +141,9 @@ public class MainController extends MainUiController {
 	}
 
 	@FXML
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = { "UP_UNUSED_PARAMETER", "UPM_UNCALLED_PRIVATE_METHOD" },
+			justification = "JavaFX event")
 	private void onClose(@SuppressWarnings("unused") final ActionEvent event) {
 		alertOnException(getStage(), () -> {
 			final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -153,6 +158,9 @@ public class MainController extends MainUiController {
 	}
 
 	@FXML
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = { "UP_UNUSED_PARAMETER", "UPM_UNCALLED_PRIVATE_METHOD" },
+			justification = "JavaFX event")
 	private void onExit(@SuppressWarnings("unused") final ActionEvent event) {
 		alertOnException(getStage(), () -> {
 			final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -167,6 +175,9 @@ public class MainController extends MainUiController {
 	}
 
 	@FXML
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = { "UP_UNUSED_PARAMETER", "UPM_UNCALLED_PRIVATE_METHOD" },
+			justification = "JavaFX event")
 	private void onAbout(@SuppressWarnings("unused") final ActionEvent event) {
 		alertOnException(getStage(), () -> {
 			final Alert alert = new Alert(AlertType.INFORMATION);
@@ -182,6 +193,11 @@ public class MainController extends MainUiController {
 		updateStageTitle(Optional.empty());
 		getPath().setValue(Optional.empty());
 		getElectionController().reset();
+	}
+
+	public void show() throws IOException {
+		getStage().setScene(new Scene(loadFxml()));
+		getStage().show();
 	}
 
 	private void updateStageTitle(final Optional<Path> path) {

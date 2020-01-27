@@ -14,10 +14,9 @@ public class LocalDistrictController extends LocalDistrictUiController {
 	}
 
 	public LocalDistrict create(final LocalElection election) {
-		final LocalDistrict district = election.getDistrict().createChild(getName().getText());
 		// TODO: pollingstations
 		// TODO: nominations
-		return district;
+		return election.getDistrict().createChild(getName().getText());
 	}
 
 	@Override

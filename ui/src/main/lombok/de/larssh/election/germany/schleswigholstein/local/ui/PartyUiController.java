@@ -10,6 +10,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import lombok.experimental.NonFinal;
 
+@SuppressWarnings("PMD.ImmutableField")
 public abstract class PartyUiController extends ChildController<LocalElectionController> {
 	@FXML
 	@NonFinal

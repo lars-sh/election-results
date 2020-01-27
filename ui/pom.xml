@@ -54,14 +54,16 @@
 	</distributionManagement>
 
 	<properties>
-		<checkstyle.skip>true</checkstyle.skip>
-		<pmd.skip>true</pmd.skip>
-		<spotbugs.skip>true</spotbugs.skip>
-
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
 		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.MainApplication</jar.manifest.mainClass>
+
+		<!-- Versions -->
+		<javafx-base.version>13.0.2</javafx-base.version>
+		<javafx-controls.version>13.0.2</javafx-controls.version>
+		<javafx-fxml.version>13.0.2</javafx-fxml.version>
+		<javafx-graphics.version>13.0.2</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
@@ -88,22 +90,22 @@
 				<dependency>
 					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-base</artifactId>
-					<version>13.0.2</version>
+					<version>${javafx-base.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-controls</artifactId>
-					<version>13.0.2</version>
+					<version>${javafx-controls.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-fxml</artifactId>
-					<version>13.0.2</version>
+					<version>${javafx-fxml.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-graphics</artifactId>
-					<version>13.0.2</version>
+					<version>${javafx-graphics.version}</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -112,10 +114,10 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
 							<ignoredUsedUndeclaredDependencies>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-base:jar:13.0.2</ignoredUsedUndeclaredDependency>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-controls:jar:13.0.2</ignoredUsedUndeclaredDependency>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-fxml:jar:13.0.2</ignoredUsedUndeclaredDependency>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:13.0.2</ignoredUsedUndeclaredDependency>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-base:jar:${javafx-base.version}</ignoredUsedUndeclaredDependency>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-controls:jar:${javafx-controls.version}</ignoredUsedUndeclaredDependency>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-fxml:jar:${javafx-fxml.version}</ignoredUsedUndeclaredDependency>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:${javafx-graphics.version}</ignoredUsedUndeclaredDependency>
 							</ignoredUsedUndeclaredDependencies>
 							<usedDependencies>
 								<usedDependency>org.openjfx:javafx-base</usedDependency>

@@ -2,6 +2,7 @@ package de.larssh.utils.javafx;
 
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Spinner;
@@ -15,6 +16,13 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class JavaFxUtils {
+	@SuppressWarnings({
+			"checkstyle:XIllegalCatchDefault",
+			"PMD.AvoidCatchingGenericException",
+			"PMD.AvoidPrintStackTrace" })
+	@SuppressFBWarnings(
+			value = { "IMC_IMMATURE_CLASS_PRINTSTACKTRACE", "INFORMATION_EXPOSURE_THROUGH_AN_ERROR_MESSAGE" },
+			justification = "temporary solution only")
 	public static void alertOnException(@Nullable final Stage stage, final Runnable runnable) {
 		try {
 			runnable.run();
@@ -48,6 +56,7 @@ public class JavaFxUtils {
 
 	@Getter
 	@RequiredArgsConstructor
+	@SuppressWarnings({ "checkstyle:XIllegalCatchDefault", "PMD.AvoidCatchingGenericException" })
 	private static class SafeStringConverter<T> extends StringConverter<T> {
 		Spinner<T> spinner;
 
@@ -58,6 +67,7 @@ public class JavaFxUtils {
 			try {
 				return Nullables.orElseGet(getConverter().fromString(value), getSpinner()::getValue);
 			} catch (@SuppressWarnings("unused") final Exception e) {
+				// Expecting any exception to be a parsing error
 				return getSpinner().getValue();
 			}
 		}

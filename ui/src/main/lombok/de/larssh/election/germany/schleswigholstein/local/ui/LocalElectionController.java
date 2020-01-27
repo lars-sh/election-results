@@ -9,13 +9,15 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.javafx.JavaFxUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter(AccessLevel.PRIVATE)
+@Getter
 public class LocalElectionController extends LocalElectionUiController {
+	private static final int POPULATION_DEFAULT = 71;
+
 	PartyController partyController;
 
 	LocalDistrictController localDistrictController;
@@ -48,6 +50,8 @@ public class LocalElectionController extends LocalElectionUiController {
 	}
 
 	@Override
+	@SuppressFBWarnings(value = "EXS_EXCEPTION_SOFTENING_NO_CHECKED",
+			justification = "missing FXML files are true runtime expections")
 	protected void initialize() {
 		// Election
 		getDistrictType().setItems(FXCollections.observableArrayList(LocalDistrictType.values()));
@@ -55,7 +59,8 @@ public class LocalElectionController extends LocalElectionUiController {
 				new IntegerSpinnerValueFactory(0, Integer.MAX_VALUE));
 		getPopulationIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getPopulation().setDisable(!newValue));
-		JavaFxUtils.initializeEditableSpinner(getPopulation(), new IntegerSpinnerValueFactory(71, Integer.MAX_VALUE));
+		JavaFxUtils.initializeEditableSpinner(getPopulation(),
+				new IntegerSpinnerValueFactory(POPULATION_DEFAULT, Integer.MAX_VALUE));
 		getNumberOfEligibleVotersIsPresent().selectedProperty()
 				.addListener((observable, oldValue, newValue) -> getNumberOfEligibleVoters().setDisable(!newValue));
 		JavaFxUtils.initializeEditableSpinner(getNumberOfEligibleVoters(),
@@ -87,7 +92,7 @@ public class LocalElectionController extends LocalElectionUiController {
 		getDate().setValue(LocalDate.now());
 		getSainteLagueScale().getValueFactory().setValue(2);
 		getPopulationIsPresent().setSelected(true);
-		getPopulation().getValueFactory().setValue(71);
+		getPopulation().getValueFactory().setValue(POPULATION_DEFAULT);
 		getPopulation().setDisable(false);
 		getNumberOfEligibleVotersIsPresent().setSelected(true);
 		getNumberOfEligibleVoters().getValueFactory().setValue(1);
@@ -111,7 +116,7 @@ public class LocalElectionController extends LocalElectionUiController {
 		getName().setText(election.getName());
 		getSainteLagueScale().getValueFactory().setValue(election.getSainteLagueScale());
 		final OptionalInt population = election.getPopulation(election.getDistrict());
-		getPopulation().getValueFactory().setValue(population.orElse(71));
+		getPopulation().getValueFactory().setValue(population.orElse(POPULATION_DEFAULT));
 		getPopulationIsPresent().setSelected(population.isPresent());
 		final OptionalInt numberOfEligibleVoters = election.getNumberOfEligibleVoters(election.getDistrict());
 		getNumberOfEligibleVoters().getValueFactory().setValue(numberOfEligibleVoters.orElse(1));

@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 
+@SuppressWarnings("PMD.ImmutableField")
 public abstract class LocalDistrictUiController extends ChildController<LocalElectionController> {
 	@FXML
 	@NonFinal
@@ -59,12 +60,14 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@EqualsAndHashCode(onParam_ = { @Nullable })
 	public static class LocalPollingStationListEntry {
+		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalPollingStationListEntry EMPTY = new LocalPollingStationListEntry(Optional.empty());
 
 		public static LocalPollingStationListEntry empty() {
 			return EMPTY;
 		}
 
+		@SuppressWarnings("PMD.ShortMethodName")
 		public static LocalPollingStationListEntry of(final LocalPollingStation pollingStation) {
 			return new LocalPollingStationListEntry(Optional.of(pollingStation));
 		}
@@ -114,16 +117,19 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@EqualsAndHashCode(onParam_ = { @Nullable })
 	public static class LocalNominationChoiceEntry {
+		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalNominationChoiceEntry EMPTY = new LocalNominationChoiceEntry(Optional.empty());
 
 		public static LocalNominationChoiceEntry empty() {
 			return EMPTY;
 		}
 
+		@SuppressWarnings("PMD.ShortMethodName")
 		public static LocalNominationChoiceEntry of(final DisplayableLocalNomination nomination) {
 			return new LocalNominationChoiceEntry(Optional.of(nomination));
 		}
 
+		@SuppressWarnings("PMD.ShortMethodName")
 		public static LocalNominationChoiceEntry of(final LocalNomination nomination) {
 			return of(new DisplayableLocalNomination(nomination.getType(),
 					nomination.getParty(),

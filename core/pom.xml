@@ -59,6 +59,9 @@
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
 
 		<maven.compiler.parameters>true</maven.compiler.parameters>
+
+		<!-- Versions -->
+		<javafx-graphics.version>13.0.2</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
@@ -100,7 +103,7 @@
 				<dependency>
 					<groupId>org.openjfx</groupId>
 					<artifactId>javafx-graphics</artifactId>
-					<version>13.0.2</version>
+					<version>${javafx-graphics.version}</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -109,7 +112,7 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
 							<ignoredUsedUndeclaredDependencies>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:13.0.2</ignoredUsedUndeclaredDependency>
+								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:${javafx-graphics.version}</ignoredUsedUndeclaredDependency>
 							</ignoredUsedUndeclaredDependencies>
 							<usedDependencies>
 								<usedDependency>org.openjfx:javafx-graphics</usedDependency>

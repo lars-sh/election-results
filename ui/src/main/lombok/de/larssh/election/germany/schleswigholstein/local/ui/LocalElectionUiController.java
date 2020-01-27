@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 
+@SuppressWarnings("PMD.ImmutableField")
 public abstract class LocalElectionUiController extends ChildController<MainController> {
 	@FXML
 	@NonFinal
@@ -148,12 +149,14 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@EqualsAndHashCode(onParam_ = { @Nullable })
 	public static class PartyChoiceEntry {
+		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final PartyChoiceEntry EMPTY = new PartyChoiceEntry(Optional.empty());
 
 		public static PartyChoiceEntry empty() {
 			return EMPTY;
 		}
 
+		@SuppressWarnings("PMD.ShortMethodName")
 		public static PartyChoiceEntry of(final Party party) {
 			return new PartyChoiceEntry(Optional.of(party));
 		}
@@ -171,12 +174,14 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@EqualsAndHashCode(onParam_ = { @Nullable })
 	public static class LocalDistrictChoiceEntry {
+		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalDistrictChoiceEntry EMPTY = new LocalDistrictChoiceEntry(Optional.empty());
 
 		public static LocalDistrictChoiceEntry empty() {
 			return EMPTY;
 		}
 
+		@SuppressWarnings("PMD.ShortMethodName")
 		public static LocalDistrictChoiceEntry of(final LocalDistrict district) {
 			return new LocalDistrictChoiceEntry(Optional.of(district));
 		}
