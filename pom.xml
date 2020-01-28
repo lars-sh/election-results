@@ -64,5 +64,6 @@
 
 	<properties>
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
+		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
 	</properties>
 </project>
