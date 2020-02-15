@@ -4,13 +4,15 @@ import static de.larssh.utils.javafx.JavaFxUtils.alertOnException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
@@ -34,7 +36,7 @@ import lombok.Getter;
 public class MainController extends MainUiController {
 	private static final Manifest MANIFEST = readManifest();
 
-	private static final ObjectMapper OBJECT_MAPPER = LocalElection.createJacksonObjectMapper();
+	private static final ObjectWriter OBJECT_WRITER = LocalElection.createJacksonObjectWriter();
 
 	private static String getManifestValue(final Name name) {
 		return MANIFEST.getMainAttributes().get(name).toString();
@@ -102,8 +104,8 @@ public class MainController extends MainUiController {
 			final File file = fileChooser.showOpenDialog(getStage());
 			if (file != null) {
 				Nullables.ifNonNull(file.getParentFile(), fileChooser::setInitialDirectory);
-				try {
-					getElectionController().setElection(OBJECT_MAPPER.readValue(file, LocalElection.class));
+				try (Reader reader = Files.newBufferedReader(file.toPath())) {
+					getElectionController().setElection(LocalElection.fromJson(reader));
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -117,8 +119,8 @@ public class MainController extends MainUiController {
 		alertOnException(getStage(), () -> {
 			if (getPath().getValue().isPresent()) {
 				try {
-					OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
-							.writeValue(getPath().getValue().get().toFile(), getElectionController().getElection());
+					OBJECT_WRITER.writeValue(getPath().getValue().get().toFile(),
+							getElectionController().getElection());
 				} catch (final IOException e) {
 					throw new UncheckedIOException(e);
 				}

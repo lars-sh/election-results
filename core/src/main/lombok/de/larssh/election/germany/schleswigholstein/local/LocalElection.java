@@ -8,6 +8,8 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -38,6 +41,7 @@ import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Nullables;
+import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.scene.paint.Color;
@@ -49,18 +53,25 @@ import lombok.ToString;
 
 @Getter
 @ToString
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.ExcessiveImports")
-@RequiredArgsConstructor(onConstructor_ = { @JsonIgnore })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
 public class LocalElection implements Election {
+	@PackagePrivate
+	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() //
+			.addMixIn(Color.class, ColorMixIn.class)
+			.registerModule(new JavaTimeModule())
+			.registerModule(new Jdk8Module())
+			.registerModule(new ParameterNamesModule());
+
 	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
 
-	public static ObjectMapper createJacksonObjectMapper() {
-		return new ObjectMapper() //
-				.addMixIn(Color.class, ColorMixIn.class)
-				.registerModule(new JavaTimeModule())
-				.registerModule(new Jdk8Module())
-				.registerModule(new ParameterNamesModule());
+	public static ObjectWriter createJacksonObjectWriter() {
+		return OBJECT_MAPPER.writer();
+	}
+
+	public static LocalElection fromJson(final Reader reader) throws IOException {
+		return OBJECT_MAPPER.readValue(reader, LocalElection.class);
 	}
 
 	LocalDistrictRoot district;

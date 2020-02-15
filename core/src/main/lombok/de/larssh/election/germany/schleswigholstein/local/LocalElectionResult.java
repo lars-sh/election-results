@@ -2,6 +2,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 
 import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Collectors.toLinkedHashSet;
+import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
@@ -12,6 +13,8 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -30,7 +33,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
@@ -45,6 +50,26 @@ import lombok.ToString;
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot> {
+	private static ThreadLocal<LocalElection> electionForJsonCreator = ThreadLocal.withInitial(() -> {
+		throw new ElectionException(
+				"Cannot initialize electionForJsonCreator. Use LocalElection.fromJson(...) instead.");
+	});
+
+	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
+
+	public static ObjectWriter createJacksonObjectWriter() {
+		return LocalElection.createJacksonObjectWriter();
+	}
+
+	public static LocalElectionResult fromJson(final Reader reader, final LocalElection election) throws IOException {
+		electionForJsonCreator.set(election);
+		final LocalElectionResult electionResult
+				= LocalElection.OBJECT_MAPPER.readValue(reader, LocalElectionResult.class);
+		electionForJsonCreator.remove();
+
+		return electionResult;
+	}
+
 	@JsonIgnore
 	LocalElection election;
 
@@ -64,6 +89,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 			.map(Ballot::getNominations)
 			.flatMap(Collection::stream)
 			.count());
+
+	@JsonCreator
+	private LocalElectionResult(final OptionalInt numberOfAllBallots, final Collection<LocalBallot> ballots) {
+		this(electionForJsonCreator.get(), numberOfAllBallots, ballots, isEqual(Boolean.TRUE));
+	}
 
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
@@ -86,6 +116,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 						election.getName());
 			}
 		}
+
+		numberOfAllBallots.ifPresent(number -> {
+			if (number < ballots.size()) {
+				throw new ElectionException(
+						"Number of ballots (%d) is lower than the number of ballots given (%d) for election \"%s\".",
+						number,
+						ballots.size(),
+						election.getName());
+			}
+		});
 
 		nominationResults = unmodifiableSet(createNominationResults());
 		partyResults = unmodifiableSet(createPartyResults());

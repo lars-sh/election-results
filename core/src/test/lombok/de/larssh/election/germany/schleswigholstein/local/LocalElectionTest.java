@@ -3,6 +3,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -12,7 +13,6 @@ import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.Gender;
@@ -27,37 +27,21 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 public class LocalElectionTest {
-	@Test
-	public void testJacksonForElection() throws IOException {
-		final ObjectMapper objectMapper = LocalElection.createJacksonObjectMapper();
-		final ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-		final Path path = Files.createTempFile("", "");
-
-		// Create
-		final LocalElection electionCreated = createElection();
-		addDistricts(electionCreated);
-		addPersons(electionCreated);
-		objectWriter.writeValue(path.toFile(), electionCreated);
-
-		// Open
-		final LocalElection electionOpened = objectMapper.readValue(path.toFile(), LocalElection.class);
-
-		// Compare
-		final String electionCreatedToString = electionCreated.toString();
-		final String electionOpenedToString = electionOpened.toString();
-		assertEquals(electionCreatedToString, electionOpenedToString);
-	}
-
-	private LocalElection createElection() {
+	public static LocalElection createElection() {
 		final LocalDistrictRoot districtRoot
 				= new LocalDistrictRoot("Gemeinde Rethwisch", LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
+
 		final LocalElection election = new LocalElection(districtRoot, LocalDate.of(2018, 5, 6), "Gemeindewahl", 2);
 		election.setPopulation(districtRoot, OptionalInt.empty());
 		election.setNumberOfEligibleVoters(districtRoot, OptionalInt.empty());
+
+		addDistricts(election);
+		addPersons(election);
+
 		return election;
 	}
 
-	private void addDistricts(final LocalElection election) {
+	private static void addDistricts(final LocalElection election) {
 		final LocalDistrict districtLocal = election.getDistrict().createChild("Rethwisch");
 		election.setPopulation(districtLocal, 1186);
 		election.setNumberOfEligibleVoters(districtLocal, OptionalInt.empty());
@@ -71,7 +55,7 @@ public class LocalElectionTest {
 		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 270);
 	}
 
-	private void addPersons(final LocalElection election) {
+	private static void addPersons(final LocalElection election) {
 		final LocalDistrict district = election.getDistrict().getChildren().iterator().next();
 
 		final Party partyCdu = new Party("CDU",
@@ -375,5 +359,26 @@ public class LocalElectionTest {
 				Optional.empty(),
 				Optional.empty());
 		election.createNomination(district, personHartmutFeddern, Optional.of(partyFwr));
+	}
+
+	@Test
+	public void testJacksonForElection() throws IOException {
+		final ObjectWriter objectWriter = LocalElection.createJacksonObjectWriter().withDefaultPrettyPrinter();
+		final Path path = Files.createTempFile("", "");
+
+		// Create
+		final LocalElection electionCreated = createElection();
+		objectWriter.writeValue(path.toFile(), electionCreated);
+
+		// Open
+		final LocalElection electionOpened;
+		try (Reader reader = Files.newBufferedReader(path)) {
+			electionOpened = LocalElection.fromJson(reader);
+		}
+
+		// Compare
+		final String electionCreatedToString = electionCreated.toString();
+		final String electionOpenedToString = electionOpened.toString();
+		assertEquals(electionCreatedToString, electionOpenedToString);
 	}
 }
