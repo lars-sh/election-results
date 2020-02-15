@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Party implements Comparable<Party> {
 	private static final Comparator<Party> COMPARATOR
 			= Comparator.comparing(Party::getType).thenComparing(Party::getShortName).thenComparing(Party::getName);

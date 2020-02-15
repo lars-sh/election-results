@@ -58,7 +58,7 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 
 	@Getter
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@EqualsAndHashCode(onParam_ = { @Nullable })
+	@EqualsAndHashCode
 	public static class LocalPollingStationListEntry {
 		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalPollingStationListEntry EMPTY = new LocalPollingStationListEntry(Optional.empty());
@@ -82,7 +82,7 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 
 	@Getter
 	@RequiredArgsConstructor
-	@EqualsAndHashCode(onParam_ = { @Nullable })
+	@EqualsAndHashCode
 	public static class DisplayableLocalNomination implements Nomination, Comparable<DisplayableLocalNomination> {
 		private static final Comparator<DisplayableLocalNomination> COMPARATOR
 				= Comparator.comparing(DisplayableLocalNomination::getParty, Optionals.comparator())
@@ -115,7 +115,7 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 
 	@Getter
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@EqualsAndHashCode(onParam_ = { @Nullable })
+	@EqualsAndHashCode
 	public static class LocalNominationChoiceEntry {
 		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalNominationChoiceEntry EMPTY = new LocalNominationChoiceEntry(Optional.empty());

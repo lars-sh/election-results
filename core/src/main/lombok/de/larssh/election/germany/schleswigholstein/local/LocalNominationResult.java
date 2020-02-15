@@ -21,7 +21,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode(onParam_ = { @Nullable })
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNominationResult implements NominationResult<LocalBallot>, Comparable<LocalNominationResult> {
 	private static final Comparator<LocalNominationResult> COMPARATOR

@@ -55,7 +55,7 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 @SuppressWarnings("PMD.ExcessiveImports")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class LocalElection implements Election {
 	@PackagePrivate
 	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() //

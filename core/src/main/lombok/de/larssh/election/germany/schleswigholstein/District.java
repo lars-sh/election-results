@@ -18,7 +18,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class District<C extends District<?>> implements Comparable<District<?>> {
 	private static final Comparator<District<?>> COMPARATOR
 			= Comparator.<District<?>, Optional<District<?>>>comparing(District::getParent, Optionals.comparator())

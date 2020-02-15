@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
-@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true, onParam_ = { @Nullable })
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class LocalDistrictRoot extends District<LocalDistrict> {
 	LocalDistrictType type;
 

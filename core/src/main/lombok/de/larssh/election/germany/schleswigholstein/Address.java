@@ -10,7 +10,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode(onParam_ = { @Nullable })
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class Address implements Comparable<Address> {
 	private static final Comparator<Address> COMPARATOR = Comparator.comparing(Address::getZip)

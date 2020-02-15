@@ -147,7 +147,7 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 
 	@Getter
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@EqualsAndHashCode(onParam_ = { @Nullable })
+	@EqualsAndHashCode
 	public static class PartyChoiceEntry {
 		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final PartyChoiceEntry EMPTY = new PartyChoiceEntry(Optional.empty());
@@ -172,7 +172,7 @@ public abstract class LocalElectionUiController extends ChildController<MainCont
 
 	@Getter
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@EqualsAndHashCode(onParam_ = { @Nullable })
+	@EqualsAndHashCode
 	public static class LocalDistrictChoiceEntry {
 		@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 		private static final LocalDistrictChoiceEntry EMPTY = new LocalDistrictChoiceEntry(Optional.empty());

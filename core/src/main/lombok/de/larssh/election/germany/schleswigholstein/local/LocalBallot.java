@@ -17,14 +17,13 @@ import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.utils.annotations.PackagePrivate;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode(onParam_ = { @Nullable })
+@EqualsAndHashCode
 @SuppressWarnings("PMD.DataClass")
 public final class LocalBallot implements Ballot {
 	@PackagePrivate
