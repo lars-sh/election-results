@@ -31,6 +31,10 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 			.thenComparing(LocalNomination::getParty, Optionals.comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
+	public static String createKey(final String personKey, final Optional<String> partyKey) {
+		return Keys.escape(personKey, ' ', '(') + partyKey.map(key -> " (" + key + ')').orElse("");
+	}
+
 	@JsonIgnore
 	@ToString.Exclude
 	LocalElection election;
@@ -60,10 +64,7 @@ public class LocalNomination implements Nomination, Comparable<LocalNomination> 
 
 	@JsonIgnore
 	public String getKey() {
-		return String.format("%s, %s%s",
-				Keys.escape(getPerson().getFamilyName(), ',', ' '),
-				Keys.escape(getPerson().getGivenName(), ' ', '('),
-				getParty().map(Party::getKey).map(key -> " (" + key + ')').orElse(""));
+		return createKey(getPerson().getKey(), getParty().map(Party::getKey));
 	}
 
 	public LocalNominationType getType() {

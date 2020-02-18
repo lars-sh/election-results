@@ -395,17 +395,13 @@ public class LocalElection implements Election {
 	}
 
 	@Getter
-	private static class ParsableLocalNomination {
+	@PackagePrivate
+	@RequiredArgsConstructor
+	static class ParsableLocalNomination {
 		String district;
 
 		Person person;
 
 		Optional<String> party;
-
-		private ParsableLocalNomination(final String district, final Person person, final Optional<String> party) {
-			this.district = district;
-			this.person = person;
-			this.party = party;
-		}
 	}
 }

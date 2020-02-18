@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -32,9 +33,9 @@ public class LocalElectionResultTest {
 		objectWriter.writeValue(path.toFile(), resultCreated);
 
 		// Open
-		final LocalElection resultOpened;
+		final LocalElectionResult resultOpened;
 		try (Reader reader = Files.newBufferedReader(path)) {
-			resultOpened = LocalElection.fromJson(reader);
+			resultOpened = LocalElectionResult.fromJson(reader, LocalElectionTest.createElection());
 		}
 
 		// Compare
@@ -46,9 +47,38 @@ public class LocalElectionResultTest {
 	private static LocalElectionResult createElectionResult() {
 		final LocalElection election = LocalElectionTest.createElection();
 
+		final LocalPollingStation rethwischdorf = findPollingStation(election, "Rethwischdorf");
+		// final LocalPollingStation kleinBoden = findPollingStation(election, "Klein
+		// Boden");
+
+		final LocalNomination poppingaJens = findNomination(election, "Poppinga", "Jens");
+
 		final Set<LocalBallot> ballots = new HashSet<>();
-		ballots.add(LocalBallot.createValidBallot(election, null, false, Arrays.asList(null))); // TODO
+		ballots.add(LocalBallot
+				.createValidBallot(election, rethwischdorf, false, new HashSet<>(Arrays.asList(poppingaJens)))); // TODO
 
 		return new LocalElectionResult(election, OptionalInt.of(20), ballots);
+	}
+
+	private static LocalNomination findNomination(final LocalElection election,
+			final String familyName,
+			final String givenName) {
+		return election.getNominations()
+				.stream()
+				.filter(nomination -> familyName.equals(nomination.getPerson().getFamilyName())
+						&& givenName.equals(nomination.getPerson().getGivenName()))
+				.findAny()
+				.get();
+	}
+
+	private static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
+		return election.getDistrict()
+				.getChildren()
+				.stream()
+				.map(LocalDistrict::getChildren)
+				.flatMap(Collection::stream)
+				.filter(district -> name.equals(district.getName()))
+				.findAny()
+				.get();
 	}
 }

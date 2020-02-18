@@ -5,6 +5,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,6 +20,10 @@ import lombok.ToString;
 public class Person implements Comparable<Person> {
 	private static final Comparator<Person> COMPARATOR
 			= Comparator.comparing(Person::getFamilyName).thenComparing(Person::getGivenName);
+
+	public static String createKey(final String familyName, final String givenName) {
+		return String.format("%s, %s", Keys.escape(familyName, ',', ' '), givenName);
+	}
 
 	@EqualsAndHashCode.Include
 	String givenName;
@@ -38,5 +44,10 @@ public class Person implements Comparable<Person> {
 	@Override
 	public int compareTo(@Nullable final Person party) {
 		return COMPARATOR.compare(this, party);
+	}
+
+	@JsonIgnore
+	public String getKey() {
+		return createKey(getFamilyName(), getGivenName());
 	}
 }

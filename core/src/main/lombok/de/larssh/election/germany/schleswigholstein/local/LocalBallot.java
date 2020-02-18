@@ -12,11 +12,13 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.utils.annotations.PackagePrivate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -44,6 +46,7 @@ public final class LocalBallot implements Ballot {
 	@JsonIgnore
 	LocalElection election;
 
+	@JsonIgnore
 	LocalPollingStation pollingStation;
 
 	boolean postalVoter;
@@ -53,6 +56,7 @@ public final class LocalBallot implements Ballot {
 	Set<LocalNomination> nominations;
 
 	@JsonIgnore
+	@ToString.Exclude
 	Supplier<Boolean> blockVoting = lazy(() -> {
 		final List<Optional<Party>> parties
 				= getNominations().stream().map(LocalNomination::getParty).distinct().collect(toList());
@@ -93,6 +97,13 @@ public final class LocalBallot implements Ballot {
 						election.getName());
 			}
 		}
+	}
+
+	@JsonProperty("pollingStation")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
+	private String getPollingStationForJackson() {
+		return getPollingStation().getKey();
 	}
 
 	@JsonIgnore

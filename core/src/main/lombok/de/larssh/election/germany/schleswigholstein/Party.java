@@ -19,6 +19,10 @@ public class Party implements Comparable<Party> {
 	private static final Comparator<Party> COMPARATOR
 			= Comparator.comparing(Party::getType).thenComparing(Party::getShortName).thenComparing(Party::getName);
 
+	private static String createKey(final String name, final String shortName) {
+		return String.format("%s (%s)", name, Keys.escape(shortName, ',', ' '));
+	}
+
 	@EqualsAndHashCode.Include
 	String shortName;
 
@@ -38,6 +42,6 @@ public class Party implements Comparable<Party> {
 
 	@JsonIgnore
 	public String getKey() {
-		return String.format("%s (%s)", getName(), Keys.escape(getShortName(), ',', ' '));
+		return createKey(getName(), getShortName());
 	}
 }

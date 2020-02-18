@@ -32,6 +32,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 					.thenComparing(LocalPartyResult::getNumberOfVotes)
 					.thenComparing(LocalPartyResult::getParty);
 
+	@ToString.Exclude
 	LocalElectionResult electionResult;
 
 	Party party;

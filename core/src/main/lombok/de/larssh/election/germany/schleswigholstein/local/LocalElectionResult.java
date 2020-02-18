@@ -2,16 +2,16 @@ package de.larssh.election.germany.schleswigholstein.local;
 
 import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Collectors.toLinkedHashSet;
+import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
-import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -42,15 +43,19 @@ import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.local.LocalElection.ParsableLocalNomination;
+import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot> {
-	private static ThreadLocal<LocalElection> electionForJsonCreator = ThreadLocal.withInitial(() -> {
+	@PackagePrivate
+	static final ThreadLocal<LocalElection> ELECTION_FOR_JSON_CREATOR = ThreadLocal.withInitial(() -> {
 		throw new ElectionException(
 				"Cannot initialize electionForJsonCreator. Use LocalElection.fromJson(...) instead.");
 	});
@@ -62,15 +67,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	}
 
 	public static LocalElectionResult fromJson(final Reader reader, final LocalElection election) throws IOException {
-		electionForJsonCreator.set(election);
+		ELECTION_FOR_JSON_CREATOR.set(election);
 		final LocalElectionResult electionResult
 				= LocalElection.OBJECT_MAPPER.readValue(reader, LocalElectionResult.class);
-		electionForJsonCreator.remove();
+		ELECTION_FOR_JSON_CREATOR.remove();
 
 		return electionResult;
 	}
 
 	@JsonIgnore
+	@ToString.Exclude
 	LocalElection election;
 
 	OptionalInt numberOfAllBallots;
@@ -90,15 +96,15 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 			.flatMap(Collection::stream)
 			.count());
 
-	@JsonCreator
-	private LocalElectionResult(final OptionalInt numberOfAllBallots, final Collection<LocalBallot> ballots) {
-		this(electionForJsonCreator.get(), numberOfAllBallots, ballots, isEqual(Boolean.TRUE));
+	@JsonCreator(mode = Mode.DELEGATING)
+	private LocalElectionResult(final ParsableLocalElectionResult parsable) {
+		this(ELECTION_FOR_JSON_CREATOR.get(), parsable.getNumberOfAllBallots(), parsable.createLocalBallots());
 	}
 
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final Collection<LocalBallot> ballots) {
-		this(election, numberOfAllBallots, ballots, isEqual(Boolean.TRUE));
+		this(election, numberOfAllBallots, ballots, ballot -> true);
 	}
 
 	private LocalElectionResult(final LocalElection election,
@@ -280,8 +286,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, ? extends Number> votes,
 			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
 		// Find last nomination
-		final Optional<? extends Number> lastNomination
-				= votes.values().stream().skip(resultTypes.size() - 1L).findAny();
+		final Optional<? extends Number> lastNomination = resultTypes.isEmpty()
+				? Optional.empty()
+				: votes.values().stream().skip(resultTypes.size() - 1L).findAny();
 		if (!lastNomination.isPresent()) {
 			return emptySet();
 		}
@@ -317,5 +324,75 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.stream()
 				.map(party -> new LocalPartyResult(this, party))
 				.collect(toCollection(TreeSet::new));
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	private static class ParsableLocalElectionResult {
+		OptionalInt numberOfAllBallots;
+
+		Collection<ParsableLocalBallot> ballots;
+
+		public Collection<LocalBallot> createLocalBallots() {
+			final LocalElection election = ELECTION_FOR_JSON_CREATOR.get();
+			return getBallots().stream()
+					.map(ballot -> ballot.isValid()
+							? LocalBallot.createValidBallot(election,
+									ballot.findPollingStation(),
+									ballot.isPostalVoter(),
+									ballot.findNominations())
+							: LocalBallot
+									.createInvalidBallot(election, ballot.findPollingStation(), ballot.isPostalVoter()))
+					.collect(toList());
+		}
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	private static class ParsableLocalBallot {
+		String pollingStation;
+
+		boolean postalVoter;
+
+		boolean valid;
+
+		Set<ParsableLocalNomination> nominations;
+
+		public LocalPollingStation findPollingStation() {
+			return ELECTION_FOR_JSON_CREATOR.get()
+					.getDistrict()
+					.getChildren()
+					.stream()
+					.map(LocalDistrict::getChildren)
+					.flatMap(Collection::stream)
+					.filter(pollingStation -> getPollingStation().equals(pollingStation.getKey()))
+					.findAny()
+					.orElseThrow(() -> new ElectionException(
+							"Could not find polling station with key \"%s\" for election \"%s\".",
+							getPollingStation(),
+							ELECTION_FOR_JSON_CREATOR.get().getName()));
+		}
+
+		public Set<LocalNomination> findNominations() {
+			final Map<String, LocalNomination> nominations = ELECTION_FOR_JSON_CREATOR.get()
+					.getNominations()
+					.stream()
+					.collect(toMap(LocalNomination::getKey, identity()));
+
+			return getNominations().stream()
+					.map(nomination -> LocalNomination.createKey(nomination.getPerson().getKey(),
+							nomination.getParty()))
+					.map(key -> {
+						final LocalNomination nomination = nominations.get(key);
+						if (nomination == null) {
+							throw new ElectionException(
+									"Could not find nomination with key \"%s\" for election \"%s\".",
+									key,
+									ELECTION_FOR_JSON_CREATOR.get().getName());
+						}
+						return nomination;
+					})
+					.collect(toSet());
+		}
 	}
 }

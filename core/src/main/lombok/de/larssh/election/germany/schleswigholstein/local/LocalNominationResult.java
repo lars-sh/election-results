@@ -29,6 +29,7 @@ public class LocalNominationResult implements NominationResult<LocalBallot>, Com
 					.thenComparing(LocalNominationResult::getSainteLagueValue)
 					.thenComparing(LocalNominationResult::getNomination);
 
+	@ToString.Exclude
 	LocalElectionResult electionResult;
 
 	LocalNomination nomination;
