@@ -20,15 +20,15 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class District<C extends District<?>> implements Comparable<District<?>> {
-	private static final Comparator<District<?>> COMPARATOR
-			= Comparator.<District<?>, Optional<District<?>>>comparing(District::getParent, Optionals.comparator())
-					.thenComparing(District::getName);
+	private static final Comparator<District<?>> COMPARATOR = Comparator
+			.<District<?>, Optional<? extends District<?>>>comparing(District::getParent, Optionals.comparator())
+			.thenComparing(District::getName);
 
 	private static final String KEY_SEPARATOR = ", ";
 
 	@EqualsAndHashCode.Include
 	@ToString.Include(rank = -1)
-	Optional<District<?>> parent;
+	Optional<? extends District<?>> parent;
 
 	@EqualsAndHashCode.Include
 	String name;

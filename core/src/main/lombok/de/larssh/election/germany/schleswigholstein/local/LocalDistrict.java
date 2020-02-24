@@ -20,8 +20,8 @@ public class LocalDistrict extends District<LocalPollingStation> {
 
 	@Override
 	@JsonIgnore
-	public Optional<District<?>> getParent() {
-		return super.getParent();
+	public Optional<LocalDistrictRoot> getParent() {
+		return super.getParent().map(district -> (LocalDistrictRoot) district);
 	}
 
 	@Override

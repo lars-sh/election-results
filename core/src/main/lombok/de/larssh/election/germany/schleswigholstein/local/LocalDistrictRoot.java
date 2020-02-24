@@ -41,7 +41,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 
 	@Override
 	@JsonIgnore
-	public Optional<District<?>> getParent() {
+	public Optional<? extends District<?>> getParent() {
 		return super.getParent();
 	}
 
