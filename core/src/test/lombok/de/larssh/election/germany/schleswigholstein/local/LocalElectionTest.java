@@ -388,6 +388,15 @@ public class LocalElectionTest {
 	}
 
 	@PackagePrivate
+	static Party findParty(final LocalElection election, final String shortName) {
+		return election.getParties()
+				.stream()
+				.filter(party -> shortName.equals(party.getShortName()))
+				.findAny()
+				.orElseThrow(() -> new ElectionException("Cannot find a party with short name \"%s\".", shortName));
+	}
+
+	@PackagePrivate
 	static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
 		return election.getDistrict()
 				.getChildren()
@@ -400,7 +409,7 @@ public class LocalElectionTest {
 	}
 
 	@Test
-	public void testJacksonForElection() throws IOException {
+	public void testJson() throws IOException {
 		final ObjectWriter objectWriter = LocalElection.createJacksonObjectWriter().withDefaultPrettyPrinter();
 		final Path path = Files.createTempFile("", "");
 

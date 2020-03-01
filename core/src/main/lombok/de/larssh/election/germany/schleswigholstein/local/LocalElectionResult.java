@@ -8,7 +8,6 @@ import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -45,6 +44,7 @@ import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.PartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection.ParsableLocalNomination;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
@@ -64,15 +64,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	});
 
 	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
-
-	public static BigDecimal calculateVoterParticipation(final int numberOfEligibleVoters,
-			final int numberOfAllBallots,
-			final int scale) {
-		return BigDecimal.valueOf(numberOfAllBallots)
-				.multiply(BigDecimal.TEN)
-				.multiply(BigDecimal.TEN)
-				.divide(BigDecimal.valueOf(numberOfEligibleVoters), scale, RoundingMode.HALF_UP);
-	}
 
 	public static ObjectWriter createJacksonObjectWriter() {
 		return LocalElection.createJacksonObjectWriter();
@@ -99,7 +90,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	Map<LocalNomination, LocalNominationResult> nominationResults;
 
 	@JsonIgnore
-	Set<LocalPartyResult> partyResults;
+	Map<Party, LocalPartyResult> partyResults;
 
 	@JsonIgnore
 	Supplier<Integer> numberOfInvalidBallots
@@ -133,11 +124,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 		}
 
 		nominationResults = unmodifiableMap(createNominationResults());
-		partyResults = unmodifiableSet(createPartyResults());
+		partyResults = unmodifiableMap(createPartyResults());
 	}
 
 	@Override
-	public ElectionResult<LocalBallot> filter(final Predicate<LocalBallot> filter) {
+	public LocalElectionResult filter(final Predicate<LocalBallot> filter) {
 		return new LocalElectionResult(getElection(), OptionalInt.empty(), getBallots(), filter);
 	}
 
@@ -320,11 +311,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 		return nominations;
 	}
 
-	private Set<LocalPartyResult> createPartyResults() {
+	private Map<Party, LocalPartyResult> createPartyResults() {
 		return getElection().getParties()
 				.stream()
 				.map(party -> new LocalPartyResult(this, party))
-				.collect(toCollection(TreeSet::new));
+				.sorted()
+				.collect(toLinkedHashMap(PartyResult::getParty, Function.identity()));
 	}
 
 	@Getter
