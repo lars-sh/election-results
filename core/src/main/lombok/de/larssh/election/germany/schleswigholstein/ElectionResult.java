@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein;
 
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -12,7 +13,7 @@ public interface ElectionResult<B extends Ballot> {
 
 	List<B> getBallots();
 
-	Set<? extends NominationResult<B>> getNominationResults();
+	Map<? extends Nomination, ? extends NominationResult<B>> getNominationResults();
 
 	Set<? extends PartyResult<B>> getPartyResults();
 

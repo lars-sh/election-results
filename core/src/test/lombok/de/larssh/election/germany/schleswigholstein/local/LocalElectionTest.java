@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -15,10 +16,13 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Gender;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyType;
 import de.larssh.election.germany.schleswigholstein.Person;
+import de.larssh.utils.Finals;
+import de.larssh.utils.annotations.PackagePrivate;
 import javafx.scene.paint.Color;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +31,12 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 public class LocalElectionTest {
+	@PackagePrivate
+	static final String POLLING_STATION_NAME_KLEIN_BODEN = Finals.constant("Klein Boden");
+
+	@PackagePrivate
+	static final String POLLING_STATION_NAME_RETHWISCHDORF = Finals.constant("Rethwischdorf");
+
 	public static LocalElection createElection() {
 		final LocalDistrictRoot districtRoot
 				= new LocalDistrictRoot("Gemeinde Rethwisch", LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
@@ -46,13 +56,15 @@ public class LocalElectionTest {
 		election.setPopulation(districtLocal, 1186);
 		election.setNumberOfEligibleVoters(districtLocal, OptionalInt.empty());
 
-		final LocalPollingStation pollingStationRethwischdorf = districtLocal.createChild("Rethwischdorf");
+		final LocalPollingStation pollingStationRethwischdorf
+				= districtLocal.createChild(POLLING_STATION_NAME_RETHWISCHDORF);
 		election.setPopulation(pollingStationRethwischdorf, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 720);
+		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 717);
 
-		final LocalPollingStation pollingStationKleinBoden = districtLocal.createChild("Klein Boden");
+		final LocalPollingStation pollingStationKleinBoden
+				= districtLocal.createChild(POLLING_STATION_NAME_KLEIN_BODEN);
 		election.setPopulation(pollingStationKleinBoden, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 270);
+		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 273);
 	}
 
 	private static void addPersons(final LocalElection election) {
@@ -359,6 +371,32 @@ public class LocalElectionTest {
 				Optional.empty(),
 				Optional.empty());
 		election.createNomination(district, personHartmutFeddern, Optional.of(partyFwr));
+	}
+
+	@PackagePrivate
+	static LocalNomination findNomination(final LocalElection election,
+			final String familyName,
+			final String givenName) {
+		return election.getNominations()
+				.stream()
+				.filter(nomination -> familyName.equals(nomination.getPerson().getFamilyName())
+						&& givenName.equals(nomination.getPerson().getGivenName()))
+				.findAny()
+				.orElseThrow(() -> new ElectionException("Cannot find a nomination named \"%s %s\".",
+						givenName,
+						familyName));
+	}
+
+	@PackagePrivate
+	static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
+		return election.getDistrict()
+				.getChildren()
+				.stream()
+				.map(LocalDistrict::getChildren)
+				.flatMap(Collection::stream)
+				.filter(district -> name.equals(district.getName()))
+				.findAny()
+				.orElseThrow(() -> new ElectionException("Cannot find a polling station named \"%s\".", name));
 	}
 
 	@Test

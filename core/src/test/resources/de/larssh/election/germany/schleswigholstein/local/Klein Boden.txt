@@ -1,0 +1,169 @@
+#
+# Klein Boden
+#
+
+* Anzahl Stimmzettel: 166
+* Anzahl Wahlberechtigte: 273
+* Korrekturwert: -25
+
+# Finales Ergebnis
+106 pop 
+71 eggersdirk
+57 beckkarsten
+57 motzkus
+69 behnksoe
+57 weger
+
+29 kroegerdi
+28 eickernst
+10 jogimarhelga
+12 sehlert
+20 ziebarth
+11 sauerjoa
+
+24 gaedejan
+16 boettgerjoh
+26 boettgervol
+14 winterm
+18 gaedehenn
+10 stapelfeld
+
+41 kuehnstef
+37 wahljoa
+34 krausmich
+64 brederol
+27 schoening
+46 koenigeva
+
+* CLEAR
+
+# Ungültige Stimmzettel
+2 -
+
+# Stimmzettel mit nur einer Gruppierung
+41 cpop cegger cbeck cmotz cbehn cweg
+6 skroe seic sjoeg sehlert szie saue
+4 ajangae aboetjo aboetvo awinma agaehenn astaalb
+20 fkuest fwahjo fkrami fbrero fschmat fkoeev 
+
+# Korrektur
+cegge fkraus skröger shelga sangelika ssauer
+cegge fkraus fmathias fkönig awinter
+
+# Stimmzettel
+pop karstenbeck motzkus sönke weger winter
+pop beck motzkus 
+gaedejan boettgerjoh volkerboet kühnstef wahljoa krausmich
+eggersdirk kroegerdi wahljoachim brederolf 
+pop dirkegger motzkus behnk stapelfeld brede
+pop dirkeggers soenkebehnk weger
+volkerboettger rolfbrede
+pop weger kroegerdi jangaede henninggaede evamariakoenig
+pop motzkus ernsteik ziebarth volkerboettger evamaria
+janhendrik volkerboett steffkue wahljoa krausmich bredrolf
+pop ernsteick arminehler volkboettg rolfbrede evamaria
+pop brede volkboettg henninggaede
+pop eickern ehlertarm 
+pop eggersdirk kuehnsteff wahljoachim krausmich brederolf
+pop behnksoen
+ehlertarm brederolf koeneva 
+pop behnksoen
+gaedejan boettgjoh gaedehenn 
+schoenimat 
+pop 
+kuehnsteff wahljoa krausmi bredero schoenmat 
+ziebarthan sauerjoa kuehnste wahljoa koenigeva 
+pop 
+wahljoach 
+weger
+pop 
+pop 
+boettvolk brederol
+pop behnksoen
+boettgvol brederolf
+pop eggersdirk motzkusdie
+kroegerd
+brederolf koenigeva
+eickernst gaedejan boettgervolk gaedehenn 
+kuehnstef
+pop kroegerdi eickern jogimar ziebarth
+pop eggersdirk beckkarsten motzkus stapelfeld koenigeva
+eickernst gaedejan wintermart gaedehenn koenigeva
+gaedejan boettgejoh boettgervolk wintermart kuehnsteffen brederolf
+pop brederolf
+pop eggersdirk behnk weger
+krausmich brederolf 
+pop eggersdirk beckkarsten behnksoe weger boettgerjoh 
+eggersdirk ziebarthangel brederolf 
+pop beckkarsten kuehnsteffen kroegerdirk koenigeva 
+pop behnksoe weger
+pop wahljoachim krausmich brederolf 
+pop behnk kroegerdi eickernst boettgervolk koenigeva
+eggersdirk beckkarsten motzkus behnk 
+boettgervolk brederolf
+pop eggersdirk beckkarsten motzkus behnk brederolf 
+gaedejan brederolf 
+pop sauerjoachim wahljoa brede schoenig koenigev
+kroegerdi kuehnste wahljoac
+pop gaedejan brederolf koenigeva
+pop fkuehn brederolf 
+pop eggersdirk kroegerdi gaedehenning kuehn brede
+pop ehlertarm kuehn wahl brede koenig
+pop eickernst joegimar brederolf
+beckkarsten motzkus weger
+kroegerdi eickernst ziebarthan
+gaedejan boettgerjoh boettgervolk kuehn wahljoach 
+eggersdirk kroegerdi boettgerjoh boettgervolk 
+brederolf koenig 
+kroegerdi eickernst ziebarth stapelfeld kraus koenigeva
+pop eickernst ziebarth boettgerjoh boettgervolk winter
+pop eggersdirk behnk weger 
+eickernst boettgerjoh 
+pop eickernst ziebarth kuehn brede koenigev
+pop eggersdirk kroegerdi eicker ehlertar brederol
+gaedejan winter gaedehenn koenigeva
+pop weger kroegerdi ziebarth boettgerjoh kuehn
+boettjoh boettvol brederolf 
+pop beckkarst motzkus 
+kroegerdi eickernst ziebart
+pop behnk eickern boettgervol gaedehenn koenigeva
+pop eggersdirk beckkar behnk weger bredero
+pop 
+pop
+eggersdi behnk bredero 
+pop eggersdi behnk gaedehenn stapelfeld 
+brederolf 
+cpop beckkarsten motzkus
+pop eggersdirk behnk weger 
+bredero koenigeva 
+pop eggersdi beckkarst motzkus behnk
+pop wahljoa kraus brederol 
+pop eggersdi kroegerdi brederol
+pop eggersdi kroegerdi brederolf
+gaedejan boettgervol stapelfeld kraus schoening koenigeva
+pop beckkarsten motzkus behnksö weger 
+gaedejan 
+kroegerdi eickern sauerjoa boettvol wahljoach
+pop beckkarsten behnksoe gaedejan kuehnst
+eggersdir eickern gaedejan wintermartin kuehn schoening
+pop kuehnstef wahljoa brederol schoeningmat 
+eickernst gaedejan boettvol kuehn wahljoa kraus
+pop beckkars motzkus behnksoe weger wintermart
+pop eggersdir behnksoe boettvolk gaedehenn brederolf
+pop ziebarth sauerjoa 
+pop eickernst stapelfeld koenigeva
+pop kroegerdi eickernst gaedejan kuehnstef koenigeva
+eggersdir gaedejan boettgerjoh
+kuehnstf wahljoa brederol 
+pop motzkusdiet ehlertarm gaedehenn koenigeva
+gaedejan boettgerjoh boettgervol wintermar
+gaedehenn brederol kroegerdi eickernst
+pop eggersdi kroegerdi joegimar gaedehenn brederol
+ziebarth
+pop eggersdi behnksoe gaedejan winterma
+behnksoe kroegerdi ziebarth
+gaedehenn
+pop behnk weger kroegerdi kraus koenigeva
+pop behnk weger
+kraus brederol koenigeva 
+pop eggersdi beckkar motzkus behnksoe brederol

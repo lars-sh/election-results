@@ -1,0 +1,344 @@
+#
+# Rethwischdorf
+#
+
+* Anzahl Stimmzettel: 435
+* Anzahl Wahlberechtigte: 717
+* Korrekturwert: -1
+
+# Finales Ergebnis
+222 cpop
+148 cegge
+124 cbeck
+134 cmotz
+151 cbehnk
+126 cweger
+
+46 skröger
+84 seick
+27 shelga
+49 sehlert
+33 sangelika
+48 ssauer
+
+136 ajangä
+105 ajohbö
+169 avolker
+73 awinter
+133 ahenning
+63 aalbert
+
+109 fkühn
+68 fwahl
+82 fkraus
+82 fbreede
+58 fmathias
+69 fkönig
+
+* CLEAR
+
+# Ungültige Stimmzettel
+1 -
+
+# Stimmzettel mit nur einer Gruppierung
+65 cpop cegger cbeck cmotz cbehn cweg
+13 skroe seic sjoeg sehlert szie saue
+41 ajangae aboetjo aboetvo awinma agaehenn astaalb
+31 fkuest fwahjo fkrami fbrero fschmat fkoeev
+
+# Korrektur
+cpop cegge cmotz cbehn cweger
+fkraus fbreede
+3 sehlert
+
+# Stimmzettel
+cpop mweger seick fkraus fbreede fkönig
+cpop ceggers cweger ajangäde ajohbö fbreede
+cbehnk
+cpop cmotz cbehnk ajangäde ajohbö ahenning
+cpop cmotz cbehnk seick shelga sehlert
+avolker awinter ahenning aalbert
+seick sehlert ssauer ajohboe avolker ahenning
+seick avolker awinter ahenning fkühn fkönig
+cpop cbeck seick fwahl fkraus cmathias
+cpop cegger skröger fkühn fwahl fkraus
+cpop cegge cbeck skröger seick sehlert
+cbehnk ajangäde aböttgerjoh awinter ahenning aalbert
+cpop ceggers ckarsten cmotz cbehnk avolker
+cpop cegger ckarsten cmotz
+cweger avolker fkühn fwahl fkraus fbreede
+cpop cegge cbeck cbehnk avolker fbreede
+cpop avolker
+cpop cmotz avolker ahenning fkühn fbreede
+cpop cegge cbehnk ajangäde ajohboe fbreede
+cpop cegge ckarsten cbehnk avolker ahenning
+cpop ajangäde ajohboe avolker fkraus fbreede
+cpop cegge cweger skröger seick sehlert
+cpop cegge cbeck cbehnk cweger sehlert
+cbehnk cweger sziebarth ahenning
+cpop sehlert ajangäde ahenning fkühn fbreede
+ajohbö
+ajangäde ajohbö avolker awinter ahenning fkühn
+ssauer ajangäde avolker ahenning
+cpop cmotz sehlert ajangäde ahenning fkühn
+cpop cbehnk sehlert avolker ahenning aalbert
+shelga sangelika fkönig
+cpop cegge fkühn fwahl fkraus fbreede
+cpop cbehnk avolker awinter fkühn
+cpop cegge cmotz seick ajangäde avolker
+cpop cmotz cbehnk seick aboettgervolker fkühn
+cpop cegge cbeck ajangäde ahenning fmathias
+cpop cbehnk cweger ajangäde aalbert fkraus
+cbeck cbehnk ajohboe avolker fkühn fbreede
+cpop cegge cbeck cmotz cbehnk ahenning
+
+cweger skröger seick sangelika fkühn fkönig
+cpop cbeck
+cbehnk skröger seick sjögimar sehlert sziebart
+cpop cegge cbeck cweger fkraus fmathias
+cpop cegge
+cweger agädejan ahenning avolker fkraus fbreede
+seick ahenning fkühn
+cmotz seick sehlert avolker fwahl fkönig
+cpop seick
+cpop cegge cmotz cbehnk avolker ahenning
+cpop cegge cmotz cbehnk ahenning aalbert
+cpop cegge cbeck cmotz cbehnk avolker
+cpop cegge cbeck cmotz cbehnk fmathias
+skröger seick shelga ssauer ajangäde avolker
+seick aalbert fsteffen fkraus fbreede fmathias
+cegge seick sangelika fkraus
+cpop ajangäde ajohbö avolker
+cpop ahenning fkühn fkraus fbreede fmathias
+cegge cbeck cbehnk avolker ahenning fmathias
+cbeck cbehnk seick ajohbö avolker fkönig
+
+cmotz
+cpop cegge cmotz seick sehlert sangelika
+cbehnk cweger avolker ahenning aalbert fbreede
+skröger shelga sarmin sangelika ssauer avolker
+cegge cweger skröger sehlert ajohbö avolker
+cpop cegge cmotz cbehnk cweger fkühn
+skröger ssauer
+cpop cweger ajohbö avolker awinter fkraus
+skröger ssauer ajangäde ajohbö avolker fkühn
+seick sehlert ajohbö avolker ahenning fkühn
+skröger ssauer avolker fkühn fkraus fkönig
+cegge cmotz cbehnk avolker awinter ahenning
+cpop avolker fkühn fwahl fkraus fbreede
+cpop cegge cbehnk avolker
+seick fkühn fwahl fkraus fbreede fkönig
+seick sehlert ajangä avolker fsteffen fbreede
+cpop skröger seick shelga sangelika ssauer
+cbehnk skröger sangelika ssauer awinter fmathias
+cpop seick fkühn fwahl fkraus fmathias
+seick
+
+skröger seick shelga ajangä fsteffen fwahl
+cbehnk skröger avolker fkühn
+cpop seick ajohbö ahenning
+sehlert ajohbö avolker fkönig
+fkühn fbreede
+skröger ssauer ajangä avolker ahenning fkönig
+cpop cegge cmotz skröger seick sehlert
+cpop cbeck cmotz ajangä avolker ahenning
+cegge avolker
+cweger ajangä ajohbö avolker ahenning aalbert
+ssauer ajangä ajohbö ahenning fwahl fkönig
+avolker fkühn fwahl fkraus fbreede fmathias
+cpop ajangä ajohbö ahenning aalbert fbreede
+cpop cbehnk ajohbö avolker fkraus
+cmotz ssauer ajangä ajohbö avolker ahenning
+cegge fmathias
+cpop cmotz cbehnk cweger seick csauer
+cpop cegge cbeck cmotz cweger avolker
+cmotz avolker ahenning fwahl fmathias fkönig
+cpop ajangä ajohbö avolker ahenning aalbert
+
+cpop cegge cbeck fkühn fwahl fkraus
+cpop cmotz cweger
+cpop cbeck cbehnk cweger avolker fkühn
+seick
+cegge cbeck cmotz cbehnk fkühn fwahl
+cpop
+cpop cegge skröger ajangä ahenning fmathias
+cpop cmotz seick
+cpop cmotz skröger seick sehlert avolker
+cegge fkühn
+seick sehlert ssauer avolker awinter fkühn
+cpop cmotz cbehnk ajangä avolker ahenning
+cpop cweger skröger shelga ajangä ahenning
+cpop seick ahenning fkraus
+cpop cegge cmotz seick ahenning fkraus
+fkönig
+cweger ajangä ajohbö avolker ahenning
+cpop cegge cweger seick sehlert ssauer
+cpop cegge skröger ajangä ajohbö avolker
+cbeck cweger seick fkühn fwahl fkönig
+cpop cmotz cbehnk cweger seick ahenning
+cpop sangelika ajangä avolker fkühn
+cegge cmotz cbehnk seick ajohbö avolker
+cpop cweger skröger seick ajohbö fkühn
+seick ajangä ajohbö
+cweger ahenning fkühn fbreede
+cweger seick ajohbö
+cpop cegge cmotz cbehnk ahenning fbreede
+cweger fkönig
+cpop cegge cbeck cmotz ajohbö awinter
+cpop fkühn fwahl fkraus fbreede fmathias
+cpop cbeck cmotz cbehnk seick avolker
+cpop cegge cbeck fkühn fwahl fkraus
+cpop avolker ahenning aalbert fkühn fbreede
+cpop cbehnk shelga ssauer ajangä ahenning
+cbehnk cweger seick sehlert ajangä avolker
+ajangä avolker ahenning fwahl fbreede fkönig
+cpop cegge cbeck cbehnk avolker fkühn
+
+cpop cegge cmotz cbehnk avolker fkühn
+cpop skröger ssauer ajangä avolker fbreede
+cweger skröger ssauer ajangä ajohbö fkönig
+cbehnk seick sehlert ahenning fwahl
+cpop cbeck sehlert ajangä fkraus fmathias
+cpop cbeck cbehnk ajangä avolker ahenning
+cpop cegge ajangä avolker ahenning fkühn
+cpop cmotz cbehnk avolker awinter ahenning
+sehlert ssauer ajangä ajohbö avolker fkühn
+cpop cegge cbeck cmotz cbehnk ajangä
+cpop cbeck cbehnk ajangä avolker fkühn
+cpop cegge cbehnk cweger ajangä avolker
+cpop cegge cbehnk cweger avolker fbreede
+seick fkraus
+cweger avolker ahenning fkühn fwahl fkönig
+cpop cegge cmotz cbehnk aalbert fbreede
+cbehnk seick sehlert ajangä ajohbö avolker
+cpop cbeck seick ssauer ahenning fkraus
+
+cbeck cmotz seick avolker ahenning fkühn
+cegge cmotz ajangä awinter ahenning fbreede
+seick sangelika ssauer ajangä ajohbö fkönig
+skröger seick sehlert
+cpop cbehnk cweger ajohbö avolker ahenning
+cpop cegge cmotz ajangä awinter ahenning
+cpop cbeck cmotz cbehnk skröger shelga
+cmotz ajangä ajohbö ahenning aalbert fkühn
+cpop avolker fkraus
+cbeck cbehnk ajangä avolker fkühn fbreede
+cpop cbeck cbehnk ajangä ajohbö avolker
+cpop cegge cbeck cmotz cbehnk ahenning
+ssauer
+cpop cbeck avolker fsteffen fbreede
+cpop cegge cbeck cbehnk cweger
+cpop cegge cbeck ajangä avolker fkühn
+cpop cbeck fkühn fkraus fbreede fkönig
+cweger sangelika awinter fkönig
+cmotz ssauer ajangä awinter fkühn fbreede
+cpop ajangä ajohbö avolker ahenning fkönig
+
+cpop cbehnk seick ajangä ajohbö ahenning
+cpop ssauer avolker fkühn
+avolker aalbert fkraus fmathias fkönig
+seick fkühn
+cmotz ajangä ajohbö
+ajangä ajohbö avolker ahenning
+cpop ahenning
+cpop cegge cbeck cmotz ajohbö
+ajangä ajohbö avolker ahenning awinter
+cpop cegge cbeck cmotz cbehnk avolker
+cweger seick shelga sangelika fkönig
+cpop fkühn fwahl fkraus fbreede fmathias
+cegge cbehnk avolker ahenning
+cpop cegge cbehnk cweger ajohbö avolker
+skröger ajangä avolker ahenning fkraus fkönig
+cpop sehlert awinter fkraus fmathias fkönig
+cegge skröger sangelika ssauer fkühn fkraus
+cpop cegge cbehnk cweger ajangä ajohbö
+cpop cegge cmotz cbehnk cweger avolker
+cpop cmotz cbehnk cweger
+ajangä
+cpop cweger seick ajangä ahenning fkühn
+cweger sangelika ssauer fkönig
+cbehnk cweger skröger ssauer ajangä avolker
+cpop cmotz cbehnk
+cpop cbeck cmotz ajangä ahenning fkühn
+cpop cbehnk cweger ajangä ajohbö fbreede
+cbehnk skröger avolker fkraus
+cpop cegge cbehnk ajangä avolker ahenning
+cpop
+cpop cegge cbehnk cweger ajangä ahenning
+cpop cbeck ahenning
+cpop cegge cbeck cbehnk cweger
+cpop avolker fkühn fwahl fkraus fbreede
+cpop cbeck ssauer avolker aalbert fbreede
+cpop cegge seick ajangä avolker fkühn
+cpop cbehn skröger sangelika fkraus fkönig
+cpop cbeck cmotz cbehnk avolker ahenning
+cmotz
+ajangä ajohbö avolker ahenning fkraus fmathias
+
+cweger skröger shelga sehlert ssauer fmathias
+cweger ajangä avolker fkühn fwahl fbreede
+cpop cegge cbeck ahenning
+cbeck cbehnk fmathias fkönig
+cpop fkühn fwahl
+cpop cegge cweger ajangä avolker fkühn
+cpop cmotz sehlert ahenning aalbert
+skröger seick sehlert
+cpop fkühn fwahl fkraus fbreede fmathias
+seick sehlert ssauer ajangä aalbert
+seick ssauer ajangä avolker awinter ahenning
+cpop
+cpop
+cmotz cweger
+avolker
+seick ajangä ajohbö avolker ahenning aalbert
+fkühn
+fkraus
+cegge avolker ahenning fkühn fwahl fbreede
+cpop cbehnk cweger seick ahenning aalbert
+
+ajangä awinter aalbert fwahl fbreede fkönig
+cpop seick ajohbö avolker ahenning fkühn
+cegge cmotz seick shelga awinter aalbert
+cpop cbeck fkraus fbreede fmathias fkönig
+ajangä avolker ahenning fwahl fkraus fmathias
+cweger sangelika ajangä awinter fmathias fkönig
+cpop cegge cbeck cmotz cweger avolker
+avolker fkühn fwahl fkraus fbreede
+ajangä ajohbö avolker awinter ahenning fkraus
+sangelika fkraus fkönig
+cpop cegge cbeck cmotz seick avolker
+ajangä awinter ahenning fkühn fwahl fkönig
+cpop cbeck ajangä ajohbö avolker awinter
+cegge cbeck cbehnk cweger avolker ahenning
+cegge cbehnk sangelika ajangä avolker fkraus
+cpop cegge cmotz cbehnk avolker ahenning
+ssauer
+cpop ajangä ajohbö avolker awinter ahenning
+cmotz sehlert ajangä avolker ahenning fbreede
+cpop cegge ajangä ajohbö avolker awinter
+cpop cegge ajohbö avolker fkühn fkraus
+cpop cegge cmotz cbehnk cweger fkühn
+
+cpop cweger seick shelga ajohbö fkühn
+cpop ajangä ajohbö avolker awinter ahenning
+cpop fkühn fwahl fkraus fbreede fmathias
+cweger ssauer ajohbö awinter fkühn fbreede
+cmotz seick sehlert ajangä ahenning fkühn
+cmotz seick sehlert ssauer avolker fwahl
+cpop cegge cbeck cmotz fkraus fmathias
+cpop cegge ajangä ajohbö avolker awinter
+cpop cegge beck cbehnk ajohbö fbreede
+seick sehlert ssauer ajohbö avolker fkühn
+cweger ajangä ajohbö avolker aalbert fbreede
+cpop seick sehlert ahenning fwahl fkönig
+cpop cbeck cbehnk fwahl fbreede fkönig
+cpop cegge cbeck cbehnk ajangä avolker
+cpop cmotz cbehnk cweger sangelika
+cpop cbehnk seick avolker fkühn fkönig
+cpop cegge cbeck
+ajangä ajohbö awinter ahenning
+seick ajangä avolker fwahl fbreede
+ajangä awinter ahenning fwahl fkraus fkönig
+ajangä ajohbö avolker awinter fkühn fwahl
+cpop cmotz cbehnk ajangä avolker ahenning
+cpop ajangä ajohbö avolker ahenning
