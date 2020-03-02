@@ -160,7 +160,7 @@ public class LocalElection implements Election {
 
 	@Override
 	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
-	public OptionalInt getNumberOfEligibleVoters(final District<?> district) { // TODO: getOrSumByChildren
+	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
 		final OptionalInt numberOfEligibleVoters = this.numberOfEligibleVoters.get(district);
 		if (numberOfEligibleVoters != null && numberOfEligibleVoters.isPresent()) {
 			return numberOfEligibleVoters;

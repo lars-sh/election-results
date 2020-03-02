@@ -19,7 +19,44 @@ public class LocalNominationResultTest {
 		final LocalElectionResult result = LegacyParserTest.readAllResults();
 		final LocalElection election = result.getElection();
 
-		// TODO: Result Type
+		// @formatter:off
+		final Map<LocalNomination, LocalNominationResult> nominationResults = result.getNominationResults();
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Bernhardt", "Christian")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(LocalNominationResultType.LIST);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Dohrendorf", "Martina")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Dohrendorf", "Thomas")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Efrom", "Joachim")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Feddern", "Axel")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Feddern", "Hartmut")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gräpel", "Carola")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(LocalNominationResultType.LIST);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Hartz", "Catrin")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Klein", "Erik")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(LocalNominationResultType.LIST);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(LocalNominationResultType.LIST);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schwarz", "Rupert")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Topel", "Andreas")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(LocalNominationResultType.LIST);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(LocalNominationResultType.DIRECT);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+		// @formatter:on
 	}
 
 	@Test

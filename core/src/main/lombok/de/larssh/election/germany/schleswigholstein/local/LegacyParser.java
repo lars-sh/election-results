@@ -61,7 +61,7 @@ public class LegacyParser {
 		}
 
 		final char possiblePartyIndicator = Character.toLowerCase(person.charAt(0));
-		Set<LocalNomination> nominations = election.getNominations()
+		final Set<LocalNomination> nominationsWithPartyPrefix = election.getNominations()
 				.stream()
 				.filter(nomination -> nomination.getDistrict().equals(district))
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
@@ -71,11 +71,11 @@ public class LegacyParser {
 						.toLowerCase(nomination.getParty().get().getShortName().charAt(0)))
 				.filter(nomination -> matches(nomination, person.substring(1)))
 				.collect(toSet());
-		if (nominations.size() == 1) {
-			return nominations.iterator().next();
+		if (nominationsWithPartyPrefix.size() == 1) {
+			return nominationsWithPartyPrefix.iterator().next();
 		}
 
-		nominations = election.getNominations() // TODO: final
+		final Set<LocalNomination> nominations = election.getNominations()
 				.stream()
 				.filter(nomination -> nomination.getDistrict().equals(district))
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)

@@ -201,6 +201,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 		// Sort
 		return Maps.sort(votes,
 				Comparator.<Entry<LocalNomination, Integer>, Integer>comparing(Entry::getValue)
+						.reversed()
 						.thenComparing(Entry::getKey));
 	}
 
