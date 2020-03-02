@@ -10,9 +10,13 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,10 +30,25 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class LegacyParser {
-	private static final Pattern BALLOT_PATTERN = Pattern.compile("^\\s*(?<count>\\d+)?\\s*(?<value>.*?)\\s*$");
+	private static final String BALLOT_INVALID = "-";
+
+	private static final String GROUP_COUNT = "count";
+
+	private static final String GROUP_VALUE = "value";
+
+	private static final Pattern BALLOT_PATTERN
+			= Pattern.compile("^\\s*(?<" + GROUP_COUNT + ">\\d+)?\\s*(?<" + GROUP_VALUE + ">.*?)\\s*$");
+
+	private static final String COMMAND_CLEAR = "clear";
 
 	private static final Pattern NUMBER_OF_ALL_BALLOTS_PATTERN
-			= Pattern.compile("^(?i)\\s*Anzahl\\s*Stimmzettel\\s*:?\\s*(?<value>\\d+)\\s*$");
+			= Pattern.compile("^(?i)\\s*Anzahl\\s*Stimmzettel\\s*:?\\s*(?<" + GROUP_VALUE + ">\\d+)\\s*$");
+
+	private static final char LINE_COMMAND = '*';
+
+	private static final char LINE_COMMENT = '#';
+
+	private static final Map<String, Pattern> PATTERN_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
 	private static Collection<LocalBallot> createBallotFromLine(final LocalElection election,
 			final LocalPollingStation pollingStation,
@@ -37,18 +56,18 @@ public class LegacyParser {
 		final Matcher matcher = Patterns.matches(BALLOT_PATTERN, line)
 				.orElseThrow(() -> new ElectionException("Failed parsing line \"%s\".", line));
 
-		LocalBallot ballot;
-		if (matcher.group("value").equals("-")) {
+		final LocalBallot ballot;
+		if (matcher.group(GROUP_VALUE).equals(BALLOT_INVALID)) {
 			ballot = LocalBallot.createInvalidBallot(election, pollingStation, false);
 		} else {
 			final Set<LocalNomination> nominations
-					= Arrays.stream(matcher.group("value").split("\\s+", SplitLimit.NONE))
+					= Arrays.stream(matcher.group(GROUP_VALUE).split("\\s+", SplitLimit.NONE))
 							.map(nomination -> findNomination(election, pollingStation.getParent().get(), nomination))
 							.collect(toSet());
 			ballot = LocalBallot.createValidBallot(election, pollingStation, false, nominations);
 		}
 
-		final int count = matcher.group("count") == null ? 1 : Integer.parseInt(matcher.group("count"));
+		final int count = Optional.ofNullable(matcher.group(GROUP_COUNT)).map(Integer::parseInt).orElse(1);
 		return IntStream.range(0, count).mapToObj(index -> ballot).collect(toList());
 	}
 
@@ -103,9 +122,10 @@ public class LegacyParser {
 	}
 
 	private static boolean matches(final String value, final String person) {
-		final Pattern pattern = Pattern.compile(getSimplifiedString(person).chars()
-				.mapToObj(v -> Character.toString((char) v))
-				.collect(joining(".*", "^.*", ".*$"))); // TODO: PatternCache
+		final Pattern pattern = PATTERN_CACHE.computeIfAbsent(person,
+				key -> Pattern.compile(getSimplifiedString(key).chars()
+						.mapToObj(v -> Character.toString((char) v))
+						.collect(joining(".*", "^.*", ".*$"))));
 		return Strings.matches(getSimplifiedString(value), pattern);
 	}
 
@@ -121,22 +141,22 @@ public class LegacyParser {
 	public static LocalElectionResult parse(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final Reader reader) throws IOException {
-		try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
+		try (BufferedReader bufferedReader = new BufferedReader(reader)) {
 			final AtomicReference<OptionalInt> numberOfAllBallots = new AtomicReference<>(OptionalInt.empty());
 			final List<LocalBallot> ballots = new ArrayList<>();
 			bufferedReader.lines()
 					.map(String::trim)
-					.filter(line -> !line.isEmpty() && !line.startsWith("#"))
+					.filter(line -> !line.isEmpty() && line.charAt(0) != LINE_COMMENT)
 					.forEachOrdered(line -> {
-						if (line.startsWith("*")) {
+						if (line.charAt(0) == LINE_COMMAND) {
 							final String command = Strings.trimStart(line.substring(1));
 
-							if ("CLEAR".equalsIgnoreCase(command)) {
+							if (COMMAND_CLEAR.equalsIgnoreCase(command)) {
 								ballots.clear();
 							}
-							Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command).ifPresent(matcher -> {
-								numberOfAllBallots.set(OptionalInt.of(Integer.parseInt(matcher.group("value"))));
-							});
+							Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command)
+									.ifPresent(matcher -> numberOfAllBallots
+											.set(OptionalInt.of(Integer.parseInt(matcher.group(GROUP_VALUE)))));
 						} else {
 							ballots.addAll(createBallotFromLine(election, pollingStation, line));
 						}

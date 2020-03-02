@@ -22,13 +22,13 @@ public class LocalPartyResultTest {
 						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
 		final LocalElection election = result.getElection();
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
-	
+
 		// Parties
 		assertThat(partyResults.get(LocalElectionTest.findParty(election, "CDU")).getNumberOfVotes()).isEqualTo(417);
 		assertThat(partyResults.get(LocalElectionTest.findParty(election, "SPD")).getNumberOfVotes()).isEqualTo(110);
 		assertThat(partyResults.get(LocalElectionTest.findParty(election, "AWG")).getNumberOfVotes()).isEqualTo(108);
 		assertThat(partyResults.get(LocalElectionTest.findParty(election, "FWR")).getNumberOfVotes()).isEqualTo(249);
-	
+
 		// Block Votings
 		assertThat(partyResults.get(LocalElectionTest.findParty(election, "CDU")).getNumberOfBlockVotings())
 				.isEqualTo(41);
