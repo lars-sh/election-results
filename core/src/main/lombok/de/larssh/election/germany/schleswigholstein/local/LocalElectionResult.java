@@ -87,9 +87,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	List<LocalBallot> ballots;
 
 	@JsonIgnore
+	@ToString.Exclude
 	Map<LocalNomination, LocalNominationResult> nominationResults;
 
 	@JsonIgnore
+	@ToString.Exclude
 	Map<Party, LocalPartyResult> partyResults;
 
 	@JsonIgnore

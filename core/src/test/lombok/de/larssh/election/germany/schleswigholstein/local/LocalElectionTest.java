@@ -1,6 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -426,6 +426,6 @@ public class LocalElectionTest {
 		// Compare
 		final String electionCreatedToString = electionCreated.toString();
 		final String electionOpenedToString = electionOpened.toString();
-		assertEquals(electionCreatedToString, electionOpenedToString);
+		assertThat(electionOpenedToString).isEqualTo(electionCreatedToString);
 	}
 }

@@ -1,5 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -32,18 +34,8 @@ public class LocalElectionResultTest {
 		}
 
 		// Compare
-		// final String electionCreatedToString = resultCreated.toString();
-		// final String electionOpenedToString = resultOpened.toString();
-		// TODO: assertEquals(electionCreatedToString, electionOpenedToString);
-	}
-
-	@Test
-	public void testResultType() {
-		// TODO: Result Type
-	}
-
-	@Test
-	public void testSainteLague() {
-		// TODO: Sainte Lague
+		final String electionCreatedToString = resultCreated.toString();
+		final String electionOpenedToString = resultOpened.toString();
+		assertThat(electionOpenedToString).isEqualTo(electionCreatedToString);
 	}
 }
