@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class LocalPartyResultTest {
 	@Test
 	public void testKleinBoden() {
-		final LocalElectionResult result = LegacyParserTest.readAllResults()
+		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
@@ -42,7 +42,7 @@ public class LocalPartyResultTest {
 
 	@Test
 	public void testRethwisch() {
-		final LocalElectionResult result = LegacyParserTest.readAllResults();
+		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
@@ -65,7 +65,7 @@ public class LocalPartyResultTest {
 
 	@Test
 	public void testRethwischdorf() {
-		final LocalElectionResult result = LegacyParserTest.readAllResults()
+		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));

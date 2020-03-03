@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -26,34 +24,25 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 public class LegacyParserTest {
+	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
+		return readResult(election, pollingStationName, Paths.get(pollingStationName + ".txt"));
+	}
+
 	@PackagePrivate
-	static LocalElectionResult readAllResults() {
-		final LocalElection election = LocalElectionTest.createElection();
-
-		final LocalElectionResult resultKleinBoden = readResult(election,
-				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
-		final LocalElectionResult resultRethwischdorf = readResult(election,
-				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
-
-		final OptionalInt numberOfAllBallots = resultKleinBoden.getNumberOfAllBallots().isPresent()
-				&& resultRethwischdorf.getNumberOfAllBallots().isPresent()
-						? OptionalInt.of(resultKleinBoden.getNumberOfAllBallots().getAsInt()
-								+ resultRethwischdorf.getNumberOfAllBallots().getAsInt())
-						: OptionalInt.empty();
-
-		final List<LocalBallot> ballots = new ArrayList<>();
-		ballots.addAll(resultKleinBoden.getBallots());
-		ballots.addAll(resultRethwischdorf.getBallots());
-
-		return new LocalElectionResult(election, numberOfAllBallots, ballots);
+	static LocalElectionResult readResult(final LocalElection election,
+			final String pollingStationName,
+			final Path classRelativePath) {
+		return readResult(election,
+				LocalElectionTest.findPollingStation(election, pollingStationName),
+				classRelativePath);
 	}
 
 	private static LocalElectionResult readResult(final LocalElection election,
-			final LocalPollingStation pollingStation) {
-		final Path path
-				= Resources.getResourceRelativeTo(LegacyParserTest.class, Paths.get(pollingStation.getName() + ".txt"))
-						.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
-								pollingStation.getKey()));
+			final LocalPollingStation pollingStation,
+			final Path classRelativePath) {
+		final Path path = Resources.getResourceRelativeTo(LegacyParserTest.class, classRelativePath)
+				.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
+						pollingStation.getKey()));
 		try (Reader reader = Files.newBufferedReader(path)) {
 			return LegacyParser.parse(election, pollingStation, reader);
 		} catch (final IOException e) {
@@ -61,12 +50,23 @@ public class LegacyParserTest {
 		}
 	}
 
+	@PackagePrivate
+	static LocalElectionResult readResultsRethwisch() {
+		final LocalElection election = LocalElectionTest.createElection();
+
+		final LocalElectionResult resultKleinBoden
+				= readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN);
+		final LocalElectionResult resultRethwischdorf
+				= readResult(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF);
+		return LegacyParser.mergeResults(election, resultKleinBoden, resultRethwischdorf);
+	}
+
 	@Test
 	public void testKleinBoden() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalPollingStation pollingStation
-				= LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN);
-		final LocalElectionResult result = readResult(election, pollingStation);
+		final String pollingStationName = LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN;
+		final LocalElectionResult result = readResult(election, pollingStationName);
+		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(273));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(166));
@@ -77,7 +77,7 @@ public class LegacyParserTest {
 
 	@Test
 	public void testRethwisch() {
-		final LocalElectionResult result = readAllResults();
+		final LocalElectionResult result = readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		// Compare
@@ -91,9 +91,9 @@ public class LegacyParserTest {
 	@Test
 	public void testRethwischdorf() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalPollingStation pollingStation
-				= LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF);
-		final LocalElectionResult result = readResult(election, pollingStation);
+		final String pollingStationName = LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF;
+		final LocalElectionResult result = readResult(election, pollingStationName);
+		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(717));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(435));

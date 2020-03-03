@@ -9,7 +9,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -28,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -175,7 +173,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 		// Result Type: List Draw
 		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes)) {
-			resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
+			if (resultTypes.getOrDefault(nomination, null) == LocalNominationResultType.LIST) {
+				resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
+			}
 		}
 
 		// Result Type: Not Elected
@@ -234,8 +234,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		final List<LocalNomination> nominations = getElection().getNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
+						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))
 						.reversed()
-						.thenComparing(entry -> -votes.get(entry.getKey()))
 						.thenComparing(entry -> nominations.indexOf(entry.getKey())));
 	}
 
@@ -277,25 +277,25 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
 	}
 
-	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, ? extends Number> votes,
+	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, ? extends Number> values,
 			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
 		// Find last nomination
-		final Optional<? extends Number> lastNomination = resultTypes.isEmpty()
-				? Optional.empty()
-				: votes.values().stream().skip(resultTypes.size() - 1L).findAny();
+		final Optional<LocalNomination> lastNomination
+				= resultTypes.keySet().stream().skip(resultTypes.isEmpty() ? 0 : resultTypes.size() - 1).findAny();
 		if (!lastNomination.isPresent()) {
 			return emptySet();
 		}
 
 		// Collect probably draw nominations
-		final Set<LocalNomination> probablyDirectNominations = votes.entrySet()
+		final Number lastNominationVotes = values.get(lastNomination.get());
+		final Set<LocalNomination> probablyDrawNominations = values.entrySet()
 				.stream()
-				.filter(entry -> entry.getValue().equals(lastNomination.get()))
+				.filter(entry -> entry.getValue().equals(lastNominationVotes))
 				.map(Entry::getKey)
-				.collect(toCollection(TreeSet::new));
-		// TODO: Result of the draws
+				.collect(toSet());
+		return probablyDrawNominations.size() > 1 ? probablyDrawNominations : emptySet();
 
-		return probablyDirectNominations.size() > 1 ? probablyDirectNominations : emptySet();
+		// TODO: Result of the draws
 	}
 
 	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,

@@ -130,6 +130,22 @@ public class LegacyParser {
 		return Strings.matches(getSimplifiedString(value), pattern);
 	}
 
+	public static LocalElectionResult mergeResults(final LocalElection election, final LocalElectionResult... results) {
+		final OptionalInt numberOfAllBallots;
+		if (Arrays.stream(results).map(LocalElectionResult::getNumberOfAllBallots).allMatch(OptionalInt::isPresent)) {
+			numberOfAllBallots = OptionalInt.of(Arrays.stream(results)
+					.map(LocalElectionResult::getNumberOfAllBallots)
+					.mapToInt(OptionalInt::getAsInt)
+					.sum());
+		} else {
+			numberOfAllBallots = OptionalInt.empty();
+		}
+
+		final List<LocalBallot> ballots = new ArrayList<>();
+		Arrays.stream(results).map(LocalElectionResult::getBallots).forEach(ballots::addAll);
+		return new LocalElectionResult(election, numberOfAllBallots, ballots);
+	}
+
 	private static String getSimplifiedString(final String value) {
 		return Strings.toNeutralLowerCase(value)
 				.replace("ä", "ae")
