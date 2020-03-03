@@ -114,17 +114,6 @@ public class LocalNominationResultTest {
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, false);
 
-		nominationResults.values().forEach(r -> {
-			System.out.println(""
-					+ r.getBallots().size()
-					+ "\t"
-					+ r.getType()
-					+ "\t"
-					+ r.getSainteLagueValue()
-					+ "\t"
-					+ r.getNomination().getPerson().getKey());
-		});
-
 		// @formatter:off
 		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LocalNominationResultType.LIST_OVERHANG_SEAT);
 		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
