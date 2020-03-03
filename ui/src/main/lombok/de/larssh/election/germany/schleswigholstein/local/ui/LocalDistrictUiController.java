@@ -83,9 +83,10 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 	@Getter
 	@RequiredArgsConstructor
 	@EqualsAndHashCode
-	public static class DisplayableLocalNomination implements Nomination, Comparable<DisplayableLocalNomination> {
+	public static class DisplayableLocalNomination
+			implements Nomination<DisplayableLocalNomination>, Comparable<DisplayableLocalNomination> {
 		private static final Comparator<DisplayableLocalNomination> COMPARATOR
-				= Comparator.comparing(DisplayableLocalNomination::getParty, Optionals.comparator())
+				= Comparator.comparing(DisplayableLocalNomination::getParty, Optionals.<Party>comparator())
 						.thenComparing(DisplayableLocalNomination::getOrderValue)
 						.thenComparing(DisplayableLocalNomination::getPerson);
 
@@ -103,7 +104,7 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 		}
 
 		@Override
-		public Election getElection() {
+		public Election<?, DisplayableLocalNomination> getElection() {
 			throw new UnsupportedOperationException();
 		}
 
