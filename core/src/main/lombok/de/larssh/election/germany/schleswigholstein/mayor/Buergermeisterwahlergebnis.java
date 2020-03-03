@@ -4,7 +4,8 @@ import java.util.Map;
 
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 
-public interface Buergermeisterwahlergebnis extends ElectionResult<Buergermeisterwahlstimmzettel> {
+public interface Buergermeisterwahlergebnis
+		extends ElectionResult<Buergermeisterwahlstimmzettel, Buergermeisterwahlvorschlag> {
 	@Override
 	Map<Buergermeisterwahlvorschlag, Buergermeisterwahlvorschlagergebnis> getNominationResults();
 }

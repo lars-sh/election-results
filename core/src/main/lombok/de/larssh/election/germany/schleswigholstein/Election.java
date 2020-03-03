@@ -7,12 +7,12 @@ import java.util.OptionalInt;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-public interface Election extends Comparable<Election> {
-	Comparator<Election> COMPARATOR = Comparator.<Election, District<?>>comparing(Election::getDistrict)
+public interface Election<D extends District<?>, N extends Nomination<? extends N>> extends Comparable<Election<?, ?>> {
+	Comparator<Election<?, ?>> COMPARATOR = Comparator.<Election<?, ?>, District<?>>comparing(Election::getDistrict)
 			.thenComparing(Election::getName)
 			.thenComparing(Election::getDate);
 
-	District<?> getDistrict();
+	D getDistrict();
 
 	LocalDate getDate();
 
@@ -46,10 +46,10 @@ public interface Election extends Comparable<Election> {
 
 	void setNumberOfEligibleVoters(District<?> district, OptionalInt numberOfEligibleVoters);
 
-	List<? extends Nomination> getNominations();
+	List<? extends N> getNominations();
 
 	@Override
-	default int compareTo(@Nullable final Election election) {
+	default int compareTo(@Nullable final Election<?, ?> election) {
 		return COMPARATOR.compare(this, election);
 	}
 }

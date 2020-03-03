@@ -23,11 +23,12 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class LocalNominationResult implements NominationResult<LocalBallot>, Comparable<LocalNominationResult> {
-	private static final Comparator<LocalNominationResult> COMPARATOR
-			= Comparator.<LocalNominationResult, Election>comparing(result -> result.getElectionResult().getElection())
-					.thenComparing(LocalNominationResult::getSainteLagueValue)
-					.thenComparing(LocalNominationResult::getNomination);
+public class LocalNominationResult
+		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
+	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
+			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
+			.thenComparing(LocalNominationResult::getSainteLagueValue)
+			.thenComparing(LocalNominationResult::getNomination);
 
 	@ToString.Exclude
 	LocalElectionResult electionResult;

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 
-public interface Buergermeisterwahlstimmzettel extends Ballot {
+public interface Buergermeisterwahlstimmzettel extends Ballot<Buergermeisterwahlvorschlag> {
 	Buergermeisterwahlvorschlag getVorschlag();
 
 	@Override

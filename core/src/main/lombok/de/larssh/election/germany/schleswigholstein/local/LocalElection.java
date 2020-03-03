@@ -56,7 +56,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @SuppressWarnings("PMD.ExcessiveImports")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class LocalElection implements Election {
+public class LocalElection implements Election<LocalDistrictRoot, LocalNomination> {
 	@PackagePrivate
 	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() //
 			.addMixIn(Color.class, ColorMixIn.class)

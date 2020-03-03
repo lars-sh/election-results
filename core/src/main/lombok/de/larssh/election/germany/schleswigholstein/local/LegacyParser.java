@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.text.Patterns;
 import de.larssh.utils.text.SplitLimit;
@@ -57,7 +58,7 @@ public class LegacyParser {
 				.orElseThrow(() -> new ElectionException("Failed parsing line \"%s\".", line));
 
 		final LocalBallot ballot;
-		if (matcher.group(GROUP_VALUE).equals(BALLOT_INVALID)) {
+		if (BALLOT_INVALID.equals(matcher.group(GROUP_VALUE))) {
 			ballot = LocalBallot.createInvalidBallot(election, pollingStation, false);
 		} else {
 			final Set<LocalNomination> nominations
@@ -71,7 +72,7 @@ public class LegacyParser {
 		return IntStream.range(0, count).mapToObj(index -> ballot).collect(toList());
 	}
 
-	private static LocalNomination findNomination(final LocalElection election,
+	private static LocalNomination findNomination(final Election<?, ? extends LocalNomination> election,
 			final LocalDistrict district,
 			final String person) {
 		if (person.isEmpty()) {
@@ -82,13 +83,13 @@ public class LegacyParser {
 		final char possiblePartyIndicator = Character.toLowerCase(person.charAt(0));
 		final Set<LocalNomination> nominationsWithPartyPrefix = election.getNominations()
 				.stream()
-				.filter(nomination -> nomination.getDistrict().equals(district))
-				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
-				.filter(nomination -> nomination.getParty().isPresent())
-				.filter(nomination -> !nomination.getParty().get().getShortName().isEmpty())
-				.filter(nomination -> possiblePartyIndicator == Character
-						.toLowerCase(nomination.getParty().get().getShortName().charAt(0)))
-				.filter(nomination -> matches(nomination, person.substring(1)))
+				.filter(nomination -> nomination.getDistrict().equals(district)
+						&& nomination.getType() == LocalNominationType.DIRECT
+						&& nomination.getParty().isPresent()
+						&& !nomination.getParty().get().getShortName().isEmpty()
+						&& possiblePartyIndicator == Character
+								.toLowerCase(nomination.getParty().get().getShortName().charAt(0))
+						&& matches(nomination, person.substring(1)))
 				.collect(toSet());
 		if (nominationsWithPartyPrefix.size() == 1) {
 			return nominationsWithPartyPrefix.iterator().next();
@@ -96,9 +97,9 @@ public class LegacyParser {
 
 		final Set<LocalNomination> nominations = election.getNominations()
 				.stream()
-				.filter(nomination -> nomination.getDistrict().equals(district))
-				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
-				.filter(nomination -> matches(nomination, person))
+				.filter(nomination -> nomination.getDistrict().equals(district)
+						&& nomination.getType() == LocalNominationType.DIRECT
+						&& matches(nomination, person))
 				.collect(toSet());
 		if (nominations.isEmpty()) {
 			throw new ElectionException("Cannot find a nomination for \"%s\" in district \"%s\".",
@@ -130,7 +131,7 @@ public class LegacyParser {
 	}
 
 	private static String getSimplifiedString(final String value) {
-		return value.toLowerCase()
+		return Strings.toNeutralLowerCase(value)
 				.replace("ä", "ae")
 				.replace("ö", "oe")
 				.replace("ü", "ue")

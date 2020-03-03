@@ -26,9 +26,9 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class LocalNomination implements Nomination, Comparable<LocalNomination> {
+public class LocalNomination implements Nomination<LocalNomination>, Comparable<LocalNomination> {
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
-			.thenComparing(LocalNomination::getParty, Optionals.comparator())
+			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	public static String createKey(final String personKey, final Optional<String> partyKey) {

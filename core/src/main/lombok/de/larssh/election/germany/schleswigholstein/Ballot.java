@@ -2,8 +2,8 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.Set;
 
-public interface Ballot {
-	Election getElection();
+public interface Ballot<N extends Nomination<? extends N>> {
+	Election<?, ? extends N> getElection();
 
 	District<?> getPollingStation();
 
@@ -11,5 +11,5 @@ public interface Ballot {
 
 	boolean isValid();
 
-	Set<? extends Nomination> getNominations();
+	Set<? extends N> getNominations();
 }

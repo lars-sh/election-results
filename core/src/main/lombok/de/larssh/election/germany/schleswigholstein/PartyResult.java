@@ -2,12 +2,12 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.List;
 
-public interface PartyResult<B extends Ballot> {
-	ElectionResult<B> getElectionResult();
+public interface PartyResult<B extends Ballot<?>> {
+	ElectionResult<? extends B, ?> getElectionResult();
 
 	Party getParty();
 
-	List<B> getBallots();
+	List<? extends B> getBallots();
 
 	int getNumberOfVotes();
 }

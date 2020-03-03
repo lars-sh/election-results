@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -56,7 +55,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
-public final class LocalElectionResult implements ElectionResult<LocalBallot> {
+public final class LocalElectionResult implements ElectionResult<LocalBallot, LocalNomination> {
 	@PackagePrivate
 	static final ThreadLocal<LocalElection> ELECTION_FOR_JSON_CREATOR = ThreadLocal.withInitial(() -> {
 		throw new ElectionException(
@@ -112,7 +111,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	private LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final Collection<LocalBallot> ballots,
-			final Predicate<LocalBallot> filter) {
+			final Predicate<? super LocalBallot> filter) {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
 		this.numberOfAllBallots = numberOfAllBallots;
@@ -130,7 +129,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 	}
 
 	@Override
-	public LocalElectionResult filter(final Predicate<LocalBallot> filter) {
+	public LocalElectionResult filter(final Predicate<? super LocalBallot> filter) {
 		return new LocalElectionResult(getElection(), OptionalInt.empty(), getBallots(), filter);
 	}
 
@@ -187,7 +186,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 						resultTypes.getOrDefault(nomination, LocalNominationResultType.NOT_ELECTED),
 						sainteLague.getOrDefault(nomination, BigDecimal.ZERO)))
 				.sorted()
-				.collect(toLinkedHashMap(LocalNominationResult::getNomination, Function.identity()));
+				.collect(toLinkedHashMap(LocalNominationResult::getNomination, identity()));
 	}
 
 	private Map<LocalNomination, Integer> getVotes() {
@@ -319,7 +318,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot> {
 				.stream()
 				.map(party -> new LocalPartyResult(this, party))
 				.sorted()
-				.collect(toLinkedHashMap(PartyResult::getParty, Function.identity()));
+				.collect(toLinkedHashMap(PartyResult::getParty, identity()));
 	}
 
 	@Getter
