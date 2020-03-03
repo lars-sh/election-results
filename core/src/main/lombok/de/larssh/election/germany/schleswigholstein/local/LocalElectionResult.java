@@ -173,7 +173,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 		// Result Type: List Draw
 		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes)) {
-			if (resultTypes.getOrDefault(nomination, null) == LocalNominationResultType.LIST) {
+			if (resultTypes.getOrDefault(nomination,
+					LocalNominationResultType.LIST) == LocalNominationResultType.LIST) {
 				resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
 			}
 		}

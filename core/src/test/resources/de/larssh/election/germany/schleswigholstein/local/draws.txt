@@ -1,0 +1,27 @@
+6 Poppinga,Jens
+5 Eggers,Dirk
+4 Beck,Karsten
+3 Motzkus,Dietrich
+2 Behnk,Sönke
+1 Weger,Marcel
+
+6 Kröger,Dirk
+5 Eick,Ernst
+4 Jögimar,Helga
+3 Ehlert,Armin
+2 Ziebarth,Angelika
+1 Sauer,Joachim
+
+6 Gäde,Jan-Hendrik
+5 Böttger,Johannes
+4 Böttger,Volker
+3 Winter,Martin
+2 Gäde,Henning
+1 Stapelfeldt,Albert
+
+6 Kühn,Steffen
+5 Wahl,Joachim
+4 Kraus,Michael
+3 Breede,Rolf
+2 Schöning,Mathias
+1 König,Eva-Maria
