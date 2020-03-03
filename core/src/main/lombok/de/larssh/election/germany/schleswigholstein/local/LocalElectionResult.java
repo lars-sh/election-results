@@ -165,17 +165,26 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
 		}
 
-		// Result Type: Direct Balance Seat
-		// TODO: Direct Balance Seat
-
-		// Result Type: List Overhang Seat
-		// TODO: List Overhang Seat
-
 		// Result Type: List Draw
 		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes)) {
 			if (resultTypes.getOrDefault(nomination,
 					LocalNominationResultType.LIST) == LocalNominationResultType.LIST) {
 				resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
+			}
+		}
+
+		// Result Type: Direct Balance Seat
+		final Set<LocalNomination> balanceAndOverhangSeats = getBalanceAndOverhangSeats(sainteLague, resultTypes);
+		for (final LocalNomination nomination : balanceAndOverhangSeats) {
+			if (resultTypes.get(nomination) == LocalNominationResultType.DIRECT) {
+				resultTypes.put(nomination, LocalNominationResultType.DIRECT_BALANCE_SEAT);
+			}
+		}
+
+		// Result Type: List Overhang Seat
+		for (final LocalNomination nomination : balanceAndOverhangSeats) {
+			if (resultTypes.get(nomination) == LocalNominationResultType.LIST) {
+				resultTypes.put(nomination, LocalNominationResultType.LIST_OVERHANG_SEAT);
 			}
 		}
 
@@ -312,6 +321,15 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			nominations.add(nomination);
 		}
 		return nominations;
+	}
+
+	private Set<LocalNomination> getBalanceAndOverhangSeats(final Map<LocalNomination, BigDecimal> sainteLague,
+			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
+		return sainteLague.keySet()
+				.stream()
+				.limit(resultTypes.size())
+				.skip(getElection().getNumberOfSeats())
+				.collect(toSet());
 	}
 
 	private Map<Party, LocalPartyResult> createPartyResults() {

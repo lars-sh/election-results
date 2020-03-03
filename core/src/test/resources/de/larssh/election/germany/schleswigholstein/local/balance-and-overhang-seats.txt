@@ -1,0 +1,27 @@
+100 Poppinga,Jens 
+0 Eggers,Dirk
+0 Beck,Karsten
+0 Motzkus,Dietrich
+0 Behnk,Sönke
+0 Weger,Marcel
+
+27 Kröger,Dirk
+26 Eick,Ernst
+25 Jögimar,Helga
+24 Ehlert,Armin
+23 Ziebarth,Angelika
+22 Sauer,Joachim
+
+21 Gäde,Jan-Hendrik
+20 Böttger,Johannes
+19 Böttger,Volker
+18 Winter,Martin
+17 Gäde,Henning
+16 Stapelfeldt,Albert
+
+15 Kühn,Steffen
+14 Wahl,Joachim
+13 Kraus,Michael
+12 Breede,Rolf
+11 Schöning,Mathias
+10 König,Eva-Maria
