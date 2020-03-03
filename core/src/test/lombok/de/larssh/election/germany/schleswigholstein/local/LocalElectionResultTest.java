@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -25,7 +26,8 @@ public class LocalElectionResultTest {
 	@Test
 	public void testEmpty() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = new LocalElectionResult(election, OptionalInt.empty(), emptyList());
+		final LocalElectionResult result
+				= new LocalElectionResult(election, OptionalInt.empty(), emptyList(), emptySet(), emptySet());
 
 		assertThat(result.getBallots()).isEmpty();
 		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.empty());

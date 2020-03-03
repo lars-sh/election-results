@@ -8,6 +8,7 @@ import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -83,6 +85,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 	List<LocalBallot> ballots;
 
+	@ToString.Exclude
+	Set<LocalNomination> directDrawResults;
+
+	@ToString.Exclude
+	Set<LocalNomination> listDrawResults;
+
 	@JsonIgnore
 	@ToString.Exclude
 	Map<LocalNomination, LocalNominationResult> nominationResults;
@@ -97,22 +105,32 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 	@JsonCreator(mode = Mode.DELEGATING)
 	private LocalElectionResult(final ParsableLocalElectionResult parsable) {
-		this(ELECTION_FOR_JSON_CREATOR.get(), parsable.getNumberOfAllBallots(), parsable.createLocalBallots());
+		this(ELECTION_FOR_JSON_CREATOR.get(),
+				parsable.getNumberOfAllBallots(),
+				parsable.createLocalBallots(),
+				parsable.createDirectDrawResults(),
+				parsable.createListDrawResults());
 	}
 
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
-			final Collection<LocalBallot> ballots) {
-		this(election, numberOfAllBallots, ballots, ballot -> true);
+			final List<LocalBallot> ballots,
+			final Set<LocalNomination> directDrawResults,
+			final Set<LocalNomination> listDrawResults) {
+		this(election, numberOfAllBallots, ballots, directDrawResults, listDrawResults, ballot -> true);
 	}
 
 	private LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
-			final Collection<LocalBallot> ballots,
+			final List<LocalBallot> ballots,
+			final Set<LocalNomination> directDrawResults,
+			final Set<LocalNomination> listDrawResults,
 			final Predicate<? super LocalBallot> filter) {
 		this.election = election;
 		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
 		this.numberOfAllBallots = numberOfAllBallots;
+		this.directDrawResults = unmodifiableSet(new HashSet<>(directDrawResults));
+		this.listDrawResults = unmodifiableSet(new HashSet<>(listDrawResults));
 
 		for (final LocalBallot ballot : ballots) {
 			if (!ballot.getElection().equals(election)) {
@@ -128,7 +146,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 	@Override
 	public LocalElectionResult filter(final Predicate<? super LocalBallot> filter) {
-		return new LocalElectionResult(getElection(), OptionalInt.empty(), getBallots(), filter);
+		return new LocalElectionResult(getElection(),
+				OptionalInt.empty(),
+				getBallots(),
+				getDirectDrawResults(),
+				getListDrawResults(),
+				filter);
 	}
 
 	public Optional<BigDecimal> getCountingProgress(final int scale) {
@@ -155,7 +178,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: Direct Draw
-		for (final LocalNomination nomination : getDrawNominations(votes, resultTypes)) {
+		for (final LocalNomination nomination : getDrawNominations(votes, resultTypes, getDirectDrawResults())) {
 			resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW);
 		}
 
@@ -166,7 +189,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List Draw
-		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes)) {
+		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes, getListDrawResults())) {
 			if (resultTypes.getOrDefault(nomination,
 					LocalNominationResultType.LIST) == LocalNominationResultType.LIST) {
 				resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
@@ -288,7 +311,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, ? extends Number> values,
-			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
+			final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Set<LocalNomination> drawResults) {
 		// Find last nomination
 		final Optional<LocalNomination> lastNomination
 				= resultTypes.keySet().stream().skip(resultTypes.isEmpty() ? 0 : resultTypes.size() - 1).findAny();
@@ -303,9 +327,18 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.filter(entry -> entry.getValue().equals(lastNominationVotes))
 				.map(Entry::getKey)
 				.collect(toSet());
-		return probablyDrawNominations.size() > 1 ? probablyDrawNominations : emptySet();
 
-		// TODO: Result of the draws
+		// Handle draw results
+		final long numberOfOpenNominations
+				= probablyDrawNominations.stream().filter(nomination -> resultTypes.containsKey(nomination)).count();
+		final long drawnNominations
+				= drawResults.stream().filter(nomination -> probablyDrawNominations.contains(nomination)).count();
+		if (drawnNominations >= numberOfOpenNominations) {
+			return emptySet();
+		}
+
+		// Mark as draw when deciding between two or more nominations
+		return probablyDrawNominations.size() > 1 ? probablyDrawNominations : emptySet();
 	}
 
 	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
@@ -345,9 +378,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	private static class ParsableLocalElectionResult {
 		OptionalInt numberOfAllBallots;
 
-		Collection<ParsableLocalBallot> ballots;
+		List<ParsableLocalBallot> ballots;
 
-		public Collection<LocalBallot> createLocalBallots() {
+		Set<ParsableLocalNomination> directDrawResults;
+
+		Set<ParsableLocalNomination> listDrawResults;
+
+		public List<LocalBallot> createLocalBallots() {
 			final LocalElection election = ELECTION_FOR_JSON_CREATOR.get();
 			return getBallots().stream()
 					.map(ballot -> ballot.isValid()
@@ -358,6 +395,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 							: LocalBallot
 									.createInvalidBallot(election, ballot.findPollingStation(), ballot.isPostalVoter()))
 					.collect(toList());
+		}
+
+		public Set<LocalNomination> createDirectDrawResults() {
+			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getDirectDrawResults());
+		}
+
+		public Set<LocalNomination> createListDrawResults() {
+			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getListDrawResults());
 		}
 	}
 
@@ -388,25 +433,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		public Set<LocalNomination> findNominations() {
-			final Map<String, LocalNomination> nominations = ELECTION_FOR_JSON_CREATOR.get()
-					.getNominations()
-					.stream()
-					.collect(toMap(LocalNomination::getKey, identity()));
-
-			return getNominations().stream()
-					.map(nomination -> LocalNomination.createKey(nomination.getPerson().getKey(),
-							nomination.getParty()))
-					.map(key -> {
-						final LocalNomination nomination = nominations.get(key);
-						if (nomination == null) {
-							throw new ElectionException(
-									"Could not find nomination with key \"%s\" for election \"%s\".",
-									key,
-									ELECTION_FOR_JSON_CREATOR.get().getName());
-						}
-						return nomination;
-					})
-					.collect(toSet());
+			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getNominations());
 		}
 	}
 }

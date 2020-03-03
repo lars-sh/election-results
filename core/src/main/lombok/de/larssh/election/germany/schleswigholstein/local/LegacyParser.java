@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -141,9 +142,19 @@ public class LegacyParser {
 			numberOfAllBallots = OptionalInt.empty();
 		}
 
-		final List<LocalBallot> ballots = new ArrayList<>();
-		Arrays.stream(results).map(LocalElectionResult::getBallots).forEach(ballots::addAll);
-		return new LocalElectionResult(election, numberOfAllBallots, ballots);
+		final List<LocalBallot> ballots = Arrays.stream(results)
+				.map(LocalElectionResult::getBallots)
+				.flatMap(Collection::stream)
+				.collect(toList());
+		final Set<LocalNomination> directDrawResults = Arrays.stream(results)
+				.map(LocalElectionResult::getDirectDrawResults)
+				.flatMap(Collection::stream)
+				.collect(toSet());
+		final Set<LocalNomination> listDrawResults = Arrays.stream(results)
+				.map(LocalElectionResult::getListDrawResults)
+				.flatMap(Collection::stream)
+				.collect(toSet());
+		return new LocalElectionResult(election, numberOfAllBallots, ballots, directDrawResults, listDrawResults);
 	}
 
 	private static String getSimplifiedString(final String value) {
@@ -178,7 +189,7 @@ public class LegacyParser {
 							ballots.addAll(createBallotFromLine(election, pollingStation, line));
 						}
 					});
-			return new LocalElectionResult(election, numberOfAllBallots.get(), ballots);
+			return new LocalElectionResult(election, numberOfAllBallots.get(), ballots, emptySet(), emptySet());
 		}
 	}
 }
