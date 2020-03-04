@@ -48,6 +48,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElection.Parsable
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -120,6 +121,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		this(election, numberOfAllBallots, ballots, directDrawResults, listDrawResults, ballot -> true);
 	}
 
+	@SuppressFBWarnings(value = "OCP_OVERLY_CONCRETE_PARAMETER",
+			justification = "Parameter \"ballots\" should be in order and therefore must not be of type Collection.")
 	private LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final List<LocalBallot> ballots,
@@ -166,6 +169,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return numberOfInvalidBallots.get();
 	}
 
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
 		final Map<LocalNomination, Integer> votes = getVotes();
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();

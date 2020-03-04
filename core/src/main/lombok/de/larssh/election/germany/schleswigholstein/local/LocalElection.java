@@ -24,7 +24,6 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -362,8 +361,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 		public void createNominationsFor(final LocalElection election) {
 			final Map<String, District<?>> districts
-					= election.getDistricts().stream().collect(toMap(District::getKey, Function.identity()));
-			final Map<String, Party> parties = getParties().stream().collect(toMap(Party::getKey, Function.identity()));
+					= election.getDistricts().stream().collect(toMap(District::getKey, identity()));
+			final Map<String, Party> parties = getParties().stream().collect(toMap(Party::getKey, identity()));
 
 			for (final ParsableLocalNomination nomination : getNominations()) {
 				final District<?> district = districts.get(nomination.getDistrict());
