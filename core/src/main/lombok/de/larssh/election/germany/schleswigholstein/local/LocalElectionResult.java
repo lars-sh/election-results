@@ -171,7 +171,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return numberOfInvalidBallots.get();
 	}
 
-	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
+	@SuppressWarnings("PMD.CyclomaticComplexity")
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
 		// TODO: Calculate results per LocalDistrict
 		final Map<LocalNomination, Integer> votes = getVotes();

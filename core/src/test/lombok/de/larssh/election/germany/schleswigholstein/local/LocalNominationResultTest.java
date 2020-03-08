@@ -170,9 +170,6 @@ public class LocalNominationResultTest {
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);
-		for (final LocalNominationResult r : nominationResults.values()) {
-			System.out.println(r.getType() + "\t" + r.getNomination().getPerson().getKey());
-		}
 
 		// @formatter:off
 		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LocalNominationResultType.LIST);
@@ -217,9 +214,6 @@ public class LocalNominationResultTest {
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);
-		for (final LocalNominationResult r : nominationResults.values()) {
-			System.out.println(r.getType() + "\t" + r.getNomination().getPerson().getKey());
-		}
 
 		// @formatter:off
 		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LocalNominationResultType.LIST);
