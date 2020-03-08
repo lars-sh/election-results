@@ -171,7 +171,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return numberOfInvalidBallots.get();
 	}
 
-	@SuppressWarnings("PMD.CyclomaticComplexity")
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
 		// TODO: Calculate results per LocalDistrict
 		final Map<LocalNomination, Integer> votes = getVotes();
@@ -322,6 +321,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
 	}
 
+	@SuppressWarnings("PMD.CyclomaticComplexity")
 	private Map<LocalNomination, LocalNominationResultType> getDrawNominations(
 			final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
@@ -348,8 +348,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					numberOfDrawSeats,
 					currentResultType.toString().toLowerCase(Locale.ROOT));
 		}
-
-		final Map<LocalNomination, LocalNominationResultType> returningResultTypes = new LinkedHashMap<>();
+		final Map<LocalNomination, LocalNominationResultType> returningResultTypes
+				= new LinkedHashMap<>(drawResults.size());
 		for (final LocalNomination nomination : drawResults) {
 			returningResultTypes.put(nomination, currentResultType);
 			if (!Nullables.orElse(votes.get(nomination), 0).equals(votesForLastNomination) // TODO: Test
