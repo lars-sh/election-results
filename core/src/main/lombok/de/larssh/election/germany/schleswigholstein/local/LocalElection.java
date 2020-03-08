@@ -399,7 +399,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@PackagePrivate
 	@RequiredArgsConstructor
 	static class ParsableLocalNomination {
-		public static Set<LocalNomination> createFromSet(final LocalElection election,
+		public static Set<LocalNomination> createSet(final LocalElection election,
 				final Set<ParsableLocalNomination> set) {
 			final Map<String, LocalNomination> nominations
 					= election.getNominations().stream().collect(toMap(LocalNomination::getKey, identity()));

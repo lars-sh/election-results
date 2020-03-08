@@ -5,7 +5,7 @@ import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -171,6 +171,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
+		// TODO: Calculate results per LocalDistrict
 		final Map<LocalNomination, Integer> votes = getVotes();
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();
 
@@ -182,8 +183,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: Direct Draw
-		for (final LocalNomination nomination : getDrawNominations(votes, resultTypes, getDirectDrawResults())) {
-			resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW);
+		for (final Entry<LocalNomination, LocalNominationResultType> entry : getDirectDrawNominations(resultTypes,
+				votes).entrySet()) {
+			resultTypes.remove(entry.getKey());
+			resultTypes.put(entry.getKey(), entry.getValue());
 		}
 
 		// Result Type: List
@@ -193,11 +196,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List Draw
-		for (final LocalNomination nomination : getDrawNominations(sainteLague, resultTypes, getListDrawResults())) {
-			if (resultTypes.getOrDefault(nomination,
-					LocalNominationResultType.LIST) == LocalNominationResultType.LIST) {
-				resultTypes.put(nomination, LocalNominationResultType.LIST_DRAW);
-			}
+		for (final Entry<LocalNomination, LocalNominationResultType> entry : getListDrawNominations(resultTypes,
+				sainteLague).entrySet()) {
+			resultTypes.remove(entry.getKey());
+			resultTypes.put(entry.getKey(), entry.getValue());
 		}
 
 		// Result Type: Direct Balance Seat
@@ -314,35 +316,109 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
 	}
 
-	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, ? extends Number> values,
+	private Map<LocalNomination, LocalNominationResultType> getDirectDrawNominations(
 			final Map<LocalNomination, LocalNominationResultType> resultTypes,
-			final Set<LocalNomination> drawResults) {
-		// Find last nomination
+			final Map<LocalNomination, Integer> votes) {
 		final Optional<LocalNomination> lastNomination
 				= resultTypes.keySet().stream().skip(resultTypes.isEmpty() ? 0 : resultTypes.size() - 1).findAny();
 		if (!lastNomination.isPresent()) {
-			return emptySet();
+			return emptyMap();
 		}
 
-		// Collect probably draw nominations
-		final Number lastNominationVotes = values.get(lastNomination.get());
-		final Set<LocalNomination> probablyDrawNominations = values.entrySet()
+		final int votesForLastNomination = votes.get(lastNomination.get());
+		final long numberOfDrawSeats = resultTypes.keySet()
 				.stream()
-				.filter(entry -> entry.getValue().equals(lastNominationVotes))
-				.map(Entry::getKey)
-				.collect(toSet());
+				.filter(nomination -> votes.getOrDefault(nomination, 0) == votesForLastNomination)
+				.count();
 
-		// Handle draw results
-		final long numberOfOpenNominations
-				= probablyDrawNominations.stream().filter(nomination -> resultTypes.containsKey(nomination)).count();
-		final long drawnNominations
-				= drawResults.stream().filter(nomination -> probablyDrawNominations.contains(nomination)).count();
-		if (drawnNominations >= numberOfOpenNominations) {
-			return emptySet();
+		// Draw Results
+		final Set<LocalNomination> drawResults = getDirectDrawResults();
+		if (drawResults.size() > numberOfDrawSeats) {
+			throw new ElectionException("%d direct draw results given while expected %d at max.",
+					drawResults.size(),
+					numberOfDrawSeats);
+		}
+		final Map<LocalNomination, LocalNominationResultType> resultTypes2 = new LinkedHashMap<>();
+		for (final LocalNomination nomination : drawResults) {
+			resultTypes2.put(nomination, LocalNominationResultType.DIRECT);
+
+			if (votes.getOrDefault(nomination, 0) != votesForLastNomination) {
+				throw new ElectionException("\"%s\" must not be part of the direct draw results.",
+						nomination.getPerson().getKey());
+			}
 		}
 
-		// Mark as draw when deciding between two or more nominations
-		return probablyDrawNominations.size() > 1 ? probablyDrawNominations : emptySet();
+		if (numberOfDrawSeats > drawResults.size()) {
+			final Set<LocalNomination> drawNominations = votes.entrySet()
+					.stream()
+					.filter(entry -> entry.getValue().equals(votesForLastNomination))
+					.map(Entry::getKey)
+					.filter(nomination -> !drawResults.contains(nomination))
+					.collect(toSet());
+
+			final LocalNominationResultType resultType = drawNominations.size() > numberOfDrawSeats - drawResults.size()
+					? LocalNominationResultType.DIRECT_DRAW
+					: LocalNominationResultType.DIRECT;
+			for (final LocalNomination nomination : drawNominations) {
+				resultTypes2.put(nomination, resultType);
+			}
+		}
+		return resultTypes2;
+	}
+
+	private Map<LocalNomination, LocalNominationResultType> getListDrawNominations(
+			final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, BigDecimal> votes) {
+		final Optional<LocalNomination> lastNomination
+				= resultTypes.keySet().stream().skip(resultTypes.isEmpty() ? 0 : resultTypes.size() - 1).findAny();
+		if (!lastNomination.isPresent()) {
+			return emptyMap();
+		}
+
+		final BigDecimal votesForLastNomination = votes.get(lastNomination.get());
+		final long numberOfDrawSeats = resultTypes.keySet() // TODO: entrySet
+				.stream()
+				.filter(nomination -> resultTypes.get(nomination) == LocalNominationResultType.LIST)
+				.filter(nomination -> votes.getOrDefault(nomination, BigDecimal.ZERO).equals(votesForLastNomination))
+				.count();
+
+		// Draw Results
+		final Set<LocalNomination> drawResults = getListDrawResults();
+		if (drawResults.size() > numberOfDrawSeats) {
+			throw new ElectionException("%d direct draw results given while expected %d at max.",
+					drawResults.size(),
+					numberOfDrawSeats);
+		}
+		final Map<LocalNomination, LocalNominationResultType> resultTypes2 = new LinkedHashMap<>();
+		for (final LocalNomination nomination : drawResults) {
+			resultTypes2.put(nomination, LocalNominationResultType.LIST);
+
+			if (!votes.getOrDefault(nomination, BigDecimal.ZERO).equals(votesForLastNomination)
+					|| resultTypes.getOrDefault(nomination,
+							LocalNominationResultType.LIST) != LocalNominationResultType.LIST) {
+				throw new ElectionException("\"%s\" must not be part of the list draw results.",
+						nomination.getPerson().getKey());
+			}
+		}
+
+		if (numberOfDrawSeats > drawResults.size()) {
+			final Set<LocalNomination> drawNominations = votes.entrySet()
+					.stream()
+					.filter(entry -> entry.getValue().equals(votesForLastNomination))
+					.map(Entry::getKey)
+					.filter(nomination -> !drawResults.contains(nomination))
+					.filter(nomination -> resultTypes.getOrDefault(nomination,
+							LocalNominationResultType.LIST) != LocalNominationResultType.LIST)
+					.collect(toSet());
+
+			final LocalNominationResultType resultType = drawNominations.size() > numberOfDrawSeats - drawResults.size()
+					? LocalNominationResultType.LIST_DRAW
+					: LocalNominationResultType.LIST;
+			for (final LocalNomination nomination : drawNominations) {
+				resultTypes2.put(nomination, resultType);
+			}
+		}
+		return resultTypes2;
 	}
 
 	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
@@ -402,11 +478,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		public Set<LocalNomination> createDirectDrawResults() {
-			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getDirectDrawResults());
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getDirectDrawResults());
 		}
 
 		public Set<LocalNomination> createListDrawResults() {
-			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getListDrawResults());
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getListDrawResults());
 		}
 	}
 
@@ -437,7 +513,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		public Set<LocalNomination> findNominations() {
-			return ParsableLocalNomination.createFromSet(ELECTION_FOR_JSON_CREATOR.get(), getNominations());
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getNominations());
 		}
 	}
 }

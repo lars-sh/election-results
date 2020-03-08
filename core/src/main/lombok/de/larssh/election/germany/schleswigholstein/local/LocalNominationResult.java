@@ -29,6 +29,7 @@ public class LocalNominationResult
 			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
 			.thenComparing(LocalNominationResult::getSainteLagueValue)
 			.reversed()
+			.thenComparing(LocalNominationResult::getType) // TODO: How's that doing?
 			.thenComparing(LocalNominationResult::getNomination);
 
 	@ToString.Exclude
