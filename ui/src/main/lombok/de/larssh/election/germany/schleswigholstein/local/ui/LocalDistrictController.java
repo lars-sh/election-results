@@ -30,7 +30,8 @@ public class LocalDistrictController extends LocalDistrictUiController {
 		// TODO: nominations
 	}
 
-	public void setLocalDistrict(final LocalElection election, final LocalDistrict localDistrict) {
+	public void setLocalDistrict(@SuppressWarnings("unused") final LocalElection election,
+			final LocalDistrict localDistrict) {
 		getName().setText(localDistrict.getName());
 		// TODO: pollingstations
 		// TODO: nominations
