@@ -60,10 +60,10 @@
 		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.MainApplication</jar.manifest.mainClass>
 
 		<!-- Versions -->
-		<javafx-base.version>14</javafx-base.version>
-		<javafx-controls.version>14</javafx-controls.version>
-		<javafx-fxml.version>14</javafx-fxml.version>
-		<javafx-graphics.version>14</javafx-graphics.version>
+		<javafx-base.version>14.0.1</javafx-base.version>
+		<javafx-controls.version>14.0.1</javafx-controls.version>
+		<javafx-fxml.version>14.0.1</javafx-fxml.version>
+		<javafx-graphics.version>14.0.1</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
