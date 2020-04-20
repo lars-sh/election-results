@@ -1,5 +1,9 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+/**
+ * {@link LocalNominationResult#compareTo(LocalNominationResult)} is based on
+ * the order specified for the below enumeration values.
+ */
 public enum LocalNominationResultType {
 	NOT_ELECTED,
 

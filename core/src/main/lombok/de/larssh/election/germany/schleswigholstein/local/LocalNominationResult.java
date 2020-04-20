@@ -27,9 +27,9 @@ public class LocalNominationResult
 		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
 	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
 			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
+			.thenComparing(LocalNominationResult::getType)
 			.thenComparing(LocalNominationResult::getSainteLagueValue)
 			.reversed()
-			.thenComparing(LocalNominationResult::getType) // TODO: How's that doing?
 			.thenComparing(LocalNominationResult::getNomination);
 
 	@ToString.Exclude
