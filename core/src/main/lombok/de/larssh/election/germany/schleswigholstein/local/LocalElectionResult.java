@@ -167,29 +167,44 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 						.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
 	}
 
+	@JsonIgnore
+	public Set<LocalNomination> getDirectDrawResults(final LocalDistrict district) {
+		return getDirectDrawResults().stream()
+				.filter(nomination -> nomination.getDistrict().equals(district))
+				.collect(toSet());
+	}
+
 	public int getNumberOfInvalidBallots() {
 		return numberOfInvalidBallots.get();
 	}
 
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
-		// TODO: Results of direct votes need to be calculated per LocalDistrict. What
-		// about list votes?
 		final Map<LocalNomination, Integer> votes = getVotes();
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();
-
-		// Result Type: Direct
 		final Map<LocalNomination, LocalNominationResultType> resultTypes
 				= new LinkedHashMap<>(getElection().getNominations().size());
-		for (final LocalNomination nomination : getDirectNominations(votes)) {
-			resultTypes.put(nomination, LocalNominationResultType.DIRECT);
-		}
 
-		// Result Type: Direct Draw
-		putDrawNominations(resultTypes,
-				votes,
-				getDirectDrawResults(),
-				LocalNominationResultType.DIRECT,
-				LocalNominationResultType.DIRECT_DRAW);
+		for (final LocalDistrict district : getElection().getDistrict().getChildren()) {
+			final Map<LocalNomination, LocalNominationResultType> localResultTypes = new LinkedHashMap<>();
+			final Map<LocalNomination, Integer> localVotes = votes.entrySet()
+					.stream()
+					.filter(entry -> entry.getKey().getDistrict().equals(district))
+					.collect(toLinkedHashMap());
+
+			// Result Type: Direct
+			for (final LocalNomination nomination : getDirectNominations(localVotes)) {
+				localResultTypes.put(nomination, LocalNominationResultType.DIRECT);
+			}
+
+			// Result Type: Direct Draw
+			putDrawNominations(localResultTypes,
+					localVotes,
+					getDirectDrawResults(district),
+					LocalNominationResultType.DIRECT,
+					LocalNominationResultType.DIRECT_DRAW);
+
+			resultTypes.putAll(localResultTypes);
+		}
 
 		// Result Type: List
 		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes, votesOfParties);
@@ -315,7 +330,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	private Set<LocalNomination> getDirectNominations(final Map<LocalNomination, Integer> votes) {
-		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
+		return votes.keySet()
+				.stream()
+				.limit(getElection().getNumberOfDirectSeatsPerLocalDistrict())
+				.collect(toLinkedHashSet());
 	}
 
 	private void putDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
