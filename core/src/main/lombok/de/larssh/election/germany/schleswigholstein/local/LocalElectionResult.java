@@ -172,7 +172,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
-		// TODO: Calculate results per LocalDistrict
+		// TODO: Results of direct votes need to be calculated per LocalDistrict. What
+		// about list votes?
 		final Map<LocalNomination, Integer> votes = getVotes();
 		final Map<Party, Integer> votesOfParties = getVotesOfParty();
 
@@ -184,7 +185,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: Direct Draw
-		handleDrawNominations(resultTypes,
+		putDrawNominations(resultTypes,
 				votes,
 				getDirectDrawResults(),
 				LocalNominationResultType.DIRECT,
@@ -197,7 +198,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List Draw
-		handleDrawNominations(resultTypes,
+		putDrawNominations(resultTypes,
 				sainteLague,
 				getListDrawResults(),
 				LocalNominationResultType.LIST,
@@ -317,18 +318,20 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
 	}
 
-	private void handleDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+	private void putDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
 			final Set<LocalNomination> drawResults,
 			final LocalNominationResultType currentResultType,
 			final LocalNominationResultType currentResultTypeDraw) {
-		if (resultTypes.isEmpty()) {
+		final Optional<LocalNomination> lastNomination
+				= resultTypes.keySet().stream().reduce((first, second) -> second);
+		if (!lastNomination.isPresent()) {
 			return;
 		}
-		final Number votesForLastNomination
-				= votes.get(resultTypes.keySet().stream().reduce((first, second) -> second).get());
 
+		final Number votesForLastNomination = votes.get(lastNomination.get());
 		final int numberOfPossibleSeats = resultTypes.size();
+
 		resultTypes.entrySet()
 				.removeIf(entry -> entry.getValue() == currentResultType
 						&& votes.get(entry.getKey()).equals(votesForLastNomination));
