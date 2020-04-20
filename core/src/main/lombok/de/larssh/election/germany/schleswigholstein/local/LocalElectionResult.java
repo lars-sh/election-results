@@ -5,7 +5,7 @@ import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -184,13 +184,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: Direct Draw
-		for (final Entry<LocalNomination, LocalNominationResultType> entry : getDrawNominations(resultTypes,
+		handleDrawNominations(resultTypes,
 				votes,
 				getDirectDrawResults(),
 				LocalNominationResultType.DIRECT,
-				LocalNominationResultType.DIRECT_DRAW).entrySet()) {
-			resultTypes.put(entry.getKey(), entry.getValue());
-		}
+				LocalNominationResultType.DIRECT_DRAW);
 
 		// Result Type: List
 		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes, votesOfParties);
@@ -199,13 +197,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List Draw
-		for (final Entry<LocalNomination, LocalNominationResultType> entry : getDrawNominations(resultTypes,
+		handleDrawNominations(resultTypes,
 				sainteLague,
 				getListDrawResults(),
 				LocalNominationResultType.LIST,
-				LocalNominationResultType.LIST_DRAW).entrySet()) {
-			resultTypes.put(entry.getKey(), entry.getValue());
-		}
+				LocalNominationResultType.LIST_DRAW);
 
 		// Result Type: Direct Balance Seat
 		final Set<LocalNomination> balanceAndOverhangSeats = getBalanceAndOverhangSeats(sainteLague, resultTypes);
@@ -321,15 +317,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return votes.keySet().stream().limit(getElection().getNumberOfDirectSeats()).collect(toLinkedHashSet());
 	}
 
-	@SuppressWarnings("PMD.CyclomaticComplexity")
-	private Map<LocalNomination, LocalNominationResultType> getDrawNominations(
-			final Map<LocalNomination, LocalNominationResultType> resultTypes,
+	private void handleDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
 			final Set<LocalNomination> drawResults,
 			final LocalNominationResultType currentResultType,
 			final LocalNominationResultType currentResultTypeDraw) {
 		if (resultTypes.isEmpty()) {
-			return emptyMap();
+			return;
 		}
 		final Number votesForLastNomination
 				= votes.get(resultTypes.keySet().stream().reduce((first, second) -> second).get());
@@ -337,10 +331,40 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		final int numberOfPossibleSeats = resultTypes.size();
 		resultTypes.entrySet()
 				.removeIf(entry -> entry.getValue() == currentResultType
-						&& votes.get(entry.getKey()).equals(votesForLastNomination)); // TODO: Do not modify from here!
+						&& votes.get(entry.getKey()).equals(votesForLastNomination));
 		final int numberOfDrawSeats = numberOfPossibleSeats - resultTypes.size();
 
 		// Draw Results
+		validateDrawResults(resultTypes,
+				votes,
+				votesForLastNomination,
+				numberOfDrawSeats,
+				drawResults,
+				currentResultType);
+		for (final LocalNomination drawResult : drawResults) {
+			resultTypes.put(drawResult, currentResultType);
+		}
+
+		// Draws
+		final Set<LocalNomination> drawNominations = getDrawNominations(resultTypes,
+				votes,
+				votesForLastNomination,
+				numberOfDrawSeats,
+				drawResults,
+				currentResultType);
+		final LocalNominationResultType drawResultType
+				= drawNominations.size() > numberOfDrawSeats ? currentResultTypeDraw : currentResultType;
+		for (final LocalNomination nomination : drawNominations) {
+			resultTypes.putIfAbsent(nomination, drawResultType);
+		}
+	}
+
+	private void validateDrawResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, ? extends Number> votes,
+			final Number votesForLastNomination,
+			final int numberOfDrawSeats,
+			final Set<LocalNomination> drawResults,
+			final LocalNominationResultType currentResultType) {
 		if (drawResults.size() > numberOfDrawSeats) {
 			throw new ElectionException("%d %s draw results given while expecting %d %s draw results at max.",
 					drawResults.size(),
@@ -348,34 +372,33 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					numberOfDrawSeats,
 					currentResultType.toString().toLowerCase(Locale.ROOT));
 		}
-		final Map<LocalNomination, LocalNominationResultType> returningResultTypes
-				= new LinkedHashMap<>(drawResults.size());
+
 		for (final LocalNomination nomination : drawResults) {
-			returningResultTypes.put(nomination, currentResultType);
-			if (!Nullables.orElse(votes.get(nomination), 0).equals(votesForLastNomination) // TODO: Test
+			if (!Nullables.orElse(votes.get(nomination), 0).equals(votesForLastNomination)
 					|| resultTypes.getOrDefault(nomination, currentResultType) != currentResultType) {
 				throw new ElectionException("\"%s\" must not be part of the %s draw results.",
 						nomination.getPerson().getKey(),
 						currentResultType.toString().toLowerCase(Locale.ROOT));
 			}
 		}
+	}
 
-		// Draws
-		if (numberOfDrawSeats > drawResults.size()) {
-			final Set<LocalNomination> drawNominations = votes.entrySet()
-					.stream()
-					.filter(entry -> entry.getValue().equals(votesForLastNomination))
-					.map(Entry::getKey)
-					.filter(nomination -> resultTypes.getOrDefault(nomination, currentResultType) == currentResultType)
-					.collect(toSet());
-			final LocalNominationResultType resultType
-					= drawNominations.size() > numberOfDrawSeats ? currentResultTypeDraw : currentResultType;
-			for (final LocalNomination nomination : drawNominations) {
-				returningResultTypes.putIfAbsent(nomination, resultType);
-			}
+	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, ? extends Number> votes,
+			final Number votesForLastNomination,
+			final int numberOfDrawSeats,
+			final Set<LocalNomination> drawResults,
+			final LocalNominationResultType currentResultType) {
+		if (numberOfDrawSeats <= drawResults.size()) {
+			return emptySet();
 		}
 
-		return returningResultTypes;
+		return votes.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().equals(votesForLastNomination))
+				.map(Entry::getKey)
+				.filter(nomination -> resultTypes.getOrDefault(nomination, currentResultType) == currentResultType)
+				.collect(toSet());
 	}
 
 	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
