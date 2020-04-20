@@ -156,6 +156,9 @@ public class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Less list draw results than list positions, all direct draw positions
+	 */
 	@Test
 	public void testTypeClosedDraws1() {
 		final LocalElection election = LocalElectionTest.createElection();
@@ -199,6 +202,9 @@ public class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Less direct draw results than direct positions, all list draw positions
+	 */
 	@Test
 	public void testTypeClosedDraws2() {
 		final LocalElection election = LocalElectionTest.createElection();
@@ -242,8 +248,6 @@ public class LocalNominationResultTest {
 		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
 		// @formatter:on
 	}
-
-	// TODO: draw with overhang and such
 
 	@Test
 	public void testTypeOpenDraws() {
