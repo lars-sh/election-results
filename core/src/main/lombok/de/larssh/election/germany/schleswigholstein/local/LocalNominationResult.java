@@ -28,6 +28,7 @@ public class LocalNominationResult
 	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
 			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
 			.thenComparing(LocalNominationResult::getType)
+			.reversed()
 			.thenComparing(LocalNominationResult::getSainteLagueValue)
 			.reversed()
 			.thenComparing(LocalNominationResult::getNomination);

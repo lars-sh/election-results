@@ -5,8 +5,6 @@ package de.larssh.election.germany.schleswigholstein.local;
  * the order specified for the below enumeration values.
  */
 public enum LocalNominationResultType {
-	NOT_ELECTED,
-
 	/**
 	 * Direktmandat
 	 */
@@ -35,5 +33,7 @@ public enum LocalNominationResultType {
 	/**
 	 * Überhangmandat
 	 */
-	LIST_OVERHANG_SEAT;
+	LIST_OVERHANG_SEAT,
+
+	NOT_ELECTED;
 }
