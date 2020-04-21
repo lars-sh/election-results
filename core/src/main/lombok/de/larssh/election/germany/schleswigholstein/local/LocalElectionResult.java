@@ -185,16 +185,15 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				= new LinkedHashMap<>(getElection().getNominations().size());
 
 		for (final LocalDistrict district : getElection().getDistrict().getChildren()) {
-			final Map<LocalNomination, LocalNominationResultType> localResultTypes = new LinkedHashMap<>();
 			final Map<LocalNomination, Integer> localVotes = votes.entrySet()
 					.stream()
 					.filter(entry -> entry.getKey().getDistrict().equals(district))
 					.collect(toLinkedHashMap());
 
 			// Result Type: Direct
-			for (final LocalNomination nomination : getDirectNominations(localVotes)) {
-				localResultTypes.put(nomination, LocalNominationResultType.DIRECT);
-			}
+			final Map<LocalNomination, LocalNominationResultType> localResultTypes
+					= getDirectNominations(localVotes).stream()
+							.collect(toLinkedHashMap(identity(), nomination -> LocalNominationResultType.DIRECT));
 
 			// Result Type: Direct Draw
 			putDrawNominations(localResultTypes,
