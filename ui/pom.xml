@@ -61,7 +61,7 @@
 
 		<!-- Versions -->
 		<javafx-base.version>14.0.2.1</javafx-base.version>
-		<javafx-controls.version>14.0.2</javafx-controls.version>
+		<javafx-controls.version>14.0.2.1</javafx-controls.version>
 		<javafx-fxml.version>14.0.2</javafx-fxml.version>
 		<javafx-graphics.version>14.0.2.1</javafx-graphics.version>
 	</properties>
