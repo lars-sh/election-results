@@ -15,7 +15,7 @@
 	<packaging>pom</packaging>
 
 	<name>Election Results</name>
-	<url>https://github.com/lars-sh/election-results</url>
+	<url>https://${parent-pom.github.organization}.github.io/${parent-pom.github.project}/</url>
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -37,17 +37,17 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git@github.com:lars-sh/election-results.git</connection>
-		<developerConnection>scm:git:git@github.com:lars-sh/election-results.git</developerConnection>
-		<url>https://github.com/lars-sh/election-results</url>
+		<connection>scm:git:git@github.com:${parent-pom.github.organization}/${parent-pom.github.project}.git</connection>
+		<developerConnection>scm:git:git@github.com:${parent-pom.github.organization}/${parent-pom.github.project}.git</developerConnection>
+		<url>https://github.com/${parent-pom.github.organization}/${parent-pom.github.project}</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/lars-sh/election-results/issues</url>
+		<url>https://github.com/${parent-pom.github.organization}/${parent-pom.github.project}/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Travis</system>
-		<url>https://travis-ci.com/lars-sh/election-results</url>
+		<url>https://travis-ci.com/${parent-pom.github.organization}/${parent-pom.github.project}</url>
 	</ciManagement>
 	<distributionManagement>
 		<snapshotRepository>
@@ -65,5 +65,6 @@
 	<properties>
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
 		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
+		<parent-pom.github.project>election-results</parent-pom.github.project>
 	</properties>
 </project>

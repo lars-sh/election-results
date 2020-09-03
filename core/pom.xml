@@ -11,47 +11,6 @@
 	<artifactId>election-results-core</artifactId>
 
 	<name>Election Results Core</name>
-	<url>https://github.com/lars-sh/election-results</url>
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>https://opensource.org/licenses/MIT</url>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<name>Lars Knickrehm</name>
-			<email>mail@lars-sh.de</email>
-			<url>https://lars-sh.de/</url>
-		</developer>
-	</developers>
-
-	<scm>
-		<connection>scm:git:git@github.com:lars-sh/election-results.git</connection>
-		<developerConnection>scm:git:git@github.com:lars-sh/election-results.git</developerConnection>
-		<url>https://github.com/lars-sh/election-results</url>
-	</scm>
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/lars-sh/election-results/issues</url>
-	</issueManagement>
-	<ciManagement>
-		<system>Travis</system>
-		<url>https://travis-ci.com/lars-sh/election-results</url>
-	</ciManagement>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Sonatype Nexus Releases</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
 
 	<properties>
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
