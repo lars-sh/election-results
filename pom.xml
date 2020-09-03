@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>de.lars-sh</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.9.7</version>
+		<version>0.9.9</version>
 		<relativePath></relativePath>
 	</parent>
 
@@ -49,18 +49,6 @@
 		<system>Travis</system>
 		<url>https://travis-ci.com/${parent-pom.github.organization}/${parent-pom.github.project}</url>
 	</ciManagement>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Sonatype Nexus Releases</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
 
 	<properties>
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
