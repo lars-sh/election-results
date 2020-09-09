@@ -20,7 +20,7 @@
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 
 		<!-- Versions -->
-		<javafx-graphics.version>14.0.2.1</javafx-graphics.version>
+		<javafx-graphics.version>15</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
