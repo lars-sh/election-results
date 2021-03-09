@@ -19,7 +19,7 @@
 		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.MainApplication</jar.manifest.mainClass>
 
 		<!-- Versions -->
-		<javafx-base.version>15.0.1</javafx-base.version>
+		<javafx-base.version>16</javafx-base.version>
 		<javafx-controls.version>16</javafx-controls.version>
 		<javafx-fxml.version>15.0.1</javafx-fxml.version>
 		<javafx-graphics.version>15.0.1</javafx-graphics.version>
