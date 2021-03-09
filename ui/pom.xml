@@ -22,7 +22,7 @@
 		<javafx-base.version>15.0.1</javafx-base.version>
 		<javafx-controls.version>15.0.1</javafx-controls.version>
 		<javafx-fxml.version>15.0.1</javafx-fxml.version>
-		<javafx-graphics.version>15.0.1</javafx-graphics.version>
+		<javafx-graphics.version>16</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
