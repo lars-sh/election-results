@@ -57,7 +57,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports" })
+@SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot, LocalNomination> {
 	@PackagePrivate
 	static final ThreadLocal<LocalElection> ELECTION_FOR_JSON_CREATOR = ThreadLocal.withInitial(() -> {

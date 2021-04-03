@@ -15,8 +15,8 @@ import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.ElectionException;
-import de.larssh.utils.Resources;
 import de.larssh.utils.annotations.PackagePrivate;
+import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
 
 /**

@@ -14,8 +14,9 @@
 
 	<properties>
 		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
+		<parent-pom.create-dependabot-yml>false</parent-pom.create-dependabot-yml>
+		<parent-pom.create-github-workflow-yml>false</parent-pom.create-github-workflow-yml>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
-		<parent-pom.create-travis-yml>false</parent-pom.create-travis-yml>
 
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 

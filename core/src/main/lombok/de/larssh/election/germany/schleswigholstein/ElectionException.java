@@ -6,8 +6,6 @@ import de.larssh.utils.text.Strings;
  * Thrown to indicate election data inconsistencies.
  */
 public class ElectionException extends RuntimeException {
-	private static final long serialVersionUID = 257565350687909476L;
-
 	/**
 	 * Constructs a new {@link ElectionException} with the given message, formatting
 	 * as described at {@link Strings#format(String, Object...)}.

@@ -25,7 +25,7 @@ public class PopulationInformation {
 	private static PopulationInformation createKreis() {
 		return new PopulationInformation(LocalDistrictType.KREIS,
 				emptyNavigableMap(),
-				Maps.builder(new TreeMap<Integer, Integer>()) //
+				(NavigableMap<Integer, Integer>) Maps.builder(new TreeMap<Integer, Integer>()) //
 						.put(0, 23)
 						.put(200_000, 25)
 						.get());
@@ -34,12 +34,12 @@ public class PopulationInformation {
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisangehoerigeGemeinde() {
 		return new PopulationInformation(LocalDistrictType.KREIS,
-				Maps.builder(new TreeMap<Integer, Integer>()) //
+				(NavigableMap<Integer, Integer>) Maps.builder(new TreeMap<Integer, Integer>()) //
 						.put(2500, 1)
 						.put(5000, 2)
 						.put(10_000, 3)
 						.get(),
-				Maps.builder(new TreeMap<Integer, Integer>())
+				(NavigableMap<Integer, Integer>) Maps.builder(new TreeMap<Integer, Integer>()) //
 						.put(70, 4)
 						.put(200, 5)
 						.put(750, 6)
@@ -58,7 +58,7 @@ public class PopulationInformation {
 	private static PopulationInformation createKreisfreieStadt() {
 		return new PopulationInformation(LocalDistrictType.KREISFREIE_STADT,
 				emptyNavigableMap(),
-				Maps.builder(new TreeMap<Integer, Integer>()) //
+				(NavigableMap<Integer, Integer>) Maps.builder(new TreeMap<Integer, Integer>()) //
 						.put(0, 22)
 						.put(150_000, 25)
 						.get());
