@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class Color {
+	private static final int MAX_INT_VALUE = 255;
+	
 	public static final Color BLACK = new Color(0, 0, 0, 1);
 
 	public static final Color BLUE = new Color(0, 0, 1, 1);
@@ -19,7 +21,7 @@ public class Color {
 	public static final Color WHITE = new Color(1, 1, 1, 1);
 
 	public static Color rgb(final int red, final int green, final int blue) {
-		return new Color((double) red / 255, (double) green / 255, (double) blue / 255, 1);
+		return new Color((double) red / MAX_INT_VALUE, (double) green / MAX_INT_VALUE, (double) blue / MAX_INT_VALUE, 1);
 	}
 
 	double red;
