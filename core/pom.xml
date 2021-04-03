@@ -57,7 +57,7 @@
 		<profile>
 			<id>javafx-for-jdk9-and-later</id>
 			<activation>
-				<jdk>(9,)</jdk>
+				<jdk>[9,)</jdk>
 			</activation>
 			<dependencies>
 				<dependency>
@@ -71,12 +71,9 @@
 					<plugin>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
-							<ignoredUsedUndeclaredDependencies>
-								<ignoredUsedUndeclaredDependency>org.openjfx:javafx-graphics:jar:${javafx-graphics.version}</ignoredUsedUndeclaredDependency>
-							</ignoredUsedUndeclaredDependencies>
-							<usedDependencies>
-								<usedDependency>org.openjfx:javafx-graphics</usedDependency>
-							</usedDependencies>
+							<ignoredDependencies>
+								<ignoredDependency>org.openjfx:javafx-graphics:jar:${javafx-graphics.version}</ignoredDependency>
+							</ignoredDependencies>
 						</configuration>
 					</plugin>
 				</plugins>
