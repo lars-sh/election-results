@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.utils.Nullables;
-import de.larssh.utils.Resources;
+import de.larssh.utils.io.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
