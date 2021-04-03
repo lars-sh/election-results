@@ -19,9 +19,6 @@
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-
-		<!-- Versions -->
-		<javafx-graphics.version>16</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
@@ -51,33 +48,4 @@
 			<version>2.12.2</version>
 		</dependency>
 	</dependencies>
-
-	<profiles>
-		<!-- JDK 9 and later: JavaFX dependency -->
-		<profile>
-			<id>javafx-for-jdk9-and-later</id>
-			<activation>
-				<jdk>[9,)</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-graphics</artifactId>
-					<version>${javafx-graphics.version}</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<configuration>
-							<ignoredDependencies>
-								<ignoredDependency>org.openjfx:javafx-graphics:jar:${javafx-graphics.version}</ignoredDependency>
-							</ignoredDependencies>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

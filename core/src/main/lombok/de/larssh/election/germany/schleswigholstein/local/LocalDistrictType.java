@@ -1,6 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import javafx.scene.paint.Color;
+import de.larssh.election.germany.schleswigholstein.Color;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

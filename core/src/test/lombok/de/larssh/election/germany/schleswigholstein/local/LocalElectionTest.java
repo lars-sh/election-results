@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Gender;
 import de.larssh.election.germany.schleswigholstein.Party;
@@ -23,7 +24,6 @@ import de.larssh.election.germany.schleswigholstein.PartyType;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Finals;
 import de.larssh.utils.annotations.PackagePrivate;
-import javafx.scene.paint.Color;
 import lombok.NoArgsConstructor;
 
 /**

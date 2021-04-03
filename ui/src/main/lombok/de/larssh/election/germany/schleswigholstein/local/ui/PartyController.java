@@ -6,16 +6,22 @@ import javafx.collections.FXCollections;
 import javafx.scene.paint.Color;
 
 public class PartyController extends PartyUiController {
+	private static de.larssh.election.germany.schleswigholstein.Color colorFromJavaFx(final Color color) {
+		return new de.larssh.election.germany.schleswigholstein.Color(color.getRed(), color.getGreen(), color.getBlue(),
+				color.getOpacity());
+	}
+
+	private static Color colorToJavaFx(final de.larssh.election.germany.schleswigholstein.Color color) {
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getOpacity());
+	}
+
 	public PartyController(final LocalElectionController parent) {
 		super(parent);
 	}
 
 	public Party getParty() {
-		return new Party(getShortName().getText(),
-				getName().getText(),
-				getType().getValue(),
-				getBackgroundColor().getValue(),
-				getFontColor().getValue());
+		return new Party(getShortName().getText(), getName().getText(), getType().getValue(),
+				colorFromJavaFx(getBackgroundColor().getValue()), colorFromJavaFx(getFontColor().getValue()));
 	}
 
 	@Override
@@ -37,7 +43,7 @@ public class PartyController extends PartyUiController {
 		getShortName().setText(party.getShortName());
 		getName().setText(party.getName());
 		getType().setValue(party.getType());
-		getBackgroundColor().setValue(party.getBackgroundColor());
-		getFontColor().setValue(party.getFontColor());
+		getBackgroundColor().setValue(colorToJavaFx(party.getBackgroundColor()));
+		getFontColor().setValue(colorToJavaFx(party.getFontColor()));
 	}
 }

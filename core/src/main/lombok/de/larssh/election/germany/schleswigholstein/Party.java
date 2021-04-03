@@ -5,7 +5,6 @@ import java.util.Comparator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
-import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

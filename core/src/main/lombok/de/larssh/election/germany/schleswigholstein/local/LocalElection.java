@@ -45,7 +45,6 @@ import de.larssh.utils.Nullables;
 import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import javafx.scene.paint.Color;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -60,7 +59,6 @@ import lombok.ToString;
 public class LocalElection implements Election<LocalDistrictRoot, LocalNomination> {
 	@PackagePrivate
 	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() //
-			.addMixIn(Color.class, ColorMixIn.class)
 			.registerModule(new JavaTimeModule())
 			.registerModule(new Jdk8Module())
 			.registerModule(new ParameterNamesModule());
@@ -276,29 +274,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			throw new ElectionException("The %s has already been set for district \"%s\".", type, district.getKey());
 		}
 		map.put(district, value);
-	}
-
-	@SuppressWarnings("PMD.CommentDefaultAccessModifier")
-	private abstract static class ColorMixIn {
-		@SuppressWarnings("unused")
-		ColorMixIn(@JsonProperty("red") final double red,
-				@JsonProperty("green") final double green,
-				@JsonProperty("blue") final double blue,
-				@JsonProperty("opacity") final double opacity) {
-			// no implementation as this is a mix in only
-		}
-
-		@JsonIgnore
-		abstract double getHue();
-
-		@JsonIgnore
-		abstract double getSaturation();
-
-		@JsonIgnore
-		abstract double getBrightness();
-
-		@JsonIgnore
-		abstract boolean isOpaque();
 	}
 
 	@Getter
