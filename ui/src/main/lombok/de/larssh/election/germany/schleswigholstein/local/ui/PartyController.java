@@ -7,7 +7,9 @@ import javafx.scene.paint.Color;
 
 public class PartyController extends PartyUiController {
 	private static de.larssh.election.germany.schleswigholstein.Color colorFromJavaFx(final Color color) {
-		return new de.larssh.election.germany.schleswigholstein.Color(color.getRed(), color.getGreen(), color.getBlue(),
+		return new de.larssh.election.germany.schleswigholstein.Color(color.getRed(),
+				color.getGreen(),
+				color.getBlue(),
 				color.getOpacity());
 	}
 
@@ -20,8 +22,11 @@ public class PartyController extends PartyUiController {
 	}
 
 	public Party getParty() {
-		return new Party(getShortName().getText(), getName().getText(), getType().getValue(),
-				colorFromJavaFx(getBackgroundColor().getValue()), colorFromJavaFx(getFontColor().getValue()));
+		return new Party(getShortName().getText(),
+				getName().getText(),
+				getType().getValue(),
+				colorFromJavaFx(getBackgroundColor().getValue()),
+				colorFromJavaFx(getFontColor().getValue()));
 	}
 
 	@Override
