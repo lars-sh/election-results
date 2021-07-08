@@ -19,7 +19,6 @@
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 
 		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.ui.MainApplication</jar.manifest.mainClass>
-		<maven.javadoc.failOnWarnings>false</maven.javadoc.failOnWarnings>
 
 		<!-- Versions -->
 		<javafx-base.version>16</javafx-base.version>

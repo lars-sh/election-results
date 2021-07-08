@@ -19,7 +19,6 @@
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
 
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<maven.javadoc.failOnWarnings>false</maven.javadoc.failOnWarnings>
 	</properties>
 
 	<dependencies>

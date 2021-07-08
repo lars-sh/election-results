@@ -55,5 +55,6 @@
 		<parent-pom.github.project>election-results</parent-pom.github.project>
 
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
+		<maven.javadoc.failOnWarnings>false</maven.javadoc.failOnWarnings>
 	</properties>
 </project>
