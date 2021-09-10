@@ -1,3 +1,9 @@
+# JFX 17: The parent POM contains duplicate profile IDs
+function suppressDuplicateProfileIdsInJfxParentPom() {
+	cat < /dev/stdin \
+	| grep --invert-match --perl-regexp "^\\[WARNING\\] Failed to build parent project for org.openjfx:javafx-(base|controls|fxml|graphics):jar:17$"
+}
+
 # PMD: The Maven Plugin tries to perform Java type resolution on POM typed projects.
 function suppressPmdWarnings() {
 	cat < /dev/stdin \
@@ -5,4 +11,5 @@ function suppressPmdWarnings() {
 }
 
 cat < /dev/stdin \
+| suppressDuplicateProfileIdsInJfxParentPom
 | suppressPmdWarnings
