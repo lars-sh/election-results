@@ -11,5 +11,5 @@ function suppressPmdWarnings() {
 }
 
 cat < /dev/stdin \
-| suppressDuplicateProfileIdsInJfxParentPom
+| suppressDuplicateProfileIdsInJfxParentPom \
 | suppressPmdWarnings
