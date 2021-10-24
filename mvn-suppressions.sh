@@ -1,7 +1,7 @@
-# JFX 17: The parent POM contains duplicate profile IDs
+# JFX 11 and later: The parent POM contains duplicate profile IDs
 function suppressDuplicateProfileIdsInJfxParentPom() {
 	cat < /dev/stdin \
-	| grep --invert-match --perl-regexp "^\\[WARNING\\] Failed to build parent project for org\\.openjfx:javafx-(base|controls|fxml|graphics):jar:17\\.0\\.0\\.1$"
+	| grep --invert-match --perl-regexp "^\\[WARNING\\] Failed to build parent project for org\\.openjfx:javafx-(base|controls|fxml|graphics):jar:17\\.0\\.1$"
 }
 
 # JaCoCo Maven Plugin: The Maven Plugin is referencing a moved Maven artifact.
