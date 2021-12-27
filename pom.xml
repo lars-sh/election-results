@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>de.lars-sh</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.9.12</version>
+		<version>0.9.13</version>
 		<relativePath />
 	</parent>
 
@@ -56,18 +56,8 @@
 
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
 		<maven.javadoc.failOnWarnings>false</maven.javadoc.failOnWarnings>
-	</properties>
 
-	<profiles>
-		<!-- JDK 15 and 16, Maven Javadoc Plugin: Logs warnings on missing JavaDoc comments inside generated code -->
-		<profile>
-			<id>fix-jdk15-and-16</id>
-			<activation>
-				<jdk>[15,17)</jdk>
-			</activation>
-			<properties>
-				<doclint>all,-missing</doclint>
-			</properties>
-		</profile>
-	</profiles>
+		<!-- Workaround as of version 3.2.0, see https://issues.apache.org/jira/browse/MDEP-753 -->
+		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+	</properties>
 </project>

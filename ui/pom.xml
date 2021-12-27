@@ -74,7 +74,7 @@
 					<plugin>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
-							<ignoredDependencies>
+							<ignoredDependencies combine.children="append">
 								<ignoredDependency>org.openjfx:javafx-base:jar:${javafx-base.version}</ignoredDependency>
 								<ignoredDependency>org.openjfx:javafx-controls:jar:${javafx-controls.version}</ignoredDependency>
 								<ignoredDependency>org.openjfx:javafx-fxml:jar:${javafx-fxml.version}</ignoredDependency>

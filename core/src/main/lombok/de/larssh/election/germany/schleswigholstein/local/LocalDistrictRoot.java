@@ -13,6 +13,7 @@ import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -22,6 +23,8 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	LocalDistrictType type;
 
 	@JsonCreator(mode = Mode.DELEGATING)
+	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+			justification = "passing this to createChildrenFor, but made sure, it's done in last position")
 	private LocalDistrictRoot(final ParsableLocalDistrictRoot parseable) {
 		this(parseable.getName(), parseable.getType());
 

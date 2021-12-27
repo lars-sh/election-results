@@ -111,6 +111,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	});
 
 	@JsonCreator(mode = Mode.DELEGATING)
+	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+			justification = "passing this to create*For, but made sure, it's filling the object in the correct order")
 	private LocalElection(final ParsableLocalElection parsable) {
 		this(parsable.getDistrict(), parsable.getDate(), parsable.getName(), parsable.getSainteLagueScale());
 

@@ -63,7 +63,7 @@ public class LegacyParser {
 			ballot = LocalBallot.createInvalidBallot(election, pollingStation, false);
 		} else {
 			final Set<LocalNomination> nominations
-					= Arrays.stream(matcher.group(GROUP_VALUE).split("\\s+", SplitLimit.NONE))
+					= Arrays.stream(matcher.group(GROUP_VALUE).split("\\s+", SplitLimit.NO_LIMIT))
 							.map(nomination -> findNomination(election, pollingStation.getParent().get(), nomination))
 							.collect(toSet());
 			ballot = LocalBallot.createValidBallot(election, pollingStation, false, nominations);
@@ -158,7 +158,7 @@ public class LegacyParser {
 	}
 
 	private static String getSimplifiedString(final String value) {
-		return Strings.toNeutralLowerCase(value)
+		return Strings.toLowerCaseNeutral(value)
 				.replace("ä", "ae")
 				.replace("ö", "oe")
 				.replace("ü", "ue")
