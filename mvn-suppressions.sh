@@ -11,6 +11,5 @@ function suppressPmdWarnings() {
 }
 
 cat < /dev/stdin \
-| suppressDuplicateProfileIdsInJfxParentPom \
 | suppressJaCoCoMavenPlugin \
 | suppressPmdWarnings
