@@ -24,7 +24,7 @@
 		<javafx-base.version>18</javafx-base.version>
 		<javafx-controls.version>18</javafx-controls.version>
 		<javafx-fxml.version>18</javafx-fxml.version>
-		<javafx-graphics.version>18</javafx-graphics.version>
+		<javafx-graphics.version>18.0.1</javafx-graphics.version>
 	</properties>
 
 	<dependencies>
