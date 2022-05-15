@@ -18,6 +18,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+/**
+ * Wahlgebiet (§ 2 KomWG SH)
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class LocalDistrictRoot extends District<LocalDistrict> {

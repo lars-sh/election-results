@@ -19,6 +19,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Vertreterinnen und Vertreter (§ 7 KomWG SH)
+ */
 @Getter
 @ToString
 @EqualsAndHashCode

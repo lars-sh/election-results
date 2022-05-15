@@ -1,6 +1,8 @@
 package de.larssh.election.germany.schleswigholstein;
 
+import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -33,6 +35,8 @@ public class Party implements Comparable<Party> {
 	Color backgroundColor;
 
 	Color fontColor;
+
+	Optional<Path> logo;
 
 	@Override
 	public int compareTo(@Nullable final Party party) {

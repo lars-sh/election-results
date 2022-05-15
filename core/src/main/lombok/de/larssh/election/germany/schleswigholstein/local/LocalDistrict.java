@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.utils.annotations.PackagePrivate;
 
+/**
+ * Wahlkreis (§ 15 KomWG SH)
+ */
 public class LocalDistrict extends District<LocalPollingStation> {
 	@PackagePrivate
 	LocalDistrict(final LocalDistrictRoot parent, final String name) {

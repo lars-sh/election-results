@@ -96,6 +96,13 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 						nomination.getPerson().getGivenName(),
 						election.getName());
 			}
+			if (nomination.getType() != LocalNominationType.DIRECT) {
+				throw new ElectionException(
+						"Nomination \"%s, %s\" of election \"%s\" is not a direct nomination. Ballots can contain direct nominations only.",
+						nomination.getPerson().getFamilyName(),
+						nomination.getPerson().getGivenName(),
+						election.getName());
+			}
 		}
 	}
 

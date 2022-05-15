@@ -21,6 +21,9 @@ public class PopulationInformation {
 					.put(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE, createKreisangehoerigeGemeinde())
 					.unmodifiable();
 
+	/**
+	 * siehe § 8 Absatz 3 KomWG SH und § 9 Absatz 3 KomWG SH
+	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreis() {
 		return new PopulationInformation(LocalDistrictType.KREIS,
@@ -31,6 +34,9 @@ public class PopulationInformation {
 						.get());
 	}
 
+	/**
+	 * siehe § 8 Absatz 1 KomWG SH und § 9 Absätze 1-2 KomWG SH
+	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisangehoerigeGemeinde() {
 		return new PopulationInformation(LocalDistrictType.KREIS,
@@ -54,6 +60,9 @@ public class PopulationInformation {
 						.get());
 	}
 
+	/**
+	 * siehe § 8 Absatz 2 KomWG SH und § 9 Absatz 3 KomWG SH
+	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisfreieStadt() {
 		return new PopulationInformation(LocalDistrictType.KREISFREIE_STADT,
@@ -71,8 +80,18 @@ public class PopulationInformation {
 	@Getter
 	LocalDistrictType type;
 
+	/**
+	 * Anzahl der Wahlkreise nach maximaler Einwohnerzahl (§ 9 Absätze 1-3 KomWG SH)
+	 *
+	 * <p>
+	 * Bei mehr Einwohnern gilt {@link #numberOfDirectSeatsIfPopulationIsGreater}.
+	 */
 	NavigableMap<Integer, Integer> numberOfDistrictsIfPopulationIsLessOrEqual;
 
+	/**
+	 * Anzahl der unmittelbaren Vertreterinnen und Vertreter nach minimaler
+	 * Einwohnerzahl (§ 8 KomWG SH)
+	 */
 	NavigableMap<Integer, Integer> numberOfDirectSeatsIfPopulationIsGreater;
 
 	public int getNumberOfDistricts(final int population) {
@@ -84,7 +103,7 @@ public class PopulationInformation {
 		final Entry<Integer, Integer> entry = numberOfDirectSeatsIfPopulationIsGreater.lowerEntry(population);
 		if (entry == null) {
 			throw new ElectionException(
-					"Population %d is too low to calculate the number of direct seats for. Increase population to %d to calculat the number of direct seats.",
+					"Population %d is too low to calculate the number of direct seats for. Increase population to %d to calculate the number of direct seats.",
 					population,
 					numberOfDirectSeatsIfPopulationIsGreater.firstKey());
 		}

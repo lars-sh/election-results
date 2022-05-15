@@ -22,6 +22,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Wahlvorschlag (§ 18 KomWG SH)
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
