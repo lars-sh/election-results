@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.Nullables;
+import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
@@ -65,7 +66,8 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 
 		final LocalDistrictType type;
 
-		private ParsableLocalDistrictRoot(@Nullable final String name,
+		@PackagePrivate
+		ParsableLocalDistrictRoot(@Nullable final String name,
 				@Nullable final Set<ParsableLocalDistrict> children,
 				@Nullable final LocalDistrictType type) {
 			this.name = Nullables.orElseThrow(name, PARSABLE_EXCEPTION_SUPPLIER_NAME);
@@ -87,8 +89,8 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 
 		final Set<ParsableLocalPollingStation> children;
 
-		private ParsableLocalDistrict(@Nullable final String name,
-				@Nullable final Set<ParsableLocalPollingStation> children) {
+		@PackagePrivate
+		ParsableLocalDistrict(@Nullable final String name, @Nullable final Set<ParsableLocalPollingStation> children) {
 			this.name = Nullables.orElseThrow(name, PARSABLE_EXCEPTION_SUPPLIER_NAME);
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
 		}

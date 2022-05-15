@@ -7,15 +7,18 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
 /**
  * {@link LegacyParser}
  */
+@PackagePrivate
 @NoArgsConstructor
-public class LocalPartyResultTest {
+class LocalPartyResultTest {
 	@Test
-	public void testKleinBoden() {
+	@PackagePrivate
+	void testKleinBoden() {
 		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
@@ -41,7 +44,8 @@ public class LocalPartyResultTest {
 	}
 
 	@Test
-	public void testRethwisch() {
+	@PackagePrivate
+	void testRethwisch() {
 		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
@@ -64,7 +68,8 @@ public class LocalPartyResultTest {
 	}
 
 	@Test
-	public void testRethwischdorf() {
+	@PackagePrivate
+	void testRethwischdorf() {
 		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()

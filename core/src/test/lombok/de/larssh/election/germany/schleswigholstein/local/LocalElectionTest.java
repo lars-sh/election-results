@@ -409,7 +409,8 @@ public class LocalElectionTest {
 	}
 
 	@Test
-	public void testJson() throws IOException {
+	@PackagePrivate
+	void testJson() throws IOException {
 		final ObjectWriter objectWriter = LocalElection.createJacksonObjectWriter().withDefaultPrettyPrinter();
 		final Path path = Files.createTempFile("", "");
 
