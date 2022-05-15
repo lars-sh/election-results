@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 /**
  * {@link LegacyParser}
  */
+@PackagePrivate
 @NoArgsConstructor
-public class LegacyParserTest {
+class LegacyParserTest {
 	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
 		return readResult(election, pollingStationName, Paths.get(pollingStationName + ".txt"));
 	}
@@ -62,7 +63,8 @@ public class LegacyParserTest {
 	}
 
 	@Test
-	public void testKleinBoden() {
+	@PackagePrivate
+	void testKleinBoden() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final String pollingStationName = LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN;
 		final LocalElectionResult result = readResult(election, pollingStationName);
@@ -70,26 +72,28 @@ public class LegacyParserTest {
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(273));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(166));
-		assertThat(result.getBallots().size()).isEqualTo(191);
+		assertThat(result.getBallots()).hasSize(191);
 		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1151, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(2);
 	}
 
 	@Test
-	public void testRethwisch() {
+	@PackagePrivate
+	void testRethwisch() {
 		final LocalElectionResult result = readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		// Compare
 		assertThat(election.getNumberOfEligibleVoters()).isEqualTo(990);
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(601));
-		assertThat(result.getBallots().size()).isEqualTo(627);
+		assertThat(result.getBallots()).hasSize(627);
 		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1043, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(3);
 	}
 
 	@Test
-	public void testRethwischdorf() {
+	@PackagePrivate
+	void testRethwischdorf() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final String pollingStationName = LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF;
 		final LocalElectionResult result = readResult(election, pollingStationName);
@@ -97,7 +101,7 @@ public class LegacyParserTest {
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(717));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(435));
-		assertThat(result.getBallots().size()).isEqualTo(436);
+		assertThat(result.getBallots()).hasSize(436);
 		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1002, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(1);
 	}
