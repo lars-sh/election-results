@@ -74,22 +74,26 @@ public class LocalElectionTest {
 				"Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
 				PartyType.POLITICAL_PARTY,
 				Color.BLACK,
-				Color.WHITE);
+				Color.WHITE,
+				Optional.empty());
 		final Party partySpd = new Party("SPD",
 				"Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch",
 				PartyType.POLITICAL_PARTY,
 				Color.rgb(237, 28, 36),
-				Color.WHITE);
+				Color.WHITE,
+				Optional.empty());
 		final Party partyAwg = new Party("AWG",
 				"Allgemeine Wählergemeinschaft Rethwisch",
 				PartyType.ASSOCIATION_OF_VOTERS,
 				Color.rgb(255, 204, 0),
-				Color.BLACK);
+				Color.BLACK,
+				Optional.empty());
 		final Party partyFwr = new Party("FWR",
 				"Freie Wählergemeinschaft Rethwisch",
 				PartyType.ASSOCIATION_OF_VOTERS,
 				Color.rgb(7, 98, 188),
-				Color.WHITE);
+				Color.WHITE,
+				Optional.empty());
 
 		final Person personJensPoppinga = new Person("Jens",
 				"Poppinga",
