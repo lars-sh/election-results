@@ -23,6 +23,8 @@ public class PopulationInformation {
 
 	/**
 	 * siehe § 8 Absatz 3 KomWG SH und § 9 Absatz 3 KomWG SH
+	 *
+	 * @return the corresponding population information
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreis() {
@@ -36,6 +38,8 @@ public class PopulationInformation {
 
 	/**
 	 * siehe § 8 Absatz 1 KomWG SH und § 9 Absätze 1-2 KomWG SH
+	 *
+	 * @return the corresponding population information
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisangehoerigeGemeinde() {
@@ -62,6 +66,8 @@ public class PopulationInformation {
 
 	/**
 	 * siehe § 8 Absatz 2 KomWG SH und § 9 Absatz 3 KomWG SH
+	 *
+	 * @return the corresponding population information
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisfreieStadt() {

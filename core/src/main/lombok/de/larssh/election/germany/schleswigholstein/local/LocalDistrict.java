@@ -6,10 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.utils.annotations.PackagePrivate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Wahlkreis (§ 15 KomWG SH)
  */
+@SuppressFBWarnings(value = "FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY",
+		justification = "no circular dependency, but a hierarchical")
 public class LocalDistrict extends District<LocalPollingStation> {
 	@PackagePrivate
 	LocalDistrict(final LocalDistrictRoot parent, final String name) {

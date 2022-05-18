@@ -7,11 +7,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.utils.annotations.PackagePrivate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Wahlbezirk (§ 16 KomWG SH)
  */
 @JsonIgnoreProperties("children")
+@SuppressFBWarnings(value = "FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY",
+		justification = "no circular dependency, but a hierarchical")
 public class LocalPollingStation extends District<District<?>> {
 	@PackagePrivate
 	LocalPollingStation(final LocalDistrict parent, final String name) {
