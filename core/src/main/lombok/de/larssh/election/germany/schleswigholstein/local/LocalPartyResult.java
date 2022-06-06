@@ -7,12 +7,10 @@ import static java.util.stream.Collectors.toList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
-import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -88,10 +86,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.filter(Ballot::isValid)
 			.map(Ballot::getNominations)
 			.flatMap(Collection::stream)
-			.map(Nomination::getParty)
-			.filter(Optional::isPresent)
-			.map(Optional::get)
-			.filter(getParty()::equals)
+			.filter(nomination -> nomination.getParty().filter(getParty()::equals).isPresent())
 			.count());
 
 	/** {@inheritDoc} */

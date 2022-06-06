@@ -87,9 +87,9 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	Supplier<Boolean> blockVoting = lazy(() -> {
 		final List<Party> parties = getNominations().stream()
 				.map(LocalNomination::getParty)
-				.distinct()
 				.filter(Optional::isPresent)
 				.map(Optional::get)
+				.distinct()
 				.collect(toList());
 		if (parties.size() != 1) {
 			return Boolean.FALSE;

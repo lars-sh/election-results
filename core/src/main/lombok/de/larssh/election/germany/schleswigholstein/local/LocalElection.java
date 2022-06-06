@@ -289,7 +289,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	public List<LocalNomination> getNominationsOfParty(final Party party) {
 		return getNominations().stream()
-				.filter(nomination -> nomination.getParty().isPresent() && nomination.getParty().get().equals(party))
+				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
 				.collect(toList());
 	}
 
