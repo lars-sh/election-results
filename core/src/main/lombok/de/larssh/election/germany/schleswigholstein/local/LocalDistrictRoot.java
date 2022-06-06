@@ -33,7 +33,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	/**
 	 * Wahlgebiet (§ 2 GKWG)
 	 *
-	 * @param parsable Jackson delegate
+	 * @param parseable Jackson delegate
 	 */
 	@JsonCreator(mode = Mode.DELEGATING)
 	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",

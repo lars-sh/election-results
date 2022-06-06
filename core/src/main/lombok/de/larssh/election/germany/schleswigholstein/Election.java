@@ -54,6 +54,7 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	/**
 	 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
 	OptionalInt getPopulation(District<?> district);
@@ -98,6 +99,7 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	/**
 	 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
 	 *         Wahlbezirk
 	 */
@@ -110,8 +112,8 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 * The number of eligible voters, that's already been set cannot be overwritten
 	 * and {@code district} must be part of elections district hierarchy.
 	 *
-	 * @param district   Wahlgebiet, Wahlkreis oder Wahlbezirk
-	 * @param population Anzahl der Wahlberechtigten
+	 * @param district               Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten
 	 */
 	default void setNumberOfEligibleVoters(final District<?> district, final int numberOfEligibleVoters) {
 		setNumberOfEligibleVoters(district, OptionalInt.of(numberOfEligibleVoters));
@@ -124,8 +126,8 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 * The number of eligible voters, that's already been set cannot be overwritten
 	 * and {@code district} must be part of elections district hierarchy.
 	 *
-	 * @param district   Wahlgebiet, Wahlkreis oder Wahlbezirk
-	 * @param population Anzahl der Wahlberechtigten
+	 * @param district               Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten
 	 */
 	void setNumberOfEligibleVoters(District<?> district, OptionalInt numberOfEligibleVoters);
 

@@ -16,6 +16,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class LocalDistrict extends District<LocalPollingStation> {
 	/**
 	 * Wahlkreis (§ 15 GKWG)
+	 *
+	 * @param parent Wahlgebiet
+	 * @param name   Name
 	 */
 	@PackagePrivate
 	LocalDistrict(final LocalDistrictRoot parent, final String name) {
