@@ -36,7 +36,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	 * @param parseable Jackson delegate
 	 */
 	@JsonCreator(mode = Mode.DELEGATING)
-	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+	@SuppressFBWarnings(value = "PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS",
 			justification = "passing this to createChild, but made sure, it's done in last position")
 	private LocalDistrictRoot(final ParsableLocalDistrictRoot parseable) {
 		this(parseable.getName(), parseable.getType());
