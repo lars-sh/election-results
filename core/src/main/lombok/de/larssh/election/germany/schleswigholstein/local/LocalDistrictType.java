@@ -4,6 +4,9 @@ import de.larssh.election.germany.schleswigholstein.Color;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Arten der Wahlgebiete
+ */
 @Getter
 @RequiredArgsConstructor
 public enum LocalDistrictType {
@@ -22,10 +25,27 @@ public enum LocalDistrictType {
 	 */
 	KREIS("Kreis", Color.RED);
 
+	/**
+	 * Name der Art des Wahlgebiets
+	 *
+	 * <p>
+	 * sieeh § 15 Absatz 3 GKWG
+	 *
+	 * @return Name
+	 */
 	String name;
 
+	/**
+	 * Farbe der Stimmzettel dieser Art Wahlgebiete
+	 *
+	 * <p>
+	 * siehe § 96 Absatz 1 GKWO
+	 *
+	 * @return Farbe der Stimmzettel
+	 */
 	Color colorOfBallots;
 
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return getName();

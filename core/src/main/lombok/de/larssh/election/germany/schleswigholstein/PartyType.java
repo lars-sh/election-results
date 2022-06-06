@@ -1,8 +1,11 @@
 package de.larssh.election.germany.schleswigholstein;
 
+/**
+ * Arten der Gruppierungen
+ */
 public enum PartyType {
 	/**
-	 * Poliische Partei
+	 * Politische Partei
 	 */
 	POLITICAL_PARTY,
 

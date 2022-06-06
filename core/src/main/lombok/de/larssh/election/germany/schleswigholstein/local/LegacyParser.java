@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,29 +30,67 @@ import de.larssh.utils.text.SplitLimit;
 import de.larssh.utils.text.Strings;
 import lombok.experimental.UtilityClass;
 
+/**
+ * This class contains helper methods to parse legacy file formats.
+ */
 @UtilityClass
 public class LegacyParser {
+	/**
+	 * Invalid ballot character
+	 */
 	private static final String BALLOT_INVALID = "-";
 
+	/**
+	 * Name of the pattern group for the optional count of a ballot line
+	 */
 	private static final String GROUP_COUNT = "count";
 
+	/**
+	 * Name of the pattern group for the value of a ballot line
+	 */
 	private static final String GROUP_VALUE = "value";
 
+	/**
+	 * Pattern to parse a ballot line
+	 */
 	private static final Pattern BALLOT_PATTERN
 			= Pattern.compile("^\\s*(?<" + GROUP_COUNT + ">\\d+)?\\s*(?<" + GROUP_VALUE + ">.*?)\\s*$");
 
+	/**
+	 * Command to be used to clear all election results
+	 */
 	private static final String COMMAND_CLEAR = "clear";
 
+	/**
+	 * Pattern to match lines stating the number of all ballots
+	 */
 	private static final Pattern NUMBER_OF_ALL_BALLOTS_PATTERN
-			= Pattern.compile("^(?i)\\s*Anzahl\\s*Stimmzettel\\s*:?\\s*(?<" + GROUP_VALUE + ">\\d+)\\s*$");
+			= Pattern.compile("^(?i)\\s*Anzahl\\s+Stimmzettel\\s*:?\\s*(?<" + GROUP_VALUE + ">\\d+)\\s*$");
 
+	/**
+	 * Character to start command lines with
+	 */
 	private static final char LINE_COMMAND = '*';
 
+	/**
+	 * Character to start line comments with
+	 */
 	private static final char LINE_COMMENT = '#';
 
-	private static final Map<String, Pattern> PATTERN_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+	/**
+	 * Cache for patterns to match persons
+	 */
+	private static final Map<String, Pattern> PATTERN_CACHE = Collections.synchronizedMap(new HashMap<>());
 
-	private static Collection<LocalBallot> createBallotFromLine(final LocalElection election,
+	/**
+	 * Parses a single {@code line} and creates ballots out of it.
+	 *
+	 * @param election       Wahl
+	 * @param pollingStation Wahlbezirk
+	 * @param line           single line
+	 * @return Stimmzettel
+	 */
+	private static Collection<LocalBallot> createBallotsFromLine(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final String line) {
 		final Matcher matcher = Patterns.matches(BALLOT_PATTERN, line)
@@ -73,6 +111,17 @@ public class LegacyParser {
 		return IntStream.range(0, count).mapToObj(index -> ballot).collect(toList());
 	}
 
+	/**
+	 * Determines the correct nomination for {@code person}.
+	 *
+	 * <p>
+	 * This method takes care of the party prefix.
+	 *
+	 * @param election Wahl
+	 * @param district Wahlkreis
+	 * @param person   Bewerberin oder Bewerber
+	 * @return Bewerberin oder Bewerber
+	 */
 	private static LocalNomination findNomination(final Election<?, ? extends LocalNomination> election,
 			final LocalDistrict district,
 			final String person) {
@@ -117,12 +166,32 @@ public class LegacyParser {
 		return nominations.iterator().next();
 	}
 
+	/**
+	 * Checks if {@code nomination} is the correct nomination for {@code person}.
+	 *
+	 * <p>
+	 * This method makes sure, that both, the given and the family name can be in
+	 * either first or second place of order.
+	 *
+	 * @param nomination Bewerberin oder Bewerber
+	 * @param person     Bewerberin oder Bewerber
+	 * @return {@code true} if {@code nomination} is the correct nomination for
+	 *         {@code person}, else {@code false}
+	 */
 	private static boolean matches(final LocalNomination nomination, final String person) {
 		final String familyName = nomination.getPerson().getFamilyName();
 		final String givenName = nomination.getPerson().getGivenName();
 		return matches(givenName + familyName, person) || matches(familyName + givenName, person);
 	}
 
+	/**
+	 * Checks if {@code person} matches {@code value}.
+	 *
+	 * @param value  the pattern
+	 * @param person Bewerberin oder Bewerber
+	 * @return {@code true} if {@code person} matches {@code value}, else
+	 *         {@code false}
+	 */
 	private static boolean matches(final String value, final String person) {
 		final Pattern pattern = PATTERN_CACHE.computeIfAbsent(person,
 				key -> Pattern.compile(getSimplifiedString(key).chars()
@@ -131,7 +200,13 @@ public class LegacyParser {
 		return Strings.matches(getSimplifiedString(value), pattern);
 	}
 
-	public static LocalElectionResult mergeResults(final LocalElection election, final LocalElectionResult... results) {
+	/**
+	 * Merges multiple {@code results} of the same election into one result.
+	 *
+	 * @param results results to merge
+	 * @return a new result object with the information of all {@code results}
+	 */
+	public static LocalElectionResult mergeResults(final LocalElectionResult... results) {
 		final OptionalInt numberOfAllBallots;
 		if (Arrays.stream(results).map(LocalElectionResult::getNumberOfAllBallots).allMatch(OptionalInt::isPresent)) {
 			numberOfAllBallots = OptionalInt.of(Arrays.stream(results)
@@ -154,9 +229,18 @@ public class LegacyParser {
 				.map(LocalElectionResult::getListDrawResults)
 				.flatMap(Collection::stream)
 				.collect(toSet());
-		return new LocalElectionResult(election, numberOfAllBallots, ballots, directDrawResults, listDrawResults);
+		return new LocalElectionResult(results[0]
+				.getElection(), numberOfAllBallots, ballots, directDrawResults, listDrawResults);
 	}
 
+	/**
+	 * Reduces the complexity of {@code value} by converting to lower case
+	 * characters, replacing umlauts and removing characters not matching a-z and
+	 * 0-9.
+	 *
+	 * @param value the value to simplify
+	 * @return the simplified value
+	 */
 	private static String getSimplifiedString(final String value) {
 		return Strings.toLowerCaseNeutral(value)
 				.replace("ä", "ae")
@@ -166,6 +250,15 @@ public class LegacyParser {
 				.replaceAll("[^a-z0-9]", "");
 	}
 
+	/**
+	 * Parses a legacy file format for a specific {@code polllingStation}.
+	 *
+	 * @param election       Wahl
+	 * @param pollingStation Wahlbezirk
+	 * @param reader         legacy file input
+	 * @return the new result object
+	 * @throws IOException on IO error
+	 */
 	public static LocalElectionResult parse(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final Reader reader) throws IOException {
@@ -186,10 +279,12 @@ public class LegacyParser {
 									.ifPresent(matcher -> numberOfAllBallots
 											.set(OptionalInt.of(Integer.parseInt(matcher.group(GROUP_VALUE)))));
 						} else {
-							ballots.addAll(createBallotFromLine(election, pollingStation, line));
+							ballots.addAll(createBallotsFromLine(election, pollingStation, line));
 						}
 					});
 			return new LocalElectionResult(election, numberOfAllBallots.get(), ballots, emptySet(), emptySet());
+		} finally {
+			PATTERN_CACHE.clear();
 		}
 	}
 }

@@ -3,7 +3,6 @@ package de.larssh.election.germany.schleswigholstein.local;
 import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
-import static de.larssh.utils.Finals.constant;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
@@ -50,11 +49,13 @@ import de.larssh.utils.Nullables;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Wahlergebnis
+ */
 @Getter
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
@@ -64,8 +65,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		throw new ElectionException(
 				"Cannot initialize electionForJsonCreator. Use LocalElection.fromJson(...) instead.");
 	});
-
-	public static final int SAINTE_LAGUE_SCALE_DEFAULT = constant(2);
 
 	public static ObjectWriter createJacksonObjectWriter() {
 		return LocalElection.createJacksonObjectWriter();
@@ -120,19 +119,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			final List<LocalBallot> ballots,
 			final Set<LocalNomination> directDrawResults,
 			final Set<LocalNomination> listDrawResults) {
-		this(election, numberOfAllBallots, ballots, directDrawResults, listDrawResults, ballot -> true);
-	}
-
-	@SuppressFBWarnings(value = "OCP_OVERLY_CONCRETE_PARAMETER",
-			justification = "Parameter \"ballots\" should be in order and therefore must not be of type Collection.")
-	private LocalElectionResult(final LocalElection election,
-			final OptionalInt numberOfAllBallots,
-			final List<LocalBallot> ballots,
-			final Set<LocalNomination> directDrawResults,
-			final Set<LocalNomination> listDrawResults,
-			final Predicate<? super LocalBallot> filter) {
 		this.election = election;
-		this.ballots = unmodifiableList(ballots.stream().filter(filter).collect(toList()));
+		this.ballots = unmodifiableList(ballots);
 		this.numberOfAllBallots = numberOfAllBallots;
 		this.directDrawResults = unmodifiableSet(new HashSet<>(directDrawResults));
 		this.listDrawResults = unmodifiableSet(new HashSet<>(listDrawResults));
@@ -149,14 +137,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		partyResults = unmodifiableMap(createPartyResults());
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public LocalElectionResult filter(final Predicate<? super LocalBallot> filter) {
 		return new LocalElectionResult(getElection(),
 				OptionalInt.empty(),
-				getBallots(),
+				getBallots().stream().filter(filter).collect(toList()),
 				getDirectDrawResults(),
-				getListDrawResults(),
-				filter);
+				getListDrawResults());
 	}
 
 	public Optional<BigDecimal> getCountingProgress(final int scale) {
@@ -470,10 +458,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					.map(ballot -> ballot.isValid()
 							? LocalBallot.createValidBallot(election,
 									ballot.findPollingStation(),
-									ballot.isPostalVoter(),
+									ballot.isPostalVote(),
 									ballot.findNominations())
 							: LocalBallot
-									.createInvalidBallot(election, ballot.findPollingStation(), ballot.isPostalVoter()))
+									.createInvalidBallot(election, ballot.findPollingStation(), ballot.isPostalVote()))
 					.collect(toList());
 		}
 
@@ -491,7 +479,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	private static class ParsableLocalBallot {
 		String pollingStation;
 
-		boolean postalVoter;
+		boolean postalVote;
 
 		boolean valid;
 

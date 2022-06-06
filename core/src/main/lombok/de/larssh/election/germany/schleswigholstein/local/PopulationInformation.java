@@ -12,8 +12,16 @@ import de.larssh.utils.collection.Maps;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Singletons mit Information zu Arten von Wahlgebieten in Abhängigkeit zu ihrer
+ * Einwohnerzahl
+ */
 @RequiredArgsConstructor
 public class PopulationInformation {
+	/**
+	 * Singletons mit Information zu Arten von Wahlgebieten in Abhängigkeit zu ihrer
+	 * Einwohnerzahl
+	 */
 	private static final Map<LocalDistrictType, PopulationInformation> INSTANCES
 			= Maps.<LocalDistrictType, PopulationInformation>builder()
 					.put(LocalDistrictType.KREIS, createKreis())
@@ -22,7 +30,7 @@ public class PopulationInformation {
 					.unmodifiable();
 
 	/**
-	 * siehe § 8 Absatz 3 KomWG SH und § 9 Absatz 3 KomWG SH
+	 * siehe § 8 Absatz 3 GKWG und § 9 Absatz 3 GKWG
 	 *
 	 * @return the corresponding population information
 	 */
@@ -37,7 +45,7 @@ public class PopulationInformation {
 	}
 
 	/**
-	 * siehe § 8 Absatz 1 KomWG SH und § 9 Absätze 1-2 KomWG SH
+	 * siehe § 8 Absatz 1 GKWG und § 9 Absätze 1-2 GKWG
 	 *
 	 * @return the corresponding population information
 	 */
@@ -65,7 +73,7 @@ public class PopulationInformation {
 	}
 
 	/**
-	 * siehe § 8 Absatz 2 KomWG SH und § 9 Absatz 3 KomWG SH
+	 * siehe § 8 Absatz 2 GKWG und § 9 Absatz 3 GKWG
 	 *
 	 * @return the corresponding population information
 	 */
@@ -79,15 +87,26 @@ public class PopulationInformation {
 						.get());
 	}
 
+	/**
+	 * Information zur Art des Wahlgebiets in Abhängigkeit zur Einwohnerzahl
+	 *
+	 * @param type Art des Wahlgebiets
+	 * @return Information in Abhängigkeit zur Einwohnerzahl
+	 */
 	public static PopulationInformation get(final LocalDistrictType type) {
 		return INSTANCES.get(type);
 	}
 
+	/**
+	 * Art des Wahlgebiets
+	 *
+	 * @return Art des Wahlgebiets
+	 */
 	@Getter
 	LocalDistrictType type;
 
 	/**
-	 * Anzahl der Wahlkreise nach maximaler Einwohnerzahl (§ 9 Absätze 1-3 KomWG SH)
+	 * Anzahl der Wahlkreise nach maximaler Einwohnerzahl (§ 9 Absätze 1-3 GKWG)
 	 *
 	 * <p>
 	 * Bei mehr Einwohnern gilt {@link #numberOfDirectSeatsIfPopulationIsGreater}.
@@ -96,15 +115,27 @@ public class PopulationInformation {
 
 	/**
 	 * Anzahl der unmittelbaren Vertreterinnen und Vertreter nach minimaler
-	 * Einwohnerzahl (§ 8 KomWG SH)
+	 * Einwohnerzahl (§ 8 GKWG)
 	 */
 	NavigableMap<Integer, Integer> numberOfDirectSeatsIfPopulationIsGreater;
 
+	/**
+	 * Anzahl der Wahlkreise (§ 9 Absätze 1-3 GKWG)
+	 *
+	 * @param population Einwohnerzahl
+	 * @return Anzahl der Wahlkreise
+	 */
 	public int getNumberOfDistricts(final int population) {
 		final Entry<Integer, Integer> entry = numberOfDistrictsIfPopulationIsLessOrEqual.higherEntry(population);
 		return entry == null ? getNumberOfDirectSeats(population) : entry.getValue();
 	}
 
+	/**
+	 * Anzahl der Vertreterinnen und Vertreter (§ 8 GKWG)
+	 *
+	 * @param population Einwohnerzahl
+	 * @return Zahl der unmittelbaren Vertreterinnen und Vertreter
+	 */
 	public int getNumberOfDirectSeats(final int population) {
 		final Entry<Integer, Integer> entry = numberOfDirectSeatsIfPopulationIsGreater.lowerEntry(population);
 		if (entry == null) {

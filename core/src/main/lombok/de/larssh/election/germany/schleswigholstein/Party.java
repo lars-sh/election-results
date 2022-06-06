@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Politische Partei oder Wählergruppe
+ */
 @Getter
 @ToString
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ public class Party implements Comparable<Party> {
 			= Comparator.comparing(Party::getType).thenComparing(Party::getShortName).thenComparing(Party::getName);
 
 	private static String createKey(final String name, final String shortName) {
-		return String.format("%s (%s)", name, Keys.escape(shortName, ',', ' '));
+		return Keys.escape(name, " (", shortName, ")");
 	}
 
 	@EqualsAndHashCode.Include

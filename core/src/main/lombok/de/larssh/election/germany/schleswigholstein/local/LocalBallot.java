@@ -3,6 +3,7 @@ package de.larssh.election.germany.schleswigholstein.local;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
@@ -23,6 +24,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Stimmzettel
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -31,45 +35,67 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	@PackagePrivate
 	static LocalBallot createInvalidBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
-			final boolean postalVoter) {
-		return new LocalBallot(election, pollingStation, postalVoter, false, emptySet());
+			final boolean postalVote) {
+		return new LocalBallot(election, pollingStation, postalVote, false, emptySet());
 	}
 
 	@PackagePrivate
 	static LocalBallot createValidBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
-			final boolean postalVoter,
+			final boolean postalVote,
 			final Set<LocalNomination> nominations) {
-		return new LocalBallot(election, pollingStation, postalVoter, true, nominations);
+		return new LocalBallot(election, pollingStation, postalVote, true, nominations);
 	}
 
+	/**
+	 * Wahl
+	 *
+	 * @return Wahl
+	 */
 	@JsonIgnore
 	LocalElection election;
 
+	/**
+	 * Wahlbezirk
+	 *
+	 * @return Wahlbezirk
+	 */
 	@JsonIgnore
 	LocalPollingStation pollingStation;
 
-	boolean postalVoter;
+	/**
+	 * Briefwahl (§ 33 GKWG)
+	 *
+	 * @return {@code true} for postal vote ballots, else {@code false}
+	 */
+	boolean postalVote;
 
+	/**
+	 * Ungültige Stimmen (§ 35 GKWG)
+	 *
+	 * @return {@code true} for valid ballots, else {@code false}
+	 */
 	boolean valid;
 
+	/**
+	 * Namen der Bewerberinnen und Bewerber (§ 28 Absatz 2 GKWG)
+	 */
 	Set<LocalNomination> nominations;
 
 	@JsonIgnore
 	@ToString.Exclude
 	Supplier<Boolean> blockVoting = lazy(() -> {
-		final List<Optional<Party>> parties
-				= getNominations().stream().map(LocalNomination::getParty).distinct().collect(toList());
+		final List<Party> parties = getNominations().stream()
+				.map(LocalNomination::getParty)
+				.distinct()
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(toList());
 		if (parties.size() != 1) {
 			return Boolean.FALSE;
 		}
 
-		final Optional<Party> firstParty = parties.get(0);
-		if (!firstParty.isPresent()) {
-			return Boolean.FALSE;
-		}
-
-		final long directNominationsOfThatParty = getElection().getNominationsOfParty(firstParty.get())
+		final long directNominationsOfThatParty = getElection().getNominationsOfParty(parties.get(0))
 				.stream()
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
 				.count();
@@ -78,30 +104,44 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 
 	private LocalBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
-			final boolean postalVoter,
+			final boolean postalVote,
 			final boolean valid,
 			final Set<LocalNomination> nominations) {
 		this.election = election;
 		this.pollingStation = pollingStation;
 		this.valid = valid;
 		this.nominations = unmodifiableSet(new TreeSet<>(nominations));
-		this.postalVoter = postalVoter;
+		this.postalVote = postalVote;
 
-		for (final LocalNomination nomination : nominations) {
-			if (!nomination.getElection().equals(election)) {
-				throw new ElectionException(
-						"Election \"%s\" of nomination \"%s, %s\" does not match election \"%s\" of ballot.",
-						nomination.getElection().getName(),
-						nomination.getPerson().getFamilyName(),
-						nomination.getPerson().getGivenName(),
-						election.getName());
+		if (valid) {
+			if (nominations.size() > election.getNumberOfVotesPerBallot()) {
+				throw new ElectionException(String.format(
+						"Ballot of election \"%s\" contains more (%d) nominations than permitted (%d). Nominations are: %s",
+						election.getName(),
+						nominations.size(),
+						election.getNumberOfVotesPerBallot(),
+						this.nominations.stream()
+								.map(nomination -> nomination.getPerson().getGivenName()
+										+ ' '
+										+ nomination.getPerson().getFamilyName())
+								.collect(joining(", "))));
 			}
-			if (nomination.getType() != LocalNominationType.DIRECT) {
-				throw new ElectionException(
-						"Nomination \"%s, %s\" of election \"%s\" is not a direct nomination. Ballots can contain direct nominations only.",
-						nomination.getPerson().getFamilyName(),
-						nomination.getPerson().getGivenName(),
-						election.getName());
+			for (final LocalNomination nomination : this.nominations) {
+				if (!nomination.getElection().equals(election)) {
+					throw new ElectionException(
+							"Election \"%s\" of nomination \"%s, %s\" does not match election \"%s\" of ballot.",
+							nomination.getElection().getName(),
+							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName(),
+							election.getName());
+				}
+				if (nomination.getType() != LocalNominationType.DIRECT) {
+					throw new ElectionException(
+							"Nomination \"%s, %s\" of election \"%s\" is not a direct nomination. Ballots can contain direct nominations only.",
+							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName(),
+							election.getName());
+				}
 			}
 		}
 	}

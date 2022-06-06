@@ -22,7 +22,7 @@ public class Person implements Comparable<Person> {
 			= Comparator.comparing(Person::getFamilyName).thenComparing(Person::getGivenName);
 
 	public static String createKey(final String familyName, final String givenName) {
-		return String.format("%s, %s", Keys.escape(familyName, ',', ' '), givenName);
+		return Keys.escape(familyName, ", ", givenName, "");
 	}
 
 	@EqualsAndHashCode.Include

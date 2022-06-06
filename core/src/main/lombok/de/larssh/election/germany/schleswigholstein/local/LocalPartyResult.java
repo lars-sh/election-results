@@ -22,21 +22,40 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Wahlergebnis einzelner politischer Parteien und Wählergruppen
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<LocalPartyResult> {
+	/**
+	 * Comparator by election, number of votes and party
+	 */
 	private static final Comparator<LocalPartyResult> COMPARATOR
 			= Comparator.<LocalPartyResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
 					.thenComparing(LocalPartyResult::getNumberOfVotes)
 					.thenComparing(LocalPartyResult::getParty);
 
+	/**
+	 * Wahlergebnis
+	 *
+	 * @return Wahlergebnis
+	 */
 	@ToString.Exclude
 	LocalElectionResult electionResult;
 
+	/**
+	 * Politische Partei oder Wählerguppe
+	 *
+	 * @return Politische Partei oder Wählerguppe
+	 */
 	Party party;
 
+	/**
+	 * Stimmzettel mit Stimmen für diese politische Partei oder Wählerguppe
+	 */
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
@@ -48,6 +67,9 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 					.anyMatch(getParty()::equals))
 			.collect(toList())));
 
+	/**
+	 * Anzahl der Stimmen für diese politische Partei oder Wählerguppe
+	 */
 	Supplier<Integer> numberOfVotes = lazy(() -> (int) getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
@@ -59,24 +81,35 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.filter(getParty()::equals)
 			.count());
 
+	/**
+	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
+	 */
 	Supplier<Integer> numberOfBlockVotings
 			= lazy(() -> (int) getBallots().stream().filter(LocalBallot::isBlockVoting).count());
 
+	/** {@inheritDoc} */
 	@Override
 	public int compareTo(@Nullable final LocalPartyResult nominationResult) {
 		return COMPARATOR.compare(this, nominationResult);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public List<LocalBallot> getBallots() {
 		return ballots.get();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public int getNumberOfVotes() {
 		return numberOfVotes.get();
 	}
 
+	/**
+	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
+	 *
+	 * @return Anzahl der Blockstimmen
+	 */
 	public int getNumberOfBlockVotings() {
 		return numberOfBlockVotings.get();
 	}

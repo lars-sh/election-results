@@ -16,7 +16,7 @@ public class PartyController extends PartyUiController {
 	}
 
 	private static Color colorToJavaFx(final de.larssh.election.germany.schleswigholstein.Color color) {
-		return new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getOpacity());
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 	}
 
 	public PartyController(final LocalElectionController parent) {

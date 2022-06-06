@@ -9,10 +9,4 @@
 	<Match>
 		<Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING" />
 	</Match>
-
-	<!-- Method "parse" expects commands to be ASCII. -->
-	<Match>
-		<Bug pattern="IMPROPER_UNICODE" />
-		<Class name="de.larssh.election.germany.schleswigholstein.local.LegacyParser" />
-	</Match>
 </FindBugsFilter>

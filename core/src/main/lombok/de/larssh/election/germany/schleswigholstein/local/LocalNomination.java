@@ -23,41 +23,81 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Wahlvorschlag (§ 18 KomWG SH)
+ * Wahlvorschlag (§ 18 GKWG)
  */
 @Getter
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNomination implements Nomination<LocalNomination>, Comparable<LocalNomination> {
+	/**
+	 * Comparator by election, party and nomination order
+	 */
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
 			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
+	/**
+	 * Creates a unique key for the given person and party keys.
+	 *
+	 * @param personKey the key of a person
+	 * @param partyKey  the key of a party
+	 * @return unique key for the given person and party keys
+	 */
 	public static String createKey(final String personKey, final Optional<String> partyKey) {
-		return Keys.escape(personKey, ' ', '(') + partyKey.map(key -> " (" + key + ')').orElse("");
+		return Keys.escape(personKey, " (", partyKey.orElse(""), ")");
 	}
 
+	/**
+	 * Wahl
+	 *
+	 * @return Wahl
+	 */
 	@JsonIgnore
 	@ToString.Exclude
 	LocalElection election;
 
+	/**
+	 * Wahlkreis
+	 *
+	 * @return Wahlkreis
+	 */
 	LocalDistrict district;
 
+	/**
+	 * Politische Partei, Wählergruppe oder empty für unabhängige Bewerberinnen und
+	 * Bewerber
+	 *
+	 * @return Politische Partei, Wählergruppe oder empty
+	 */
 	Optional<Party> party;
 
+	/**
+	 * Bewerberin oder Bewerber
+	 *
+	 * @return Bewerberin oder Bewerber
+	 */
 	Person person;
 
+	/**
+	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
+	 */
 	@JsonIgnore
 	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
 			|| getElection().getNominationsOfParty(getParty().get()).indexOf(this) < getElection()
 					.getNumberOfDirectSeats() ? LocalNominationType.DIRECT : LocalNominationType.LIST);
 
+	/** {@inheritDoc} */
 	@Override
 	public int compareTo(@Nullable final LocalNomination nomination) {
 		return COMPARATOR.compare(this, nomination);
 	}
 
+	/**
+	 * District as JSON property
+	 *
+	 * @return Wahlkreis
+	 */
 	@JsonProperty("district")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
@@ -65,15 +105,30 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 		return getDistrict().getKey();
 	}
 
+	/**
+	 * Creates a unique key based on the person and party.
+	 *
+	 * @return unique key based on the person and party
+	 */
 	@JsonIgnore
 	public String getKey() {
 		return createKey(getPerson().getKey(), getParty().map(Party::getKey));
 	}
 
+	/**
+	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
+	 *
+	 * @return Art des Wahlvorschlags
+	 */
 	public LocalNominationType getType() {
 		return type.get();
 	}
 
+	/**
+	 * Party as JSON property
+	 *
+	 * @return Politische Partei, Wählergruppe oder empty
+	 */
 	@JsonProperty("party")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")

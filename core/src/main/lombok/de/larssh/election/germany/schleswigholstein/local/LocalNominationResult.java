@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Vertreterinnen und Vertreter (§ 7 KomWG SH)
+ * Wahlergebnis einzelner Vertreterinnen und Vertreter
  */
 @Getter
 @ToString
@@ -28,6 +28,10 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNominationResult
 		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
+	/**
+	 * Comparator by election, nomination result type, Sainte Laguë value and
+	 * nomination order
+	 */
 	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
 			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
 			.thenComparing(LocalNominationResult::getType)
@@ -36,26 +40,42 @@ public class LocalNominationResult
 			.reversed()
 			.thenComparing(LocalNominationResult::getNomination);
 
+	/**
+	 * Wahlergebnis
+	 */
 	@ToString.Exclude
 	LocalElectionResult electionResult;
 
+	/**
+	 * Bewerberin oder Bewerber
+	 */
 	LocalNomination nomination;
 
+	/**
+	 * Art der Vertreterin oder des Vertreters gem. § 9+10 GKWG
+	 *
+	 * @return Art der Vertreterinn oder des Vertreters
+	 */
 	LocalNominationResultType type;
 
 	BigDecimal sainteLagueValue;
 
+	/**
+	 * Stimmzettel der Vertreterin oder des Vertreters
+	 */
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
 			.filter(ballot -> ballot.getNominations().contains(getNomination()))
 			.collect(toList())));
 
+	/** {@inheritDoc} */
 	@Override
 	public int compareTo(@Nullable final LocalNominationResult nominationResult) {
 		return COMPARATOR.compare(this, nominationResult);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public List<LocalBallot> getBallots() {
 		return ballots.get();
