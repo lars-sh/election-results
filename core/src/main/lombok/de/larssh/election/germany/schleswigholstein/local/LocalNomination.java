@@ -50,6 +50,8 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 
 	/**
 	 * Wahl
+	 *
+	 * @return Wahl
 	 */
 	@JsonIgnore
 	@ToString.Exclude
@@ -57,17 +59,23 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 
 	/**
 	 * Wahlkreis
+	 *
+	 * @return Wahlkreis
 	 */
 	LocalDistrict district;
 
 	/**
 	 * Politische Partei, Wählergruppe oder empty für unabhängige Bewerberinnen und
 	 * Bewerber
+	 *
+	 * @return Politische Partei, Wählergruppe oder empty
 	 */
 	Optional<Party> party;
 
 	/**
 	 * Bewerberin oder Bewerber
+	 *
+	 * @return Bewerberin oder Bewerber
 	 */
 	Person person;
 

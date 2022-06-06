@@ -99,6 +99,8 @@ public class PopulationInformation {
 
 	/**
 	 * Art des Wahlgebiets
+	 *
+	 * @return Art des Wahlgebiets
 	 */
 	@Getter
 	LocalDistrictType type;

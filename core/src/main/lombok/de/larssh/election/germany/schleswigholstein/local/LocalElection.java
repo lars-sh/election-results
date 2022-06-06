@@ -97,12 +97,16 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 	/**
 	 * Date of the election
+	 *
+	 * @return the date of the election
 	 */
 	@EqualsAndHashCode.Include
 	LocalDate date;
 
 	/**
 	 * Name of the election
+	 *
+	 * @return the name of the election
 	 */
 	@EqualsAndHashCode.Include
 	String name;
@@ -134,6 +138,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * <p>
 	 * Usually this is {@code 2}.
+	 *
+	 * @return the scale (decimal places) of Sainte Laguë values
 	 */
 	int sainteLagueScale;
 

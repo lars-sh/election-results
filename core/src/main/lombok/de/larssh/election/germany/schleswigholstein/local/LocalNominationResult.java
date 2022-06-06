@@ -53,6 +53,8 @@ public class LocalNominationResult
 
 	/**
 	 * Art der Vertreterin oder des Vertreters gem. § 9+10 GKWG
+	 *
+	 * @return Art der Vertreterinn oder des Vertreters
 	 */
 	LocalNominationResultType type;
 

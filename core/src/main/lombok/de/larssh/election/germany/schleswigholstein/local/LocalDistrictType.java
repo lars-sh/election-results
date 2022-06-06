@@ -30,6 +30,8 @@ public enum LocalDistrictType {
 	 *
 	 * <p>
 	 * sieeh § 15 Absatz 3 GKWG
+	 *
+	 * @return Name
 	 */
 	String name;
 
@@ -38,6 +40,8 @@ public enum LocalDistrictType {
 	 *
 	 * <p>
 	 * siehe § 96 Absatz 1 GKWO
+	 *
+	 * @return Farbe der Stimmzettel
 	 */
 	Color colorOfBallots;
 
