@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Wahlergebnis einzelner Bewerberinnen und Bewerber
  *
- * @param <N> the type of ballots
+ * @param <B> the type of ballots
  * @param <N> the type of nominations
  */
 public interface NominationResult<B extends Ballot<? extends N>, N extends Nomination<? extends N>> {

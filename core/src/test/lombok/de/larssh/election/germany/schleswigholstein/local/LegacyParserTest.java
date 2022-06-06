@@ -51,6 +51,11 @@ class LegacyParserTest {
 		}
 	}
 
+	/**
+	 * Read one result containing all data of Rethwisch
+	 *
+	 * @return one result containing all data of Rethwisch
+	 */
 	@PackagePrivate
 	static LocalElectionResult readResultsRethwisch() {
 		final LocalElection election = LocalElectionTest.createElection();
@@ -62,6 +67,9 @@ class LegacyParserTest {
 		return LegacyParser.mergeResults(resultKleinBoden, resultRethwischdorf);
 	}
 
+	/**
+	 * Test parsing using results of Klein Boden
+	 */
 	@Test
 	@PackagePrivate
 	void testKleinBoden() {
@@ -77,6 +85,9 @@ class LegacyParserTest {
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(2);
 	}
 
+	/**
+	 * Test parsing using results of Rethwisch
+	 */
 	@Test
 	@PackagePrivate
 	void testRethwisch() {
@@ -91,6 +102,9 @@ class LegacyParserTest {
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(3);
 	}
 
+	/**
+	 * Test parsing using results of Rethwischdorf
+	 */
 	@Test
 	@PackagePrivate
 	void testRethwischdorf() {

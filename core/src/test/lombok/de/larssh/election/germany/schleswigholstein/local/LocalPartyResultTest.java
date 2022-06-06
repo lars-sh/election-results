@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 @NoArgsConstructor
 class LocalPartyResultTest {
+	/**
+	 * Test results using results of Klein Boden
+	 */
 	@Test
 	@PackagePrivate
 	void testKleinBoden() {
@@ -43,6 +46,9 @@ class LocalPartyResultTest {
 				.isEqualTo(20);
 	}
 
+	/**
+	 * Test results using results of Rethwisch
+	 */
 	@Test
 	@PackagePrivate
 	void testRethwisch() {
@@ -67,6 +73,9 @@ class LocalPartyResultTest {
 				.isEqualTo(51);
 	}
 
+	/**
+	 * Test results using results of Rethwischdorf
+	 */
 	@Test
 	@PackagePrivate
 	void testRethwischdorf() {

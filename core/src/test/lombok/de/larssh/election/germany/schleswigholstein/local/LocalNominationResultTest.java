@@ -295,6 +295,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test types using results of Rethwisch
+	 */
 	@Test
 	@PackagePrivate
 	void testTypeRethwisch() {
@@ -343,6 +346,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test votes using results of Klein Boden
+	 */
 	@Test
 	@PackagePrivate
 	void testVotesKleinBoden() {
@@ -383,6 +389,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test votes using results of Rethwisch
+	 */
 	@Test
 	@PackagePrivate
 	void testVotesRethwisch() {
@@ -420,6 +429,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test votes using results of Rethwischdorf
+	 */
 	@Test
 	@PackagePrivate
 	void testVotesRethwischdorf() {
