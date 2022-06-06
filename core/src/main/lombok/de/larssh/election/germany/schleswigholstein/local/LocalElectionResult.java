@@ -49,6 +49,7 @@ import de.larssh.utils.Nullables;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -114,6 +115,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				parsable.createListDrawResults());
 	}
 
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Election is no longer modifiable when passed here.")
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
 			final List<LocalBallot> ballots,

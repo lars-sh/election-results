@@ -272,12 +272,13 @@ public class LegacyParser {
 						if (line.charAt(0) == LINE_COMMAND) {
 							final String command = line.substring(1).trim();
 
-							if (COMMAND_CLEAR.equalsIgnoreCase(command)) {
+							if (Strings.equalsIgnoreCaseAscii(COMMAND_CLEAR, command)) {
 								ballots.clear();
+							} else {
+								Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command)
+										.ifPresent(matcher -> numberOfAllBallots
+												.set(OptionalInt.of(Integer.parseInt(matcher.group(GROUP_VALUE)))));
 							}
-							Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command)
-									.ifPresent(matcher -> numberOfAllBallots
-											.set(OptionalInt.of(Integer.parseInt(matcher.group(GROUP_VALUE)))));
 						} else {
 							ballots.addAll(createBallotsFromLine(election, pollingStation, line));
 						}
