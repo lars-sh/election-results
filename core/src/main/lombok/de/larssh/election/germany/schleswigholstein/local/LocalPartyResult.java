@@ -61,11 +61,24 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.filter(Ballot::isValid)
 			.filter(ballot -> ballot.getNominations()
 					.stream()
-					.map(Nomination::getParty)
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.anyMatch(getParty()::equals))
+					.anyMatch(nomination -> nomination.getParty().filter(getParty()::equals).isPresent()))
 			.collect(toList())));
+
+	/**
+	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
+	 */
+	Supplier<Integer> numberOfBlockVotings
+			= lazy(() -> (int) getBallots().stream().filter(LocalBallot::isBlockVoting).count());
+
+	/**
+	 * Anzahl der Sitze für diese politische Partei oder Wählerguppe
+	 */
+	Supplier<Integer> numberOfSeats = lazy(() -> (int) getElectionResult().getNominationResults()
+			.values()
+			.stream()
+			.filter(nominationResult -> nominationResult.getType() != LocalNominationResultType.NOT_ELECTED
+					&& nominationResult.getNomination().getParty().filter(getParty()::equals).isPresent())
+			.count());
 
 	/**
 	 * Anzahl der Stimmen für diese politische Partei oder Wählerguppe
@@ -81,12 +94,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.filter(getParty()::equals)
 			.count());
 
-	/**
-	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
-	 */
-	Supplier<Integer> numberOfBlockVotings
-			= lazy(() -> (int) getBallots().stream().filter(LocalBallot::isBlockVoting).count());
-
 	/** {@inheritDoc} */
 	@Override
 	public int compareTo(@Nullable final LocalPartyResult nominationResult) {
@@ -99,12 +106,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		return ballots.get();
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public int getNumberOfVotes() {
-		return numberOfVotes.get();
-	}
-
 	/**
 	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
 	 *
@@ -112,5 +113,20 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 */
 	public int getNumberOfBlockVotings() {
 		return numberOfBlockVotings.get();
+	}
+
+	/**
+	 * Anzahl der Sitze für diese politische Partei oder Wählerguppe
+	 *
+	 * @return Anzahl der Sitze
+	 */
+	public int getNumberOfSeats() {
+		return numberOfSeats.get();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int getNumberOfVotes() {
+		return numberOfVotes.get();
 	}
 }
