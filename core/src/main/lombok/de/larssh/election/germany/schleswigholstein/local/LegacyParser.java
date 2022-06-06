@@ -65,7 +65,7 @@ public class LegacyParser {
 	 * Pattern to match lines stating the number of all ballots
 	 */
 	private static final Pattern NUMBER_OF_ALL_BALLOTS_PATTERN
-			= Pattern.compile("^(?i)\\s*Anzahl\\s+Stimmzettel\\s*:?\\s*(?<" + GROUP_VALUE + ">\\d+)\\s*$");
+			= Pattern.compile("^(?i)Anzahl\\s+Stimmzettel\\s*:?\\s*(?<" + GROUP_VALUE + ">\\d+)$");
 
 	/**
 	 * Character to start command lines with
@@ -270,7 +270,7 @@ public class LegacyParser {
 					.filter(line -> !line.isEmpty() && line.charAt(0) != LINE_COMMENT)
 					.forEachOrdered(line -> {
 						if (line.charAt(0) == LINE_COMMAND) {
-							final String command = Strings.trimStart(line.substring(1));
+							final String command = line.substring(1).trim();
 
 							if (COMMAND_CLEAR.equalsIgnoreCase(command)) {
 								ballots.clear();
