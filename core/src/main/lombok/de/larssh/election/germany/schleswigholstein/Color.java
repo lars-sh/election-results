@@ -59,21 +59,29 @@ public class Color {
 
 	/**
 	 * Percentage of the red channel
+	 *
+	 * @return the percentage of the red channel
 	 */
 	double red;
 
 	/**
 	 * Percentage of the green channel
+	 *
+	 * @return the green of the red channel
 	 */
 	double green;
 
 	/**
 	 * Percentage of the blue channel
+	 *
+	 * @return the blue of the red channel
 	 */
 	double blue;
 
 	/**
 	 * Percentage of the alpha channel
+	 *
+	 * @return the alpha of the red channel
 	 */
 	double alpha;
 }

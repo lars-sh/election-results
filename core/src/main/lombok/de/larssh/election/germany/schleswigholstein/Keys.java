@@ -28,7 +28,7 @@ public class Keys {
 	 * as expected. An {@link IllegalArgumentException} is thrown in case it is too
 	 * short.
 	 *
-	 * <table width="100%">
+	 * <table style="width: 100%;">
 	 * <caption>Real Examples</caption>
 	 * <tr>
 	 * <th>{@code value}
@@ -53,7 +53,7 @@ public class Keys {
 	 * </tr>
 	 * </table>
 	 *
-	 * <table width="100%">
+	 * <table style="width: 100%;">
 	 * <caption>Edge Cases</caption>
 	 * <tr>
 	 * <th>{@code value}

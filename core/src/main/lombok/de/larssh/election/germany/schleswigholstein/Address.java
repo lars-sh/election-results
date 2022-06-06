@@ -26,21 +26,29 @@ public class Address implements Comparable<Address> {
 
 	/**
 	 * Street name without house number
+	 *
+	 * @return the street name without house number
 	 */
 	String street;
 
 	/**
 	 * House number
+	 *
+	 * @return the house number
 	 */
 	String houseNumber;
 
 	/**
 	 * Postal code
+	 *
+	 * @return the postal code
 	 */
 	String zip;
 
 	/**
 	 * City
+	 *
+	 * @return the city
 	 */
 	String city;
 
