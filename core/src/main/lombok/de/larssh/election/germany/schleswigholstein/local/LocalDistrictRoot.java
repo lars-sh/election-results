@@ -25,8 +25,6 @@ import lombok.Getter;
 public class LocalDistrictRoot extends District<LocalDistrict> {
 	/**
 	 * Art des Wahlgebiets
-	 *
-	 * @return Art des Wahlgebiets
 	 */
 	LocalDistrictType type;
 
@@ -89,22 +87,16 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	private static class ParsableLocalDistrictRoot {
 		/**
 		 * Name des Wahlgebiets
-		 *
-		 * @return Name
 		 */
 		final String name;
 
 		/**
 		 * Wahlkreise des Wahlgebiets
-		 *
-		 * @return Wahlkreise
 		 */
 		final Set<ParsableLocalDistrict> children;
 
 		/**
 		 * Art des Wahlgebiets
-		 *
-		 * @return Art des Wahlgebiets
 		 */
 		final LocalDistrictType type;
 
@@ -134,8 +126,6 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	private static class ParsableLocalDistrict {
 		/**
 		 * Name des Wahlkreises
-		 *
-		 * @return Name
 		 */
 		final String name;
 
@@ -174,8 +164,6 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	private static class ParsableLocalPollingStation {
 		/**
 		 * Name des Wahlbezirks
-		 *
-		 * @return Name
 		 */
 		final String name;
 

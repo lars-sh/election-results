@@ -38,16 +38,12 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 
 	/**
 	 * Wahlergebnis
-	 *
-	 * @return Wahlergebnis
 	 */
 	@ToString.Exclude
 	LocalElectionResult electionResult;
 
 	/**
 	 * Politische Partei oder Wählerguppe
-	 *
-	 * @return Politische Partei oder Wählerguppe
 	 */
 	Party party;
 

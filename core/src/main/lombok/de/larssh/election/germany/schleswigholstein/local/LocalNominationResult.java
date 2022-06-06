@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Wahlergebnis einzelner Vertreterinnen und Vertreter
+ * Wahlergebnis einzelner Bewerberinnen und Bewerber
  */
 @Getter
 @ToString
@@ -53,15 +53,13 @@ public class LocalNominationResult
 
 	/**
 	 * Art der Vertreterin oder des Vertreters gem. § 9+10 GKWG
-	 *
-	 * @return Art der Vertreterinn oder des Vertreters
 	 */
 	LocalNominationResultType type;
 
 	BigDecimal sainteLagueValue;
 
 	/**
-	 * Stimmzettel der Vertreterin oder des Vertreters
+	 * Stimmzettel der Bewerberin oder des Bewerbers
 	 */
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()

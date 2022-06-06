@@ -49,31 +49,23 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 
 	/**
 	 * Wahl
-	 *
-	 * @return Wahl
 	 */
 	@JsonIgnore
 	LocalElection election;
 
 	/**
 	 * Wahlbezirk
-	 *
-	 * @return Wahlbezirk
 	 */
 	@JsonIgnore
 	LocalPollingStation pollingStation;
 
 	/**
 	 * Briefwahl (§ 33 GKWG)
-	 *
-	 * @return {@code true} for postal vote ballots, else {@code false}
 	 */
 	boolean postalVote;
 
 	/**
-	 * Ungültige Stimmen (§ 35 GKWG)
-	 *
-	 * @return {@code true} for valid ballots, else {@code false}
+	 * Ungültige Stimme (§ 35 GKWG)
 	 */
 	boolean valid;
 

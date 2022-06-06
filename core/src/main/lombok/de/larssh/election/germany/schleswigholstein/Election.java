@@ -15,6 +15,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @param <N> the type of nominations
  */
 public interface Election<D extends District<?>, N extends Nomination<? extends N>> extends Comparable<Election<?, ?>> {
+	/**
+	 * Comparator by district, name and date
+	 */
 	Comparator<Election<?, ?>> COMPARATOR = Comparator.<Election<?, ?>, District<?>>comparing(Election::getDistrict)
 			.thenComparing(Election::getName)
 			.thenComparing(Election::getDate);

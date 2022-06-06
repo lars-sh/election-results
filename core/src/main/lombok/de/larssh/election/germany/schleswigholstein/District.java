@@ -34,8 +34,6 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 
 	/**
 	 * Parent of the district or empty for root districts
-	 *
-	 * @return the parent district or empty
 	 */
 	@EqualsAndHashCode.Include
 	@ToString.Include(rank = -1)
@@ -43,8 +41,6 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 
 	/**
 	 * Name of the district
-	 *
-	 * @return the name
 	 */
 	@EqualsAndHashCode.Include
 	String name;
