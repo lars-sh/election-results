@@ -58,6 +58,11 @@ public class LocalNominationResult
 	 */
 	LocalNominationResultType type;
 
+	/**
+	 * Sainte Laguë value
+	 *
+	 * @return the Sainte Laguë value
+	 */
 	BigDecimal sainteLagueValue;
 
 	/**

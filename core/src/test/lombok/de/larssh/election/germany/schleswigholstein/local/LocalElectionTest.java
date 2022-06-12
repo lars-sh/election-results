@@ -46,7 +46,7 @@ public class LocalElectionTest {
 		election.setNumberOfEligibleVoters(districtRoot, OptionalInt.empty());
 
 		addDistricts(election);
-		addPersons(election);
+		addPartiesAndNominations(election);
 
 		return election;
 	}
@@ -67,7 +67,7 @@ public class LocalElectionTest {
 		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 273);
 	}
 
-	private static void addPersons(final LocalElection election) {
+	private static void addPartiesAndNominations(final LocalElection election) {
 		final LocalDistrict district = election.getDistrict().getChildren().iterator().next();
 
 		final Party partyCdu = new Party("CDU",
@@ -377,6 +377,18 @@ public class LocalElectionTest {
 		election.createNomination(district, personHartmutFeddern, Optional.of(partyFwr));
 	}
 
+	/**
+	 * Finds a nomination based the family and given name.
+	 *
+	 * <p>
+	 * This method throws an {@link ElectionException} in case no such nomination
+	 * can be found.
+	 *
+	 * @param election   the election to search
+	 * @param familyName the nomination's family name
+	 * @param givenName  the nomination's given name
+	 * @return the nomination
+	 */
 	@PackagePrivate
 	static LocalNomination findNomination(final LocalElection election,
 			final String familyName,
@@ -391,6 +403,17 @@ public class LocalElectionTest {
 						familyName));
 	}
 
+	/**
+	 * Finds a party based its short name.
+	 *
+	 * <p>
+	 * This method throws an {@link ElectionException} in case no such party can be
+	 * found.
+	 *
+	 * @param election  the election to search
+	 * @param shortName the party's short name
+	 * @return the party
+	 */
 	@PackagePrivate
 	static Party findParty(final LocalElection election, final String shortName) {
 		return election.getParties()
@@ -400,6 +423,17 @@ public class LocalElectionTest {
 				.orElseThrow(() -> new ElectionException("Cannot find a party with short name \"%s\".", shortName));
 	}
 
+	/**
+	 * Finds a polling station based its name.
+	 *
+	 * <p>
+	 * This method throws an {@link ElectionException} in case no such polling
+	 * station can be found.
+	 *
+	 * @param election the election to search
+	 * @param name     the polling station's name
+	 * @return the polling station
+	 */
 	@PackagePrivate
 	static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
 		return election.getDistrict()
@@ -412,6 +446,10 @@ public class LocalElectionTest {
 				.orElseThrow(() -> new ElectionException("Cannot find a polling station named \"%s\".", name));
 	}
 
+	/**
+	 * Test writing and reading JSON, creating an election equal to the original
+	 * one.
+	 */
 	@Test
 	@PackagePrivate
 	void testJson() throws IOException {

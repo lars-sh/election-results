@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 class LocalElectionResultTest {
 	/**
-	 * An empty result must not fail, but return the expected values.
+	 * Test, that calculating an empty result does not fail
 	 */
 	@Test
 	@PackagePrivate
@@ -52,8 +52,8 @@ class LocalElectionResultTest {
 	}
 
 	/**
-	 * Writing and reading JSON results must create a result equal to the original
-	 * one.
+	 * Test writing and reading JSON results, creating a result equal to the
+	 * original one.
 	 */
 	@Test
 	@PackagePrivate

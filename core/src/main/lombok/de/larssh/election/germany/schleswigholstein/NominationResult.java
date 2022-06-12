@@ -30,5 +30,10 @@ public interface NominationResult<B extends Ballot<? extends N>, N extends Nomin
 	 */
 	List<? extends B> getBallots();
 
+	/**
+	 * Number of votes for this nomination
+	 *
+	 * @return the number of votes for this nomination
+	 */
 	int getNumberOfVotes();
 }

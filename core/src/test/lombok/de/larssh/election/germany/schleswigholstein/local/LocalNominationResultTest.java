@@ -20,6 +20,21 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 @NoArgsConstructor
 class LocalNominationResultTest {
+	/**
+	 * Executes {@link LocalElectionResult#getNominationResults()} and asserts the
+	 * result for the expected number of results.
+	 *
+	 * <p>
+	 * {@code assertListNominationsAsNotElected} can be specified to test if list
+	 * nominations are not elected, which is the case as long as no balance seat is
+	 * involved.
+	 *
+	 * @param result                            the {@link LocalElectionResult}
+	 * @param assertListNominationsAsNotElected {@code true} if list nominations
+	 *                                          shall be asserted as not elected,
+	 *                                          else {@code false}
+	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 */
 	private static Map<LocalNomination, LocalNominationResult> getAndAssertNominationResults(
 			final LocalElectionResult result,
 			final boolean assertListNominationsAsNotElected) {
@@ -38,6 +53,10 @@ class LocalNominationResultTest {
 		return nominationResults;
 	}
 
+	/**
+	 * Test the Sainte Laguë value of the local district Rethwisch based on the
+	 * official results from 2018
+	 */
 	@Test
 	@PackagePrivate
 	void testSainteLagueRethwisch() {
@@ -86,6 +105,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test types in case no ballot was evaluated
+	 */
 	@Test
 	@PackagePrivate
 	void testTypeAllZero() {
@@ -98,6 +120,10 @@ class LocalNominationResultTest {
 						.isEqualTo(LocalNominationResultType.NOT_ELECTED));
 	}
 
+	/**
+	 * Test types in case exactly the same number of votes were given to all
+	 * nominations.
+	 */
 	@Test
 	@PackagePrivate
 	void testTypeAllOne() {
@@ -112,6 +138,9 @@ class LocalNominationResultTest {
 						.isEqualTo(LocalNominationResultType.DIRECT_DRAW));
 	}
 
+	/**
+	 * Test types in case of balance and overhang seats
+	 */
 	@Test
 	@PackagePrivate
 	void testTypeBalanceAndOverhangSeats() {
@@ -163,11 +192,12 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * Less list draw results than list positions, all direct draw positions
+	 * Test types in case of partially closed draws in case there are less list draw
+	 * results than list positions
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeClosedDraws1() {
+	void testTypePartiallyClosedDraws1() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest
 				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("draws.txt"));
@@ -210,11 +240,12 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * Less direct draw results than direct positions, all list draw positions
+	 * Test types in case of partially closed draws in case there are less direct
+	 * draw results than direct positions
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeClosedDraws2() {
+	void testTypePartiallyClosedDraws2() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest
 				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("draws.txt"));
@@ -257,6 +288,9 @@ class LocalNominationResultTest {
 		// @formatter:on
 	}
 
+	/**
+	 * Test types in case of completely open draws
+	 */
 	@Test
 	@PackagePrivate
 	void testTypeOpenDraws() {

@@ -21,12 +21,11 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Person implements Comparable<Person> {
+	/**
+	 * Comparator by family and given name
+	 */
 	private static final Comparator<Person> COMPARATOR
 			= Comparator.comparing(Person::getFamilyName).thenComparing(Person::getGivenName);
-
-	public static String createKey(final String familyName, final String givenName) {
-		return Keys.escape(familyName, ", ", givenName, "");
-	}
 
 	/**
 	 * Given name
@@ -92,6 +91,6 @@ public class Person implements Comparable<Person> {
 	 */
 	@JsonIgnore
 	public String getKey() {
-		return createKey(getFamilyName(), getGivenName());
+		return Keys.escape(getFamilyName(), ", ", getGivenName(), "");
 	}
 }

@@ -2,6 +2,11 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.List;
 
+/**
+ * Wahlergebnis einzelner politischer Parteien oder Wählergruppen
+ *
+ * @param <B> the type of ballots
+ */
 public interface PartyResult<B extends Ballot<?>> {
 	/**
 	 * Wahlergebnis
@@ -24,5 +29,10 @@ public interface PartyResult<B extends Ballot<?>> {
 	 */
 	List<? extends B> getBallots();
 
+	/**
+	 * Number of votes for this party
+	 *
+	 * @return the number of votes for this party
+	 */
 	int getNumberOfVotes();
 }

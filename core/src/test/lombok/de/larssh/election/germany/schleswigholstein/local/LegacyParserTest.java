@@ -25,22 +25,31 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 @NoArgsConstructor
 class LegacyParserTest {
+	/**
+	 * Read the result file of a {@code pollingStationName} from a class-relative
+	 * text file
+	 *
+	 * @param election           the election to reference
+	 * @param pollingStationName the name of a polling station
+	 * @return the {@link LocalElectionResult}
+	 */
 	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
 		return readResult(election, pollingStationName, Paths.get(pollingStationName + ".txt"));
 	}
 
+	/**
+	 * Read the result file of {@code classRelativePath}
+	 *
+	 * @param election           the election to reference
+	 * @param pollingStationName the name of a polling station
+	 * @param classRelativePath  path to a class-relative text file
+	 * @return the {@link LocalElectionResult}
+	 */
 	@PackagePrivate
 	static LocalElectionResult readResult(final LocalElection election,
 			final String pollingStationName,
 			final Path classRelativePath) {
-		return readResult(election,
-				LocalElectionTest.findPollingStation(election, pollingStationName),
-				classRelativePath);
-	}
-
-	private static LocalElectionResult readResult(final LocalElection election,
-			final LocalPollingStation pollingStation,
-			final Path classRelativePath) {
+		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 		final Path path = Resources.getResourceRelativeTo(LegacyParserTest.class, classRelativePath)
 				.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
 						pollingStation.getKey()));
