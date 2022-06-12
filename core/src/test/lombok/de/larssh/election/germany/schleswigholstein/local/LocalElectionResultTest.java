@@ -37,6 +37,7 @@ class LocalElectionResultTest {
 		assertThat(result.getNominationResults()).hasSameSizeAs(election.getNominations());
 		result.getNominationResults().values().forEach(nominationResult -> {
 			assertThat(nominationResult.getBallots()).isEmpty();
+			assertThat(nominationResult.getNumberOfVotes()).isZero();
 			assertThat(nominationResult.getSainteLagueValue()).isEqualTo(BigDecimal.ZERO);
 			assertThat(nominationResult.getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
 		});

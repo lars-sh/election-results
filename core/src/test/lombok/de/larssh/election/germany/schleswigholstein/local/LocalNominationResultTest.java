@@ -362,30 +362,30 @@ class LocalNominationResultTest {
 				= getAndAssertNominationResults(result, true);
 
 		// @formatter:off
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getBallots()).hasSize(57);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getBallots()).hasSize(69);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getBallots()).hasSize(64);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getBallots()).hasSize(16);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getBallots()).hasSize(26);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getBallots()).hasSize(71);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getBallots()).hasSize(12);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getBallots()).hasSize(28);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getBallots()).hasSize(18);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getBallots()).hasSize(24);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getBallots()).hasSize(10);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getBallots()).hasSize(34);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getBallots()).hasSize(29);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getBallots()).hasSize(46);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getBallots()).hasSize(41);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getBallots()).hasSize(57);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getBallots()).hasSize(106);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getBallots()).hasSize(11);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getBallots()).hasSize(27);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getBallots()).hasSize(10);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getBallots()).hasSize(37);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getBallots()).hasSize(57);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getBallots()).hasSize(14);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getBallots()).hasSize(20);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(57);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(69);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(64);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(16);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(26);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(71);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(12);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(28);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(18);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(24);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(10);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(34);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(29);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(46);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(41);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(57);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(106);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(11);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(27);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(10);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(37);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(57);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(14);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(20);
 		// @formatter:on
 	}
 
@@ -402,30 +402,30 @@ class LocalNominationResultTest {
 				= getAndAssertNominationResults(result, true);
 
 		// @formatter:off
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getBallots()).hasSize(181);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getBallots()).hasSize(220);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getBallots()).hasSize(146);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getBallots()).hasSize(121);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getBallots()).hasSize(195);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getBallots()).hasSize(219);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getBallots()).hasSize(64);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getBallots()).hasSize(112);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getBallots()).hasSize(151);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getBallots()).hasSize(160);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getBallots()).hasSize(37);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getBallots()).hasSize(116);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getBallots()).hasSize(75);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getBallots()).hasSize(115);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getBallots()).hasSize(150);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getBallots()).hasSize(191);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getBallots()).hasSize(328);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getBallots()).hasSize(59);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getBallots()).hasSize(85);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getBallots()).hasSize(73);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getBallots()).hasSize(105);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getBallots()).hasSize(183);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getBallots()).hasSize(87);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getBallots()).hasSize(53);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(181);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(220);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(146);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(121);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(195);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(219);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(64);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(112);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(151);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(160);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(37);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(116);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(75);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(115);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(150);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(191);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(328);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(59);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(85);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(73);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(105);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(183);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(87);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(53);
 		// @formatter:on
 	}
 
@@ -445,30 +445,30 @@ class LocalNominationResultTest {
 				= getAndAssertNominationResults(result, true);
 
 		// @formatter:off
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getBallots()).hasSize(124);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getBallots()).hasSize(151);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getBallots()).hasSize(82);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getBallots()).hasSize(105);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getBallots()).hasSize(169);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getBallots()).hasSize(148);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getBallots()).hasSize(52);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getBallots()).hasSize(84);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getBallots()).hasSize(133);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getBallots()).hasSize(136);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getBallots()).hasSize(27);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getBallots()).hasSize(82);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getBallots()).hasSize(46);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getBallots()).hasSize(69);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getBallots()).hasSize(109);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getBallots()).hasSize(134);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getBallots()).hasSize(222);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getBallots()).hasSize(48);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getBallots()).hasSize(58);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getBallots()).hasSize(63);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getBallots()).hasSize(68);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getBallots()).hasSize(126);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getBallots()).hasSize(73);
-		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getBallots()).hasSize(33);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(124);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(151);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(82);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(105);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(169);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(148);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(52);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(84);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(133);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(136);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(27);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(82);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(46);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(69);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(109);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(134);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(222);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(48);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(58);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(63);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(68);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(126);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(73);
+		assertThat(nominationResults.get(LocalElectionTest.findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(33);
 		// @formatter:on
 	}
 }

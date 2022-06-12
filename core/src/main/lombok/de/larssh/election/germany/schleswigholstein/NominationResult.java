@@ -29,4 +29,6 @@ public interface NominationResult<B extends Ballot<? extends N>, N extends Nomin
 	 * @return Stimmzettel der Bewerberin oder des Bewerbers
 	 */
 	List<? extends B> getBallots();
+
+	int getNumberOfVotes();
 }

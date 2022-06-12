@@ -80,4 +80,10 @@ public class LocalNominationResult
 	public List<LocalBallot> getBallots() {
 		return ballots.get();
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int getNumberOfVotes() {
+		return getBallots().size();
+	}
 }
