@@ -142,9 +142,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	/** {@inheritDoc} */
 	@Override
 	public LocalElectionResult filter(final Predicate<? super LocalBallot> filter) {
+		final List<LocalBallot> filteredBallots = getBallots().stream().filter(filter).collect(toList());
+		final OptionalInt numberOfFilteredBallots = OptionalInts
+				.filter(getNumberOfAllBallots(), numberOfAllBallots -> numberOfAllBallots == getBallots().size())
+				.isPresent() ? OptionalInt.of(filteredBallots.size()) : OptionalInt.empty();
+
 		return new LocalElectionResult(getElection(),
-				OptionalInt.empty(),
-				getBallots().stream().filter(filter).collect(toList()),
+				numberOfFilteredBallots,
+				filteredBallots,
 				getDirectDrawResults(),
 				getListDrawResults());
 	}
