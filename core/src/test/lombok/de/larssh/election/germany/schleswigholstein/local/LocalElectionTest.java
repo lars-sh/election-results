@@ -119,60 +119,60 @@ public class LocalElectionTest {
 				Color.WHITE,
 				Optional.empty());
 
-		addNomination(election, "Jens", "Poppinga", Gender.MALE, partyCdu);
-		addNomination(election, "Dirk", "Eggers", Gender.MALE, partyCdu);
-		addNomination(election, "Karsten", "Beck", Gender.MALE, partyCdu);
-		addNomination(election, "Dietrich", "Motzkus", Gender.MALE, partyCdu);
-		addNomination(election, "Sönke", "Behnk", Gender.MALE, partyCdu);
-		addNomination(election, "Marcel", "Weger", Gender.MALE, partyCdu);
-		addNomination(election, "Carola", "Gräpel", Gender.FEMALE, partyCdu);
-		addNomination(election, "Rupert", "Schwarz", Gender.MALE, partyCdu);
-		addNomination(election, "Erik", "Klein", Gender.MALE, partyCdu);
-		addNomination(election, "Martina", "Dohrendorf", Gender.FEMALE, partyCdu);
-		addNomination(election, "Christian", "Bernhardt", Gender.MALE, partyCdu);
-		addNomination(election, "Andreas", "Topel", Gender.MALE, partyCdu);
-		addNomination(election, "Dirk", "Kröger", Gender.MALE, partySpd);
-		addNomination(election, "Ernst", "Eick", Gender.MALE, partySpd);
-		addNomination(election, "Helga", "Jögimar", Gender.FEMALE, partySpd);
-		addNomination(election, "Armin", "Ehlert", Gender.MALE, partySpd);
-		addNomination(election, "Angelika", "Ziebarth", Gender.FEMALE, partySpd);
-		addNomination(election, "Joachim", "Sauer", Gender.MALE, partySpd);
-		addNomination(election, "Jan-Hendrik", "Gäde", Gender.MALE, partyAwg);
-		addNomination(election, "Johannes", "Böttger", Gender.MALE, partyAwg);
-		addNomination(election, "Volker", "Böttger", Gender.MALE, partyAwg);
-		addNomination(election, "Martin", "Winter", Gender.MALE, partyAwg);
-		addNomination(election, "Henning", "Gäde", Gender.MALE, partyAwg);
-		addNomination(election, "Albert", "Stapelfeldt", Gender.MALE, partyAwg);
-		addNomination(election, "Steffen", "Kühn", Gender.MALE, partyFwr);
-		addNomination(election, "Joachim", "Wahl", Gender.MALE, partyFwr);
-		addNomination(election, "Michael", "Kraus", Gender.MALE, partyFwr);
-		addNomination(election, "Rolf", "Breede", Gender.MALE, partyFwr);
-		addNomination(election, "Mathias", "Schöning", Gender.MALE, partyFwr);
-		addNomination(election, "Eva-Maria", "König", Gender.FEMALE, partyFwr);
-		addNomination(election, "Catrin", "Hartz", Gender.FEMALE, partyFwr);
-		addNomination(election, "Thomas", "Dohrendorf", Gender.MALE, partyFwr);
-		addNomination(election, "Joachim", "Efrom", Gender.MALE, partyFwr);
-		addNomination(election, "Axel", "Feddern", Gender.MALE, partyFwr);
-		addNomination(election, "Hartmut", "Feddern", Gender.MALE, partyFwr);
+		addNomination(election, partyCdu, "Poppinga", "Jens", Gender.MALE);
+		addNomination(election, partyCdu, "Eggers", "Dirk", Gender.MALE);
+		addNomination(election, partyCdu, "Beck", "Karsten", Gender.MALE);
+		addNomination(election, partyCdu, "Motzkus", "Dietrich", Gender.MALE);
+		addNomination(election, partyCdu, "Behnk", "Sönke", Gender.MALE);
+		addNomination(election, partyCdu, "Weger", "Marcel", Gender.MALE);
+		addNomination(election, partyCdu, "Gräpel", "Carola", Gender.FEMALE);
+		addNomination(election, partyCdu, "Schwarz", "Rupert", Gender.MALE);
+		addNomination(election, partyCdu, "Klein", "Erik", Gender.MALE);
+		addNomination(election, partyCdu, "Dohrendorf", "Martina", Gender.FEMALE);
+		addNomination(election, partyCdu, "Bernhardt", "Christian", Gender.MALE);
+		addNomination(election, partyCdu, "Topel", "Andreas", Gender.MALE);
+		addNomination(election, partySpd, "Kröger", "Dirk", Gender.MALE);
+		addNomination(election, partySpd, "Eick", "Ernst", Gender.MALE);
+		addNomination(election, partySpd, "Jögimar", "Helga", Gender.FEMALE);
+		addNomination(election, partySpd, "Ehlert", "Armin", Gender.MALE);
+		addNomination(election, partySpd, "Ziebarth", "Angelika", Gender.FEMALE);
+		addNomination(election, partySpd, "Sauer", "Joachim", Gender.MALE);
+		addNomination(election, partyAwg, "Gäde", "Jan-Hendrik", Gender.MALE);
+		addNomination(election, partyAwg, "Böttger", "Johannes", Gender.MALE);
+		addNomination(election, partyAwg, "Böttger", "Volker", Gender.MALE);
+		addNomination(election, partyAwg, "Winter", "Martin", Gender.MALE);
+		addNomination(election, partyAwg, "Gäde", "Henning", Gender.MALE);
+		addNomination(election, partyAwg, "Stapelfeldt", "Albert", Gender.MALE);
+		addNomination(election, partyFwr, "Kühn", "Steffen", Gender.MALE);
+		addNomination(election, partyFwr, "Wahl", "Joachim", Gender.MALE);
+		addNomination(election, partyFwr, "Kraus", "Michael", Gender.MALE);
+		addNomination(election, partyFwr, "Breede", "Rolf", Gender.MALE);
+		addNomination(election, partyFwr, "Schöning", "Mathias", Gender.MALE);
+		addNomination(election, partyFwr, "König", "Eva-Maria", Gender.FEMALE);
+		addNomination(election, partyFwr, "Hartz", "Catrin", Gender.FEMALE);
+		addNomination(election, partyFwr, "Dohrendorf", "Thomas", Gender.MALE);
+		addNomination(election, partyFwr, "Efrom", "Joachim", Gender.MALE);
+		addNomination(election, partyFwr, "Feddern", "Axel", Gender.MALE);
+		addNomination(election, partyFwr, "Feddern", "Hartmut", Gender.MALE);
 	}
 
 	/**
 	 * Adds a nomination for testing to {@code election}.
 	 *
-	 * @param election  Wahl
-	 * @param firstName the given name
-	 * @param lastName  the family name
-	 * @param gender    the gender
-	 * @param party     the party
+	 * @param election   Wahl
+	 * @param party      the party
+	 * @param familyName the family name
+	 * @param givenName  the given name
+	 * @param gender     the gender
 	 */
 	private static void addNomination(final LocalElection election,
-			final String givenName,
+			final Party party,
 			final String familyName,
-			final Gender gender,
-			final Party party) {
+			final String givenName,
+			final Gender gender) {
 		election.createNomination(election.getDistrict().getChildren().iterator().next(),
-				new Person(givenName,
-						familyName,
+				new Person(familyName,
+						givenName,
 						Optional.of(gender),
 						OptionalInt.empty(),
 						Optional.of(Locale.GERMAN),

@@ -28,20 +28,20 @@ public class Person implements Comparable<Person> {
 			= Comparator.comparing(Person::getFamilyName).thenComparing(Person::getGivenName);
 
 	/**
-	 * Given name
-	 *
-	 * @return the given name
-	 */
-	@EqualsAndHashCode.Include
-	String givenName;
-
-	/**
 	 * Family name
 	 *
 	 * @return the family name
 	 */
 	@EqualsAndHashCode.Include
 	String familyName;
+
+	/**
+	 * Given name
+	 *
+	 * @return the given name
+	 */
+	@EqualsAndHashCode.Include
+	String givenName;
 
 	/**
 	 * Optional gender
