@@ -55,66 +55,158 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Wahlergebnis
+ * Wahlergebnis auf Basis einer ggf. gefilterten Liste an Stimmzetteln
  */
 @Getter
 @ToString
 @SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot, LocalNomination> {
+	/**
+	 * Thread-local temporary storage of a {@link LocalElection}, used while parsing
+	 * JSON data.
+	 *
+	 * <p>
+	 * This thread-local variable is empty and must not be set outside of
+	 * {@link #fromJson(Reader, LocalElection)}.
+	 */
 	@PackagePrivate
 	static final ThreadLocal<LocalElection> ELECTION_FOR_JSON_CREATOR = ThreadLocal.withInitial(() -> {
 		throw new ElectionException(
 				"Cannot initialize electionForJsonCreator. Use LocalElection.fromJson(...) instead.");
 	});
 
+	/**
+	 * Comparator by value (high to low) and nomination
+	 */
+	private static final Comparator<Entry<LocalNomination, Integer>> VOTES_OF_NOMINATIONS_COMPARATOR
+			= Comparator.<Entry<LocalNomination, Integer>, Integer>comparing(Entry::getValue)
+					.reversed()
+					.thenComparing(Entry::getKey);
+
+	/**
+	 * Comparator by value (low to high) and party
+	 */
+	private static final Comparator<Entry<Party, Integer>> VOTES_OF_PARTY_COMPARATOR
+			= Comparator.<Entry<Party, Integer>, Integer>comparing(Entry::getValue).thenComparing(Entry::getKey);
+
+	/**
+	 * Creates a new JSON {@link ObjectWriter} compatible with
+	 * {@link LocalElectionResult}.
+	 *
+	 * @return the created JSON {@link ObjectWriter}
+	 */
 	public static ObjectWriter createJacksonObjectWriter() {
 		return LocalElection.createJacksonObjectWriter();
 	}
 
+	/**
+	 * Creates a {@link LocalElectionResult} from JSON.
+	 *
+	 * @param reader   JSON data
+	 * @param election Wahl
+	 * @return the created {@link LocalElectionResult}
+	 * @throws IOException on IO error
+	 */
 	public static LocalElectionResult fromJson(final Reader reader, final LocalElection election) throws IOException {
-		ELECTION_FOR_JSON_CREATOR.set(election);
-		final LocalElectionResult electionResult
-				= LocalElection.OBJECT_MAPPER.readValue(reader, LocalElectionResult.class);
-		ELECTION_FOR_JSON_CREATOR.remove();
-
-		return electionResult;
+		try {
+			ELECTION_FOR_JSON_CREATOR.set(election);
+			return LocalElection.OBJECT_MAPPER.readValue(reader, LocalElectionResult.class);
+		} finally {
+			ELECTION_FOR_JSON_CREATOR.remove();
+		}
 	}
 
+	/**
+	 * Wahl
+	 *
+	 * @return Wahl
+	 */
 	@JsonIgnore
 	@ToString.Exclude
 	LocalElection election;
 
+	/**
+	 * Optional number of all ballots of the election
+	 *
+	 * <p>
+	 * In case this number is larger than the size of the list of ballots, then some
+	 * ballots were not evaluated, yet.
+	 *
+	 * @return the number of all ballots of the election or empty
+	 */
 	OptionalInt numberOfAllBallots;
 
+	/**
+	 * Stimmzettel
+	 *
+	 * @return Stimmzettel
+	 */
 	List<LocalBallot> ballots;
 
+	/**
+	 * Ausgeloste Loskandidaten mit Direktmandat
+	 *
+	 * @return Ausgeloste Loskandidaten mit Direktmandat
+	 */
 	@ToString.Exclude
 	Set<LocalNomination> directDrawResults;
 
+	/**
+	 * Ausgeloste Loskandidaten mit Listenmandat
+	 *
+	 * @return Ausgeloste Loskandidaten mit Listenmandat
+	 */
 	@ToString.Exclude
 	Set<LocalNomination> listDrawResults;
 
+	/**
+	 * Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 *
+	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 */
 	@JsonIgnore
 	@ToString.Exclude
 	Map<LocalNomination, LocalNominationResult> nominationResults;
 
+	/**
+	 * Wahlergebnis einzelner politischer Parteien und Wählergruppen
+	 *
+	 * @return Wahlergebnis einzelner politischer Parteien und Wählergruppen
+	 */
 	@JsonIgnore
 	@ToString.Exclude
 	Map<Party, LocalPartyResult> partyResults;
 
+	/**
+	 * Number of invalid ballots
+	 */
 	@JsonIgnore
 	Supplier<Integer> numberOfInvalidBallots
 			= lazy(() -> (int) getBallots().stream().filter(ballot -> !ballot.isValid()).count());
 
+	/**
+	 * Wahlergebnis
+	 *
+	 * @param parsable JSON delegate
+	 */
 	@JsonCreator(mode = Mode.DELEGATING)
 	private LocalElectionResult(final ParsableLocalElectionResult parsable) {
 		this(ELECTION_FOR_JSON_CREATOR.get(),
 				parsable.getNumberOfAllBallots(),
-				parsable.createLocalBallots(),
-				parsable.createDirectDrawResults(),
-				parsable.createListDrawResults());
+				parsable.getLocalBallots(),
+				parsable.getDirectDrawResults(),
+				parsable.getListDrawResults());
 	}
 
+	/**
+	 * Wahlergebnis
+	 *
+	 * @param election           Wahl
+	 * @param numberOfAllBallots optional number of all ballots of the election
+	 * @param ballots            Stimmzettel
+	 * @param directDrawResults  Ausgeloste Loskandidaten mit Direktmandat
+	 * @param listDrawResults    Ausgeloste Loskandidaten mit Listenmandat
+	 */
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Election is no longer modifiable when passed here.")
 	public LocalElectionResult(final LocalElection election,
 			final OptionalInt numberOfAllBallots,
@@ -135,6 +227,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			}
 		}
 
+		// Creating the nomination results first, because party results are based on the
+		// nomination results
 		nominationResults = unmodifiableMap(createNominationResults());
 		partyResults = unmodifiableMap(createPartyResults());
 	}
@@ -154,7 +248,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				getListDrawResults());
 	}
 
-	public Optional<BigDecimal> getCountingProgress(final int scale) {
+	/**
+	 * Calculates the ballot evaluation progress in percentage.
+	 *
+	 * @param scale the scale of the {@link BigDecimal} quotient
+	 * @return the ballot evaluation progress in percentage or empty if the number
+	 *         of all ballots is empty
+	 */
+	public Optional<BigDecimal> getEvaluationProgress(final int scale) {
 		return OptionalInts.mapToObj(getNumberOfAllBallots(),
 				numberOfAllBallots -> BigDecimal.valueOf(getBallots().size())
 						.multiply(BigDecimal.TEN)
@@ -162,6 +263,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 						.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
 	}
 
+	/**
+	 * Ausgeloste Loskandidaten mit Direktmandat eines Wahlkreises
+	 *
+	 * @param district Wahlkreis
+	 * @return Ausgeloste Loskandidaten mit Direktmandat eines Wahlkreises
+	 */
 	@JsonIgnore
 	public Set<LocalNomination> getDirectDrawResults(final LocalDistrict district) {
 		return getDirectDrawResults().stream()
@@ -169,13 +276,28 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toSet());
 	}
 
+	/**
+	 * Number of invalid ballots
+	 *
+	 * @return the number of invalid ballots
+	 */
 	public int getNumberOfInvalidBallots() {
 		return numberOfInvalidBallots.get();
 	}
 
+	/**
+	 * Calculates the nomination results.
+	 *
+	 * <p>
+	 * This method is used within the method constructor. Except for the balance
+	 * seats the implementation is structured based on the order of
+	 * {@link LocalNominationResultType}.
+	 *
+	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 */
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
-		final Map<LocalNomination, Integer> votes = getVotes();
-		final Map<Party, Integer> votesOfParties = getVotesOfParty();
+		final Map<LocalNomination, Integer> votes = getVotesOfNominations();
+		final Map<Party, Integer> votesOfParties = getVotesOfParties();
 		final Map<LocalNomination, LocalNominationResultType> resultTypes
 				= new LinkedHashMap<>(getElection().getNominations().size());
 
@@ -239,7 +361,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap(LocalNominationResult::getNomination, identity()));
 	}
 
-	private Map<LocalNomination, Integer> getVotes() {
+	/**
+	 * Calculates the number of votes per nomination. The returned map is sorted by
+	 * value (high to low) and nomination. Nominations, which were not voted for are
+	 * not part of the result.
+	 *
+	 * @return the number of votes per nomination
+	 */
+	private Map<LocalNomination, Integer> getVotesOfNominations() {
 		// Calculate
 		final Map<LocalNomination, Integer> votes = getBallots().stream()
 				.filter(Ballot::isValid)
@@ -248,13 +377,17 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toMap(identity(), nomination -> 1, (oldValue, thisValue) -> oldValue + thisValue));
 
 		// Sort
-		return Maps.sort(votes,
-				Comparator.<Entry<LocalNomination, Integer>, Integer>comparing(Entry::getValue)
-						.reversed()
-						.thenComparing(Entry::getKey));
+		return Maps.sort(votes, VOTES_OF_NOMINATIONS_COMPARATOR);
 	}
 
-	private Map<Party, Integer> getVotesOfParty() {
+	/**
+	 * Calculates the number of votes per party. The returned map is sorted by value
+	 * (low to high) and party. Parties, which were not voted for are not part of
+	 * the result.
+	 *
+	 * @return the number of votes per party
+	 */
+	private Map<Party, Integer> getVotesOfParties() {
 		// Calculate
 		final Map<Party, Integer> votes = getBallots().stream()
 				.filter(Ballot::isValid)
@@ -266,8 +399,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toMap(identity(), party -> 1, (oldValue, thisValue) -> oldValue + thisValue));
 
 		// Sort
-		return Maps.sort(votes,
-				Comparator.<Entry<Party, Integer>, Integer>comparing(Entry::getValue).thenComparing(Entry::getKey));
+		return Maps.sort(votes, VOTES_OF_PARTY_COMPARATOR);
 	}
 
 	private Map<LocalNomination, BigDecimal> getSainteLague(final Map<LocalNomination, Integer> votes,
@@ -281,6 +413,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
+		// TODO: What's this sort order about? Can be eliminate
+		// VOTES_BY_PARTY_COMPARATOR?
 		final List<LocalNomination> nominations = getElection().getNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
@@ -323,6 +457,18 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				RoundingMode.HALF_UP);
 	}
 
+	/**
+	 * Returns a set of nominations, which were elected directly.
+	 *
+	 * <p>
+	 * Implementation notice: This method simply returns the best few nominations
+	 * based on {@link LocalElection#getNumberOfDirectSeatsPerLocalDistrict()}.
+	 * Therefore there is a chance, that some of the returned nominations will turn
+	 * into direct draw candidates.
+	 *
+	 * @param votes the number of votes per nomination
+	 * @return the directly elected nominations
+	 */
 	private Set<LocalNomination> getDirectNominations(final Map<LocalNomination, Integer> votes) {
 		return votes.keySet()
 				.stream()
@@ -440,6 +586,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toSet());
 	}
 
+	/**
+	 * Creates the party results.
+	 *
+	 * <p>
+	 * This method is used within the method constructor. Calculating the results is
+	 * done within {@link LocalPartyResult} and required the nomination results to
+	 * be calculated beforehand.
+	 *
+	 * @return Wahlergebnis einzelner politischer Parteien und Wählergruppen
+	 */
 	private Map<Party, LocalPartyResult> createPartyResults() {
 		return getElection().getParties()
 				.stream()
@@ -448,58 +604,118 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap(PartyResult::getParty, identity()));
 	}
 
+	/**
+	 * JSON delegate for {@link LocalElectionResult}
+	 */
 	@Getter
 	@RequiredArgsConstructor
 	private static class ParsableLocalElectionResult {
+		/**
+		 * Optional number of all ballots of the election
+		 *
+		 * <p>
+		 * In case this number is larger than the size of the list of ballots, then some
+		 * ballots were not evaluated, yet.
+		 *
+		 * @return the number of all ballots of the election or empty
+		 */
 		OptionalInt numberOfAllBallots;
 
+		/**
+		 * Stimmzettel
+		 */
 		List<ParsableLocalBallot> ballots;
 
+		/**
+		 * Ausgeloste Loskandidaten mit Direktmandat
+		 */
 		Set<ParsableLocalNomination> directDrawResults;
 
+		/**
+		 * Ausgeloste Loskandidaten mit Listenmandat
+		 */
 		Set<ParsableLocalNomination> listDrawResults;
 
-		public List<LocalBallot> createLocalBallots() {
+		/**
+		 * Stimmzettel
+		 *
+		 * @return Stimmzettel
+		 */
+		public List<LocalBallot> getLocalBallots() {
 			final LocalElection election = ELECTION_FOR_JSON_CREATOR.get();
-			return getBallots().stream()
+			return ballots.stream()
 					.map(ballot -> ballot.isValid()
 							? LocalBallot.createValidBallot(election,
-									ballot.findPollingStation(),
+									ballot.getPollingStation(),
 									ballot.isPostalVote(),
-									ballot.findNominations())
+									ballot.getNominations())
 							: LocalBallot
-									.createInvalidBallot(election, ballot.findPollingStation(), ballot.isPostalVote()))
+									.createInvalidBallot(election, ballot.getPollingStation(), ballot.isPostalVote()))
 					.collect(toList());
 		}
 
-		public Set<LocalNomination> createDirectDrawResults() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getDirectDrawResults());
+		/**
+		 * Ausgeloste Loskandidaten mit Direktmandat
+		 *
+		 * @return Ausgeloste Loskandidaten mit Direktmandat
+		 */
+		public Set<LocalNomination> getDirectDrawResults() {
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), directDrawResults);
 		}
 
-		public Set<LocalNomination> createListDrawResults() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getListDrawResults());
+		/**
+		 * Ausgeloste Loskandidaten mit Listenmandat
+		 *
+		 * @return Ausgeloste Loskandidaten mit Listenmandat
+		 */
+		public Set<LocalNomination> getListDrawResults() {
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), listDrawResults);
 		}
 	}
 
+	/**
+	 * JSON delegate for {@link LocalBallot}
+	 */
 	@Getter
 	@RequiredArgsConstructor
 	private static class ParsableLocalBallot {
+		/**
+		 * Wahlbezirk
+		 */
 		String pollingStation;
 
+		/**
+		 * Briefwahl
+		 *
+		 * @return {@code true} for postal vote ballots, else {@code false}
+		 */
 		boolean postalVote;
 
+		/**
+		 * Ungültige Stimme
+		 *
+		 * @return {@code true} for valid ballots, else {@code false}
+		 */
 		boolean valid;
 
+		/**
+		 * Gewählte Bewerberinnen und Bewerber
+		 */
 		Set<ParsableLocalNomination> nominations;
 
-		public LocalPollingStation findPollingStation() {
+		/**
+		 * Wahlbezirk
+		 *
+		 * @return Wahlbezirk
+		 */
+		public LocalPollingStation getPollingStation() {
 			return ELECTION_FOR_JSON_CREATOR.get()
 					.getDistrict()
 					.getChildren()
 					.stream()
 					.map(LocalDistrict::getChildren)
 					.flatMap(Collection::stream)
-					.filter(pollingStation -> getPollingStation().equals(pollingStation.getKey()))
+					.filter(district -> pollingStation.equals(district.getKey()))
 					.findAny()
 					.orElseThrow(() -> new ElectionException(
 							"Could not find polling station with key \"%s\" for election \"%s\".",
@@ -507,8 +723,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 							ELECTION_FOR_JSON_CREATOR.get().getName()));
 		}
 
-		public Set<LocalNomination> findNominations() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), getNominations());
+		/**
+		 * Gewählte Bewerberinnen und Bewerber
+		 *
+		 * @return Gewählte Bewerberinnen und Bewerber
+		 */
+		public Set<LocalNomination> getNominations() {
+			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), nominations);
 		}
 	}
 }

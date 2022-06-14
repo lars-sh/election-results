@@ -33,7 +33,7 @@ class LocalElectionResultTest {
 				= new LocalElectionResult(election, OptionalInt.empty(), emptyList(), emptySet(), emptySet());
 
 		assertThat(result.getBallots()).isEmpty();
-		assertThat(result.getCountingProgress(1)).isEmpty();
+		assertThat(result.getEvaluationProgress(1)).isEmpty();
 		assertThat(result.getNominationResults()).hasSameSizeAs(election.getNominations());
 		result.getNominationResults().values().forEach(nominationResult -> {
 			assertThat(nominationResult.getBallots()).isEmpty();

@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
-import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,15 +31,32 @@ import lombok.ToString;
 @EqualsAndHashCode
 @SuppressWarnings("PMD.DataClass")
 public final class LocalBallot implements Ballot<LocalNomination> {
-	@PackagePrivate
-	static LocalBallot createInvalidBallot(final LocalElection election,
+	/**
+	 * Creates an invalid ballot
+	 *
+	 * @param election       Wahl
+	 * @param pollingStation Wahlbezirk
+	 * @param postalVote     {@code true} for postal vote ballots, else
+	 *                       {@code false}
+	 * @return the new ballot
+	 */
+	public static LocalBallot createInvalidBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final boolean postalVote) {
 		return new LocalBallot(election, pollingStation, postalVote, false, emptySet());
 	}
 
-	@PackagePrivate
-	static LocalBallot createValidBallot(final LocalElection election,
+	/**
+	 * Creates a valid ballot
+	 *
+	 * @param election       Wahl
+	 * @param pollingStation Wahlbezirk
+	 * @param postalVote     {@code true} for postal vote ballots, else
+	 *                       {@code false}
+	 * @param nominations    gewählte Bewerberinnen und Bewerber
+	 * @return the new ballot
+	 */
+	public static LocalBallot createValidBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final boolean postalVote,
 			final Set<LocalNomination> nominations) {
@@ -78,10 +94,15 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	boolean valid;
 
 	/**
-	 * Namen der Bewerberinnen und Bewerber (§ 28 Absatz 2 GKWG)
+	 * Gewählte Bewerberinnen und Bewerber (§ 28 Absatz 2 GKWG)
+	 *
+	 * @return Gewählte Bewerberinnen und Bewerber
 	 */
 	Set<LocalNomination> nominations;
 
+	/**
+	 * Blockwahl
+	 */
 	@JsonIgnore
 	@ToString.Exclude
 	Supplier<Boolean> blockVoting = lazy(() -> {
@@ -90,6 +111,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.distinct()
+				.limit(2)
 				.collect(toList());
 		if (parties.size() != 1) {
 			return Boolean.FALSE;
@@ -102,6 +124,16 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 		return getNominations().size() == directNominationsOfThatParty;
 	});
 
+	/**
+	 * Stimmzettel
+	 *
+	 * @param election       Wahl
+	 * @param pollingStation Wahlbezirk
+	 * @param postalVote     {@code true} for postal vote ballots, else
+	 *                       {@code false}
+	 * @param valid          {@code true} for valid ballots, else {@code false}
+	 * @param nominations    gewählte Bewerberinnen und Bewerber
+	 */
 	private LocalBallot(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final boolean postalVote,
@@ -146,6 +178,11 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 		}
 	}
 
+	/**
+	 * Polling station as JSON property
+	 *
+	 * @return Wahlbezirk
+	 */
 	@JsonProperty("pollingStation")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
@@ -153,6 +190,12 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 		return getPollingStation().getKey();
 	}
 
+	/**
+	 * Blockwahl
+	 *
+	 * @return {@code true} if the ballot contains all and only nominations of
+	 *         exactly one party, else {@code false}
+	 */
 	@JsonIgnore
 	public boolean isBlockVoting() {
 		return blockVoting.get();

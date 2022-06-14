@@ -31,12 +31,27 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 public class LocalElectionTest {
+	/**
+	 * Name des Wahlbezirks "Klein Boden"
+	 */
 	@PackagePrivate
 	static final String POLLING_STATION_NAME_KLEIN_BODEN = Finals.constant("Klein Boden");
 
+	/**
+	 * Name des Wahlbezirks "Rethwischdorf"
+	 */
 	@PackagePrivate
 	static final String POLLING_STATION_NAME_RETHWISCHDORF = Finals.constant("Rethwischdorf");
 
+	/**
+	 * Creates an election for testing purposes.
+	 *
+	 * <p>
+	 * To simplify verifying results the test case is based on the Kommunalwahl 2018
+	 * in Rethwisch.
+	 *
+	 * @return Wahl
+	 */
 	public static LocalElection createElection() {
 		final LocalDistrictRoot districtRoot
 				= new LocalDistrictRoot("Gemeinde Rethwisch", LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
@@ -45,12 +60,18 @@ public class LocalElectionTest {
 		election.setPopulation(districtRoot, OptionalInt.empty());
 		election.setNumberOfEligibleVoters(districtRoot, OptionalInt.empty());
 
+		// Add districts first, because nominations are based on the districts
 		addDistricts(election);
 		addPartiesAndNominations(election);
 
 		return election;
 	}
 
+	/**
+	 * Adds districts for testing to {@code election}.
+	 *
+	 * @param election Wahl
+	 */
 	private static void addDistricts(final LocalElection election) {
 		final LocalDistrict districtLocal = election.getDistrict().createChild("Rethwisch");
 		election.setPopulation(districtLocal, 1186);
@@ -67,9 +88,12 @@ public class LocalElectionTest {
 		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 273);
 	}
 
+	/**
+	 * Adds parties and nominations for testing to {@code election}.
+	 *
+	 * @param election Wahl
+	 */
 	private static void addPartiesAndNominations(final LocalElection election) {
-		final LocalDistrict district = election.getDistrict().getChildren().iterator().next();
-
 		final Party partyCdu = new Party("CDU",
 				"Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
 				PartyType.POLITICAL_PARTY,
@@ -95,286 +119,66 @@ public class LocalElectionTest {
 				Color.WHITE,
 				Optional.empty());
 
-		final Person personJensPoppinga = new Person("Jens",
-				"Poppinga",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJensPoppinga, Optional.of(partyCdu));
-		final Person personDirkEggers = new Person("Dirk",
-				"Eggers",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personDirkEggers, Optional.of(partyCdu));
-		final Person personKarstenBeck = new Person("Karsten",
-				"Beck",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personKarstenBeck, Optional.of(partyCdu));
-		final Person personDietrichMotzkus = new Person("Dietrich",
-				"Motzkus",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personDietrichMotzkus, Optional.of(partyCdu));
-		final Person personSoenkeBehnk = new Person("Sönke",
-				"Behnk",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personSoenkeBehnk, Optional.of(partyCdu));
-		final Person personMarcelWeger = new Person("Marcel",
-				"Weger",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personMarcelWeger, Optional.of(partyCdu));
-		final Person personCarolaGraepel = new Person("Carola",
-				"Gräpel",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personCarolaGraepel, Optional.of(partyCdu));
-		final Person personRupertSchwarz = new Person("Rupert",
-				"Schwarz",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personRupertSchwarz, Optional.of(partyCdu));
-		final Person personErikKlein = new Person("Erik",
-				"Klein",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personErikKlein, Optional.of(partyCdu));
-		final Person personMartinaDohrendorf = new Person("Martina",
-				"Dohrendorf",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personMartinaDohrendorf, Optional.of(partyCdu));
-		final Person personChristianBernhardt = new Person("Christian",
-				"Bernhardt",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personChristianBernhardt, Optional.of(partyCdu));
-		final Person personAndreasTopel = new Person("Andreas",
-				"Topel",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personAndreasTopel, Optional.of(partyCdu));
-		final Person personDirkKroeger = new Person("Dirk",
-				"Kröger",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personDirkKroeger, Optional.of(partySpd));
-		final Person personErnstEick = new Person("Ernst",
-				"Eick",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personErnstEick, Optional.of(partySpd));
-		final Person personHelgaJoegimar = new Person("Helga",
-				"Jögimar",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personHelgaJoegimar, Optional.of(partySpd));
-		final Person personArminEhlert = new Person("Armin",
-				"Ehlert",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personArminEhlert, Optional.of(partySpd));
-		final Person personAngelikaZiebarth = new Person("Angelika",
-				"Ziebarth",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personAngelikaZiebarth, Optional.of(partySpd));
-		final Person personJoachimSauer = new Person("Joachim",
-				"Sauer",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJoachimSauer, Optional.of(partySpd));
-		final Person personJanHendrikGaede = new Person("Jan-Hendrik",
-				"Gäde",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJanHendrikGaede, Optional.of(partyAwg));
-		final Person personJohannesBoettger = new Person("Johannes",
-				"Böttger",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJohannesBoettger, Optional.of(partyAwg));
-		final Person personVolkerBoettger = new Person("Volker",
-				"Böttger",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personVolkerBoettger, Optional.of(partyAwg));
-		final Person personMartinWinter = new Person("Martin",
-				"Winter",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personMartinWinter, Optional.of(partyAwg));
-		final Person personHenningGaede = new Person("Henning",
-				"Gäde",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personHenningGaede, Optional.of(partyAwg));
-		final Person personAlbertStapelfeldt = new Person("Albert",
-				"Stapelfeldt",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personAlbertStapelfeldt, Optional.of(partyAwg));
-		final Person personSteffenKuehn = new Person("Steffen",
-				"Kühn",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personSteffenKuehn, Optional.of(partyFwr));
-		final Person personJoachimWahl = new Person("Joachim",
-				"Wahl",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJoachimWahl, Optional.of(partyFwr));
-		final Person personMichaelKraus = new Person("Michael",
-				"Kraus",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personMichaelKraus, Optional.of(partyFwr));
-		final Person personRolfBreede = new Person("Rolf",
-				"Breede",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personRolfBreede, Optional.of(partyFwr));
-		final Person personMathiasSchoening = new Person("Mathias",
-				"Schöning",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personMathiasSchoening, Optional.of(partyFwr));
-		final Person personEvaMariaKoenig = new Person("Eva-Maria",
-				"König",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personEvaMariaKoenig, Optional.of(partyFwr));
-		final Person personCatrinHartz = new Person("Catrin",
-				"Hartz",
-				Optional.of(Gender.FEMALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personCatrinHartz, Optional.of(partyFwr));
-		final Person personThomasDohrendorf = new Person("Thomas",
-				"Dohrendorf",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personThomasDohrendorf, Optional.of(partyFwr));
-		final Person personJoachimEfrom = new Person("Joachim",
-				"Efrom",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personJoachimEfrom, Optional.of(partyFwr));
-		final Person personAxelFeddern = new Person("Axel",
-				"Feddern",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personAxelFeddern, Optional.of(partyFwr));
-		final Person personHartmutFeddern = new Person("Hartmut",
-				"Feddern",
-				Optional.of(Gender.MALE),
-				OptionalInt.empty(),
-				Optional.of(Locale.GERMAN),
-				Optional.empty(),
-				Optional.empty());
-		election.createNomination(district, personHartmutFeddern, Optional.of(partyFwr));
+		addNomination(election, "Jens", "Poppinga", Gender.MALE, partyCdu);
+		addNomination(election, "Dirk", "Eggers", Gender.MALE, partyCdu);
+		addNomination(election, "Karsten", "Beck", Gender.MALE, partyCdu);
+		addNomination(election, "Dietrich", "Motzkus", Gender.MALE, partyCdu);
+		addNomination(election, "Sönke", "Behnk", Gender.MALE, partyCdu);
+		addNomination(election, "Marcel", "Weger", Gender.MALE, partyCdu);
+		addNomination(election, "Carola", "Gräpel", Gender.FEMALE, partyCdu);
+		addNomination(election, "Rupert", "Schwarz", Gender.MALE, partyCdu);
+		addNomination(election, "Erik", "Klein", Gender.MALE, partyCdu);
+		addNomination(election, "Martina", "Dohrendorf", Gender.FEMALE, partyCdu);
+		addNomination(election, "Christian", "Bernhardt", Gender.MALE, partyCdu);
+		addNomination(election, "Andreas", "Topel", Gender.MALE, partyCdu);
+		addNomination(election, "Dirk", "Kröger", Gender.MALE, partySpd);
+		addNomination(election, "Ernst", "Eick", Gender.MALE, partySpd);
+		addNomination(election, "Helga", "Jögimar", Gender.FEMALE, partySpd);
+		addNomination(election, "Armin", "Ehlert", Gender.MALE, partySpd);
+		addNomination(election, "Angelika", "Ziebarth", Gender.FEMALE, partySpd);
+		addNomination(election, "Joachim", "Sauer", Gender.MALE, partySpd);
+		addNomination(election, "Jan-Hendrik", "Gäde", Gender.MALE, partyAwg);
+		addNomination(election, "Johannes", "Böttger", Gender.MALE, partyAwg);
+		addNomination(election, "Volker", "Böttger", Gender.MALE, partyAwg);
+		addNomination(election, "Martin", "Winter", Gender.MALE, partyAwg);
+		addNomination(election, "Henning", "Gäde", Gender.MALE, partyAwg);
+		addNomination(election, "Albert", "Stapelfeldt", Gender.MALE, partyAwg);
+		addNomination(election, "Steffen", "Kühn", Gender.MALE, partyFwr);
+		addNomination(election, "Joachim", "Wahl", Gender.MALE, partyFwr);
+		addNomination(election, "Michael", "Kraus", Gender.MALE, partyFwr);
+		addNomination(election, "Rolf", "Breede", Gender.MALE, partyFwr);
+		addNomination(election, "Mathias", "Schöning", Gender.MALE, partyFwr);
+		addNomination(election, "Eva-Maria", "König", Gender.FEMALE, partyFwr);
+		addNomination(election, "Catrin", "Hartz", Gender.FEMALE, partyFwr);
+		addNomination(election, "Thomas", "Dohrendorf", Gender.MALE, partyFwr);
+		addNomination(election, "Joachim", "Efrom", Gender.MALE, partyFwr);
+		addNomination(election, "Axel", "Feddern", Gender.MALE, partyFwr);
+		addNomination(election, "Hartmut", "Feddern", Gender.MALE, partyFwr);
+	}
+
+	/**
+	 * Adds a nomination for testing to {@code election}.
+	 *
+	 * @param election  Wahl
+	 * @param firstName the given name
+	 * @param lastName  the family name
+	 * @param gender    the gender
+	 * @param party     the party
+	 */
+	private static void addNomination(final LocalElection election,
+			final String givenName,
+			final String familyName,
+			final Gender gender,
+			final Party party) {
+		election.createNomination(election.getDistrict().getChildren().iterator().next(),
+				new Person(givenName,
+						familyName,
+						Optional.of(gender),
+						OptionalInt.empty(),
+						Optional.of(Locale.GERMAN),
+						Optional.empty(),
+						Optional.empty()),
+				Optional.of(party));
 	}
 
 	/**

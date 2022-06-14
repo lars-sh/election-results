@@ -406,6 +406,9 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		map.put(district, value);
 	}
 
+	/**
+	 * JSON delegate for {@link LocalElection}
+	 */
 	@Getter
 	@SuppressWarnings("PMD.DataClass")
 	private static class ParsableLocalElection {
@@ -500,6 +503,9 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		}
 	}
 
+	/**
+	 * JSON delegate for {@link LocalNomination}
+	 */
 	@Getter
 	@PackagePrivate
 	@RequiredArgsConstructor

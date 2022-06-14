@@ -90,7 +90,7 @@ class LegacyParserTest {
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(273));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(166));
 		assertThat(result.getBallots()).hasSize(191);
-		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1151, 1)));
+		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1151, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(2);
 	}
 
@@ -107,7 +107,7 @@ class LegacyParserTest {
 		assertThat(election.getNumberOfEligibleVoters()).isEqualTo(990);
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(601));
 		assertThat(result.getBallots()).hasSize(627);
-		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1043, 1)));
+		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1043, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(3);
 	}
 
@@ -125,7 +125,7 @@ class LegacyParserTest {
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(717));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(435));
 		assertThat(result.getBallots()).hasSize(436);
-		assertThat(result.getCountingProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1002, 1)));
+		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1002, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(1);
 	}
 }
