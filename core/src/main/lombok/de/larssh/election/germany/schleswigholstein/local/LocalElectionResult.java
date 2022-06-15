@@ -309,7 +309,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 			// Result Type: Direct
 			final Map<LocalNomination, LocalNominationResultType> localResultTypes
-					= getDirectNominations(localVotes).stream()
+					= getDirectResults(localVotes).stream()
 							.collect(toLinkedHashMap(identity(), nomination -> LocalNominationResultType.DIRECT));
 
 			// Result Type: Direct Draw
@@ -324,7 +324,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 		// Result Type: List
 		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes, votesOfParties);
-		for (final LocalNomination nomination : getListNominations(votes, sainteLague)) {
+		for (final LocalNomination nomination : getListResults(votes, sainteLague)) {
 			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
 		}
 
@@ -402,6 +402,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return Maps.sort(votes, VOTES_OF_PARTY_COMPARATOR);
 	}
 
+	/**
+	 * Calculates the Sainte Laguë value for each nomination.
+	 *
+	 * @param votes          the number of votes per nomination
+	 * @param votesOfParties the number of votes per party
+	 * @return the Sainte Laguë value for each nomination
+	 */
 	private Map<LocalNomination, BigDecimal> getSainteLague(final Map<LocalNomination, Integer> votes,
 			final Map<Party, Integer> votesOfParties) {
 		// Calculate
@@ -423,6 +430,17 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 						.thenComparing(entry -> nominations.indexOf(entry.getKey())));
 	}
 
+	/**
+	 * Calculates the Sainte Laguë value for each nomination of {@code party}.
+	 *
+	 * <p>
+	 * The returned map is ordered by Sainte Laguë value (high to low).
+	 *
+	 * @param votes        the number of votes per nomination
+	 * @param party        the party
+	 * @param votesOfParty the number of votes for {@code party}
+	 * @return the Sainte Laguë value for each nomination of {@code party}
+	 */
 	private Map<LocalNomination, BigDecimal> getSainteLagueOfParty(final Map<LocalNomination, Integer> votes,
 			final Party party,
 			final int votesOfParty) {
@@ -435,12 +453,26 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap(step -> iterator.next(), identity()));
 	}
 
+	/**
+	 * Returns a set of all nominations of {@code party} in their order of Sainte
+	 * Laguë value assignment.
+	 *
+	 * <p>
+	 * Directly elected nominations of {@code party} come first in order of their
+	 * number of votes (high to low). All other nominations of {@code party} follow
+	 * in given order.
+	 *
+	 * @param votes the number of votes per nomination
+	 * @param party the party
+	 * @return the nominations of {@code party} in their order of Sainte Laguë value
+	 *         assignment
+	 */
 	private Set<LocalNomination> getSainteLagueNominationsOfParty(final Map<LocalNomination, Integer> votes,
 			final Party party) {
 		final Set<LocalNomination> nominations = new LinkedHashSet<>();
 
 		// Result Type: Direct and Direct Draw
-		getDirectNominations(votes).stream()
+		getDirectResults(votes).stream()
 				.filter(nomination -> nomination.getParty().map(party::equals).orElse(Boolean.FALSE))
 				.forEach(nominations::add);
 
@@ -450,6 +482,20 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return nominations;
 	}
 
+	/**
+	 * Calculates the Sainte Laguë value using the formula:
+	 *
+	 * <p>
+	 * {@code votesOfParty / (step + 0.5)}
+	 *
+	 * <p>
+	 * {@code step} starts at zero and the scale of the returned {@link BigDecimal}
+	 * is given by {@link LocalElection#getSainteLagueScale()}.
+	 *
+	 * @param votesOfParty the number of votes of the corresponding party
+	 * @param step         step, starting at zero
+	 * @return the Sainte Laguë value
+	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private BigDecimal getSainteLagueValue(final BigDecimal votesOfParty, final int step) {
 		return votesOfParty.divide(BigDecimal.valueOf(step * 10L + 5, 1),
@@ -463,19 +509,41 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * <p>
 	 * Implementation notice: This method simply returns the best few nominations
 	 * based on {@link LocalElection#getNumberOfDirectSeatsPerLocalDistrict()}.
-	 * Therefore there is a chance, that some of the returned nominations will turn
-	 * into direct draw candidates.
+	 * Therefore there is a chance, that some of the returned nominations need to
+	 * turn into direct draw candidates.
 	 *
 	 * @param votes the number of votes per nomination
 	 * @return the directly elected nominations
 	 */
-	private Set<LocalNomination> getDirectNominations(final Map<LocalNomination, Integer> votes) {
+	private Set<LocalNomination> getDirectResults(final Map<LocalNomination, Integer> votes) {
 		return votes.keySet()
 				.stream()
 				.limit(getElection().getNumberOfDirectSeatsPerLocalDistrict())
 				.collect(toLinkedHashSet());
 	}
 
+	/**
+	 * Puts nominations with either draw results or open draws to
+	 * {@code resultTypes}.
+	 *
+	 * <p>
+	 * The number of votes of a draw are given by the last nomination of
+	 * {@code resultTypes} and the number of maximum possible seats is given by the
+	 * size of {@code resultTypes}.
+	 *
+	 * <p>
+	 * {@code drawResults} must neither contain more nominations than possible draw
+	 * seats, nor invalid nominations. In addition it does not need to contain a
+	 * draw result for all open draws or even any draw result. In such cases one of
+	 * the draw {@link LocalNominationResultType} is put to {@code resultTypes}
+	 * according to {@code currentResultTypeDraw}.
+	 *
+	 * @param resultTypes           result types per nomination
+	 * @param votes                 the number of votes per nomination
+	 * @param drawResults           optional draws results to take into account
+	 * @param currentResultType     the original result type, which might need draws
+	 * @param currentResultTypeDraw the corresponding draw result type
+	 */
 	private void putDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
 			final Set<LocalNomination> drawResults,
@@ -490,12 +558,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		final Number votesForLastNomination = votes.get(lastNomination.get());
 		final int numberOfPossibleSeats = resultTypes.size();
 
+		// Remove the last few entries, which have the same result type and votes
 		resultTypes.entrySet()
 				.removeIf(entry -> entry.getValue() == currentResultType
 						&& votes.get(entry.getKey()).equals(votesForLastNomination));
 		final int numberOfDrawSeats = numberOfPossibleSeats - resultTypes.size();
 
-		// Draw Results
+		// Add positive draw results
 		validateDrawResults(resultTypes,
 				votes,
 				votesForLastNomination,
@@ -506,7 +575,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			resultTypes.put(drawResult, currentResultType);
 		}
 
-		// Draws
+		// Add open draws
 		final Set<LocalNomination> drawNominations = getDrawNominations(resultTypes,
 				votes,
 				votesForLastNomination,
@@ -520,6 +589,22 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 	}
 
+	/**
+	 * Validates {@code drawResults}.
+	 *
+	 * <p>
+	 * Right now the number of draw results must not be larger than the number of
+	 * draw seats. In addition each nomination must be part of the draw by number of
+	 * votes and result type.
+	 *
+	 * @param resultTypes            result types per nomination
+	 * @param votes                  the number of votes per nomination
+	 * @param votesForLastNomination the number of votes for nominations of the draw
+	 * @param numberOfDrawSeats      the number of draw seats
+	 * @param drawResults            optional draws results to take into account
+	 * @param currentResultType      the original result type, which might need
+	 *                               draws
+	 */
 	private void validateDrawResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
 			final Number votesForLastNomination,
@@ -537,19 +622,32 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		for (final LocalNomination nomination : drawResults) {
 			if (!Nullables.orElse(votes.get(nomination), 0).equals(votesForLastNomination)
 					|| resultTypes.getOrDefault(nomination, currentResultType) != currentResultType) {
-				throw new ElectionException("\"%s\" must not be part of the %s draw results.",
+				throw new ElectionException("\"%s\" is not part of the %s draw.",
 						nomination.getPerson().getKey(),
 						currentResultType.toString().toLowerCase(Locale.ROOT));
 			}
 		}
 	}
 
+	/**
+	 * Returns the nominations, which are part of the draw.
+	 *
+	 * @param resultTypes            result types per nomination
+	 * @param votes                  the number of votes per nomination
+	 * @param votesForLastNomination the number of votes for nominations of the draw
+	 * @param numberOfDrawSeats      the number of draw seats
+	 * @param drawResults            optional draws results to take into account
+	 * @param currentResultType      the original result type, which might need
+	 *                               draws
+	 * @return the nominations, which are part of the draw
+	 */
 	private Set<LocalNomination> getDrawNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> votes,
 			final Number votesForLastNomination,
 			final int numberOfDrawSeats,
 			final Set<LocalNomination> drawResults,
 			final LocalNominationResultType currentResultType) {
+		// No need to iterate "votes" if all draw seats are filled with draw results.
 		if (numberOfDrawSeats <= drawResults.size()) {
 			return emptySet();
 		}
@@ -562,14 +660,33 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toSet());
 	}
 
-	private Set<LocalNomination> getListNominations(final Map<LocalNomination, Integer> votes,
+	/**
+	 * Returns a set of nominations, which were elected by list.
+	 *
+	 * <p>
+	 * Implementation notice: This method simply returns the best few nominations
+	 * based on {@link LocalElection#getNumberOfSeats()}. Therefore there is a
+	 * chance, that some of the returned nominations need to turn into list draw
+	 * candidates.
+	 *
+	 * <p>
+	 * In case some direct results have a relatively low Sainte Laguë value the
+	 * returned map might be larger than {@link LocalElection#getNumberOfSeats()}.
+	 *
+	 * @param votes       the number of votes per nomination
+	 * @param sainteLague the Sainte Laguë value per nomination
+	 * @return the elected nominations by list
+	 */
+	private Set<LocalNomination> getListResults(final Map<LocalNomination, Integer> votes,
 			final Map<LocalNomination, BigDecimal> sainteLague) {
-		final Set<LocalNomination> directNominations = getDirectNominations(votes);
+		final Set<LocalNomination> directNominationsWithParty = getDirectResults(votes).stream()
+				.filter(nomination -> nomination.getParty().isPresent())
+				.collect(toSet());
 		final int numberOfSeats = getElection().getNumberOfSeats();
 
 		final Set<LocalNomination> nominations = new LinkedHashSet<>(numberOfSeats);
 		for (final LocalNomination nomination : sainteLague.keySet()) {
-			if (nominations.size() >= numberOfSeats && nominations.containsAll(directNominations)) {
+			if (nominations.size() >= numberOfSeats && nominations.containsAll(directNominationsWithParty)) {
 				return nominations;
 			}
 			nominations.add(nomination);
@@ -577,6 +694,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		return nominations;
 	}
 
+	/**
+	 * Returns nominations, which have either balance or overhang seats.
+	 *
+	 * @param sainteLague the Sainte Laguë value per nomination
+	 * @param resultTypes result types per nomination
+	 * @return the nominations, which have either balance or overhang seats
+	 */
 	private Set<LocalNomination> getBalanceAndOverhangSeats(final Map<LocalNomination, BigDecimal> sainteLague,
 			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
 		return sainteLague.keySet()
@@ -660,7 +784,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Ausgeloste Loskandidaten mit Direktmandat
 		 */
 		public Set<LocalNomination> getDirectDrawResults() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), directDrawResults);
+			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), directDrawResults);
 		}
 
 		/**
@@ -669,7 +793,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Ausgeloste Loskandidaten mit Listenmandat
 		 */
 		public Set<LocalNomination> getListDrawResults() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), listDrawResults);
+			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), listDrawResults);
 		}
 	}
 
@@ -729,7 +853,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Gewählte Bewerberinnen und Bewerber
 		 */
 		public Set<LocalNomination> getNominations() {
-			return ParsableLocalNomination.createSet(ELECTION_FOR_JSON_CREATOR.get(), nominations);
+			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), nominations);
 		}
 	}
 }

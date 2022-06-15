@@ -126,6 +126,7 @@ public class Keys {
 	 * @param suffix        the suffix of the value to escape
 	 * @return the unique value
 	 */
+	@SuppressWarnings("PMD.UseObjectForClearerAPI")
 	public static String escape(final String value,
 			final String prefix,
 			final String valueToEscape,

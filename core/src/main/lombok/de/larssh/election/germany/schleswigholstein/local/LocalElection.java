@@ -163,15 +163,20 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		return unmodifiableSet(districts);
 	});
 
+	/**
+	 * Wahl
+	 *
+	 * @param parsable JSON delegate
+	 */
 	@JsonCreator(mode = Mode.DELEGATING)
 	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
 			justification = "passing this to create*For, but made sure, it's filling the object in the correct order")
 	private LocalElection(final ParsableLocalElection parsable) {
 		this(parsable.getDistrict(), parsable.getDate(), parsable.getName(), parsable.getSainteLagueScale());
 
-		parsable.createPopulationFor(this);
-		parsable.createNumberOfEligibleVotersFor(this);
-		parsable.createNominationsFor(this);
+		parsable.addPopulationTo(this);
+		parsable.addNumberOfEligibleVotersTo(this);
+		parsable.addNominationsTo(this);
 	}
 
 	/** {@inheritDoc} */
@@ -199,6 +204,11 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		return OptionalInt.of(calculated);
 	}
 
+	/**
+	 * Population information as JSON property
+	 *
+	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 */
 	@JsonProperty("population")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
@@ -239,6 +249,12 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		return OptionalInt.of(calculated);
 	}
 
+	/**
+	 * The number of eligible voters as JSON property
+	 *
+	 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
+	 *         Wahlbezirk
+	 */
 	@JsonProperty("numberOfEligibleVoters")
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
@@ -412,22 +428,79 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@Getter
 	@SuppressWarnings("PMD.DataClass")
 	private static class ParsableLocalElection {
+		/**
+		 * Wahlgebiet
+		 */
 		LocalDistrictRoot district;
 
+		/**
+		 * Date of the election
+		 *
+		 * @return the date of the election
+		 */
 		LocalDate date;
 
+		/**
+		 * Name of the election
+		 *
+		 * @return the name of the election
+		 */
 		String name;
 
+		/**
+		 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+		 *
+		 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+		 */
 		Map<String, OptionalInt> population;
 
+		/**
+		 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+		 *
+		 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
+		 *         Wahlbezirk
+		 */
 		Map<String, OptionalInt> numberOfEligibleVoters;
 
+		/**
+		 * Bewerberinnen und Bewerber
+		 *
+		 * <p>
+		 * Elements of this list are guaranteed to be distinct.
+		 */
 		List<ParsableLocalNomination> nominations;
 
+		/**
+		 * Scale (decimal places) of Sainte Laguë values
+		 *
+		 * <p>
+		 * Usually this is {@code 2}.
+		 *
+		 * @return the scale (decimal places) of Sainte Laguë values
+		 */
 		int sainteLagueScale;
 
+		/**
+		 * Politische Parteien und Wählergruppen
+		 *
+		 * @return Politische Parteien und Wählergruppen
+		 */
 		Set<Party> parties;
 
+		/**
+		 * JSON delegate for {@link LocalElection}
+		 *
+		 * @param district               Wahlgebiet
+		 * @param date                   Date
+		 * @param name                   Name
+		 * @param population             Einwohnerzahl nach Wahlgebiet, Wahlkreis oder
+		 *                               Wahlbezirk
+		 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten nach Wahlgebiet,
+		 *                               Wahlkreis oder Wahlbezirk
+		 * @param nominations            Bewerberinnen und Bewerber
+		 * @param sainteLagueScale       Scale (decimal places) of Sainte Laguë values
+		 * @param parties                Politische Parteien und Wählergruppen
+		 */
 		@SuppressWarnings("checkstyle:ParameterNumber")
 		private ParsableLocalElection(@Nullable final LocalDistrictRoot district,
 				@Nullable final LocalDate date,
@@ -450,7 +523,12 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			this.parties = Nullables.orElseGet(parties, Collections::emptySet);
 		}
 
-		public void createPopulationFor(final LocalElection election) {
+		/**
+		 * Adds population information to {@code election}.
+		 *
+		 * @param election Wahl
+		 */
+		public void addPopulationTo(final LocalElection election) {
 			final Map<String, OptionalInt> population = getPopulation();
 
 			for (final District<?> district : election.getDistricts()) {
@@ -458,7 +536,12 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			}
 		}
 
-		public void createNumberOfEligibleVotersFor(final LocalElection election) {
+		/**
+		 * Adds the numbers of eligible voters to {@code election}.
+		 *
+		 * @param election Wahl
+		 */
+		public void addNumberOfEligibleVotersTo(final LocalElection election) {
 			final Map<String, OptionalInt> numberOfEligibleVoters = getNumberOfEligibleVoters();
 
 			for (final District<?> district : election.getDistricts()) {
@@ -467,7 +550,12 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			}
 		}
 
-		public void createNominationsFor(final LocalElection election) {
+		/**
+		 * Adds nominations to {@code election}.
+		 *
+		 * @param election Wahl
+		 */
+		public void addNominationsTo(final LocalElection election) {
 			final Map<String, District<?>> districts
 					= election.getDistricts().stream().collect(toMap(District::getKey, identity()));
 			final Map<String, Party> parties = getParties().stream().collect(toMap(Party::getKey, identity()));
@@ -510,7 +598,15 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@PackagePrivate
 	@RequiredArgsConstructor
 	static class ParsableLocalNomination {
-		public static Set<LocalNomination> createSet(final LocalElection election,
+		/**
+		 * Creates a set of {@link LocalNomination} based on a given set of
+		 * {@link ParsableLocalNomination}.
+		 *
+		 * @param election Wahl
+		 * @param set      the set of {@link ParsableLocalNomination}
+		 * @return the set of {@link LocalNomination}
+		 */
+		public static Set<LocalNomination> convert(final LocalElection election,
 				final Set<ParsableLocalNomination> set) {
 			final Map<String, LocalNomination> nominations
 					= election.getNominations().stream().collect(toMap(LocalNomination::getKey, identity()));
@@ -531,10 +627,26 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 					.collect(toSet());
 		}
 
+		/**
+		 * Wahlkreis
+		 *
+		 * @return Wahlkreis
+		 */
 		String district;
 
-		Person person;
-
+		/**
+		 * Politische Partei, Wählergruppe oder empty für unabhängige Bewerberinnen und
+		 * Bewerber
+		 *
+		 * @return Politische Partei, Wählergruppe oder empty
+		 */
 		Optional<String> party;
+
+		/**
+		 * Bewerberin oder Bewerber
+		 *
+		 * @return Bewerberin oder Bewerber
+		 */
+		Person person;
 	}
 }

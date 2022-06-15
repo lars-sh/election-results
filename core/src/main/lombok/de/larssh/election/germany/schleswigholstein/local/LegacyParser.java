@@ -34,6 +34,7 @@ import lombok.experimental.UtilityClass;
  * This class contains helper methods to parse legacy file formats.
  */
 @UtilityClass
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class LegacyParser {
 	/**
 	 * Invalid ballot character
