@@ -208,6 +208,14 @@ public class LegacyParser {
 	 * @return a new result object with the information of all {@code results}
 	 */
 	public static LocalElectionResult mergeResults(final LocalElectionResult... results) {
+		if (results.length == 0) {
+			throw new IllegalArgumentException(
+					"No election result passed, but expecting at least one election to merge results.");
+		}
+		if (Arrays.stream(results).map(LocalElectionResult::getElection).distinct().count() != 1) {
+			throw new IllegalArgumentException("Election results of different elections cannot be merged.");
+		}
+
 		final OptionalInt numberOfAllBallots;
 		if (Arrays.stream(results).map(LocalElectionResult::getNumberOfAllBallots).allMatch(OptionalInt::isPresent)) {
 			numberOfAllBallots = OptionalInt.of(Arrays.stream(results)

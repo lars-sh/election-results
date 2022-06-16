@@ -84,12 +84,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					.thenComparing(Entry::getKey);
 
 	/**
-	 * Comparator by value (low to high) and party
-	 */
-	private static final Comparator<Entry<Party, Integer>> VOTES_OF_PARTY_COMPARATOR
-			= Comparator.<Entry<Party, Integer>, Integer>comparing(Entry::getValue).thenComparing(Entry::getKey);
-
-	/**
 	 * Creates a new JSON {@link ObjectWriter} compatible with
 	 * {@link LocalElectionResult}.
 	 *
@@ -297,7 +291,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	private Map<LocalNomination, LocalNominationResult> createNominationResults() {
 		final Map<LocalNomination, Integer> votes = getVotesOfNominations();
-		final Map<Party, Integer> votesOfParties = getVotesOfParties();
 		final Map<LocalNomination, LocalNominationResultType> resultTypes
 				= new LinkedHashMap<>(getElection().getNominations().size());
 
@@ -323,7 +316,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List
-		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes, votesOfParties);
+		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes);
 		for (final LocalNomination nomination : getListResults(votes, sainteLague)) {
 			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
 		}
@@ -388,8 +381,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return the number of votes per party
 	 */
 	private Map<Party, Integer> getVotesOfParties() {
-		// Calculate
-		final Map<Party, Integer> votes = getBallots().stream()
+		return getBallots().stream()
 				.filter(Ballot::isValid)
 				.map(Ballot::getNominations)
 				.flatMap(Set::stream)
@@ -397,22 +389,21 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toMap(identity(), party -> 1, (oldValue, thisValue) -> oldValue + thisValue));
-
-		// Sort
-		return Maps.sort(votes, VOTES_OF_PARTY_COMPARATOR);
 	}
 
 	/**
 	 * Calculates the Sainte Laguë value for each nomination.
 	 *
-	 * @param votes          the number of votes per nomination
-	 * @param votesOfParties the number of votes per party
+	 * <p>
+	 * The returned map is ordered by Sainte Laguë value (high to low), the number
+	 * of votes (high to lower) and the nomination key.
+	 *
+	 * @param votes the number of votes per nomination
 	 * @return the Sainte Laguë value for each nomination
 	 */
-	private Map<LocalNomination, BigDecimal> getSainteLague(final Map<LocalNomination, Integer> votes,
-			final Map<Party, Integer> votesOfParties) {
+	private Map<LocalNomination, BigDecimal> getSainteLague(final Map<LocalNomination, Integer> votes) {
 		// Calculate
-		final Map<LocalNomination, BigDecimal> sainteLague = votesOfParties.entrySet()
+		final Map<LocalNomination, BigDecimal> sainteLague = getVotesOfParties().entrySet()
 				.stream()
 				.map(entry -> getSainteLagueOfParty(votes, entry.getKey(), entry.getValue()))
 				.map(Map::entrySet)
@@ -420,8 +411,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
-		// TODO: What's this sort order about? Can be eliminate
-		// VOTES_BY_PARTY_COMPARATOR?
 		final List<LocalNomination> nominations = getElection().getNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
@@ -672,6 +661,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * <p>
 	 * In case some direct results have a relatively low Sainte Laguë value the
 	 * returned map might be larger than {@link LocalElection#getNumberOfSeats()}.
+	 *
+	 * <p>
+	 * The returned map is ordered the same as {@code sainteLague}.
 	 *
 	 * @param votes       the number of votes per nomination
 	 * @param sainteLague the Sainte Laguë value per nomination
