@@ -209,47 +209,6 @@ public class LegacyParser {
 	}
 
 	/**
-	 * Merges multiple {@code results} of the same election into one result.
-	 *
-	 * @param results results to merge
-	 * @return a new result object with the information of all {@code results}
-	 */
-	public static LocalElectionResult mergeResults(final LocalElectionResult... results) {
-		if (results.length == 0) {
-			throw new IllegalArgumentException(
-					"No election result passed, but expecting at least one election to merge results.");
-		}
-		if (Arrays.stream(results).map(LocalElectionResult::getElection).distinct().count() != 1) {
-			throw new IllegalArgumentException("Election results of different elections cannot be merged.");
-		}
-
-		final OptionalInt numberOfAllBallots;
-		if (Arrays.stream(results).map(LocalElectionResult::getNumberOfAllBallots).allMatch(OptionalInt::isPresent)) {
-			numberOfAllBallots = OptionalInt.of(Arrays.stream(results)
-					.map(LocalElectionResult::getNumberOfAllBallots)
-					.mapToInt(OptionalInt::getAsInt)
-					.sum());
-		} else {
-			numberOfAllBallots = OptionalInt.empty();
-		}
-
-		final List<LocalBallot> ballots = Arrays.stream(results)
-				.map(LocalElectionResult::getBallots)
-				.flatMap(Collection::stream)
-				.collect(toList());
-		final Set<LocalNomination> directDrawResults = Arrays.stream(results)
-				.map(LocalElectionResult::getDirectDrawResults)
-				.flatMap(Collection::stream)
-				.collect(toSet());
-		final Set<LocalNomination> listDrawResults = Arrays.stream(results)
-				.map(LocalElectionResult::getListDrawResults)
-				.flatMap(Collection::stream)
-				.collect(toSet());
-		return new LocalElectionResult(results[0]
-				.getElection(), numberOfAllBallots, ballots, directDrawResults, listDrawResults);
-	}
-
-	/**
 	 * Reduces the complexity of {@code value} by converting to lower case
 	 * characters, replacing umlauts and removing characters not matching a-z and
 	 * 0-9.

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -225,6 +226,47 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		// nomination results
 		nominationResults = unmodifiableMap(createNominationResults());
 		partyResults = unmodifiableMap(createPartyResults());
+	}
+
+	/**
+	 * Creates a new {@link LocalElectionResult} by merging {@code this} and
+	 * multiple {@code results} of the same election.
+	 *
+	 * @param resultsToAdd results to merge with {@code this}
+	 * @return a new result object with the information of {@code this} and all
+	 *         {@code resultsToAdd}
+	 */
+	public LocalElectionResult add(final LocalElectionResult... resultsToAdd) {
+		if (!Arrays.stream(resultsToAdd).allMatch(result -> result.getElection() == getElection())) {
+			throw new IllegalArgumentException("Election results of a different election cannot be merged.");
+		}
+
+		// Create a new set including this
+		final Set<LocalElectionResult> results = new HashSet<>(Arrays.asList(resultsToAdd));
+		results.add(this);
+
+		// Calculate number of all ballots
+		final OptionalInt numberOfAllBallots;
+		if (results.stream().map(LocalElectionResult::getNumberOfAllBallots).allMatch(OptionalInt::isPresent)) {
+			numberOfAllBallots = OptionalInt.of(results.stream()
+					.map(LocalElectionResult::getNumberOfAllBallots)
+					.mapToInt(OptionalInt::getAsInt)
+					.sum());
+		} else {
+			numberOfAllBallots = OptionalInt.empty();
+		}
+
+		final List<LocalBallot> ballots
+				= results.stream().map(LocalElectionResult::getBallots).flatMap(Collection::stream).collect(toList());
+		final Set<LocalNomination> directDrawResults = results.stream()
+				.map(LocalElectionResult::getDirectDrawResults)
+				.flatMap(Collection::stream)
+				.collect(toSet());
+		final Set<LocalNomination> listDrawResults = results.stream()
+				.map(LocalElectionResult::getListDrawResults)
+				.flatMap(Collection::stream)
+				.collect(toSet());
+		return new LocalElectionResult(getElection(), numberOfAllBallots, ballots, directDrawResults, listDrawResults);
 	}
 
 	/** {@inheritDoc} */

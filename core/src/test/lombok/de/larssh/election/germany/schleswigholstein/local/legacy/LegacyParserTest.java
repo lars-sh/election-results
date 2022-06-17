@@ -74,7 +74,7 @@ public class LegacyParserTest {
 				= readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN);
 		final LocalElectionResult resultRethwischdorf
 				= readResult(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF);
-		return LegacyParser.mergeResults(resultKleinBoden, resultRethwischdorf);
+		return resultKleinBoden.add(resultRethwischdorf);
 	}
 
 	/**
