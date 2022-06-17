@@ -1,4 +1,4 @@
-package de.larssh.election.germany.schleswigholstein.local;
+package de.larssh.election.germany.schleswigholstein.local.legacy;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
@@ -25,6 +25,13 @@ import java.util.stream.IntStream;
 
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
+import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
+import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
+import de.larssh.election.germany.schleswigholstein.local.LocalElection;
+import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
+import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
+import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
+import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.text.Patterns;
 import de.larssh.utils.text.SplitLimit;
 import de.larssh.utils.text.Strings;

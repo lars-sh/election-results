@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import de.larssh.election.germany.schleswigholstein.local.legacy.LegacyParserTest;
 import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
@@ -112,8 +113,9 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeAllZero() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyParserTest
-				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("all-zero.txt"));
+		final LocalElectionResult result = LegacyParserTest.readResult(election,
+				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
+				Paths.get("LocalNominationResult-all-zero.txt"));
 
 		getAndAssertNominationResults(result, true).values()
 				.forEach(nominationResult -> assertThat(nominationResult.getType())
@@ -128,8 +130,9 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeAllOne() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyParserTest
-				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("all-one.txt"));
+		final LocalElectionResult result = LegacyParserTest.readResult(election,
+				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
+				Paths.get("LocalNominationResult-all-one.txt"));
 
 		getAndAssertNominationResults(result, true).values()
 				.stream()
@@ -147,7 +150,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = LegacyParserTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("balance-and-overhang-seats.txt"));
+				Paths.get("LocalNominationResult-balance-and-overhang-seats.txt"));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, false);
@@ -199,8 +202,9 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypePartiallyClosedDraws1() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest
-				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("draws.txt"));
+		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest.readResult(election,
+				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
+				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				resultWithoutDrawResults.getNumberOfAllBallots(),
 				resultWithoutDrawResults.getBallots(),
@@ -247,8 +251,9 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypePartiallyClosedDraws2() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest
-				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("draws.txt"));
+		final LocalElectionResult resultWithoutDrawResults = LegacyParserTest.readResult(election,
+				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
+				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				resultWithoutDrawResults.getNumberOfAllBallots(),
 				resultWithoutDrawResults.getBallots(),
@@ -295,8 +300,9 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeOpenDraws() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyParserTest
-				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, Paths.get("draws.txt"));
+		final LocalElectionResult result = LegacyParserTest.readResult(election,
+				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
+				Paths.get("LocalNominationResult-draws.txt"));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);

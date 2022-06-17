@@ -1,4 +1,4 @@
-package de.larssh.election.germany.schleswigholstein.local;
+package de.larssh.election.germany.schleswigholstein.local.legacy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,6 +15,10 @@ import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.ElectionException;
+import de.larssh.election.germany.schleswigholstein.local.LocalElection;
+import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
+import de.larssh.election.germany.schleswigholstein.local.LocalElectionTest;
+import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
@@ -22,9 +26,8 @@ import lombok.NoArgsConstructor;
 /**
  * {@link LegacyParser}
  */
-@PackagePrivate
 @NoArgsConstructor
-class LegacyParserTest {
+public class LegacyParserTest {
 	/**
 	 * Read the result file of a {@code pollingStationName} from a class-relative
 	 * text file
@@ -34,7 +37,7 @@ class LegacyParserTest {
 	 * @return the {@link LocalElectionResult}
 	 */
 	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
-		return readResult(election, pollingStationName, Paths.get(pollingStationName + ".txt"));
+		return readResult(election, pollingStationName, Paths.get("LegacyParser-" + pollingStationName + ".txt"));
 	}
 
 	/**
@@ -45,8 +48,7 @@ class LegacyParserTest {
 	 * @param classRelativePath  path to a class-relative text file
 	 * @return the {@link LocalElectionResult}
 	 */
-	@PackagePrivate
-	static LocalElectionResult readResult(final LocalElection election,
+	public static LocalElectionResult readResult(final LocalElection election,
 			final String pollingStationName,
 			final Path classRelativePath) {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
@@ -65,8 +67,7 @@ class LegacyParserTest {
 	 *
 	 * @return one result containing all data of Rethwisch
 	 */
-	@PackagePrivate
-	static LocalElectionResult readResultsRethwisch() {
+	public static LocalElectionResult readResultsRethwisch() {
 		final LocalElection election = LocalElectionTest.createElection();
 
 		final LocalElectionResult resultKleinBoden
@@ -104,7 +105,7 @@ class LegacyParserTest {
 		final LocalElection election = result.getElection();
 
 		// Compare
-		assertThat(election.getNumberOfEligibleVoters()).isEqualTo(990);
+		assertThat(election.getNumberOfEligibleVoters()).isEqualTo(OptionalInt.of(990));
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(601));
 		assertThat(result.getBallots()).hasSize(627);
 		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1043, 1)));

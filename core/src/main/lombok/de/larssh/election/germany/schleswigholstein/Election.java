@@ -93,10 +93,8 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 *
 	 * @return Anzahl der Wahlberechtigten im Wahlgebiet
 	 */
-	default int getNumberOfEligibleVoters() {
-		return getNumberOfEligibleVoters(getDistrict()).orElseThrow(
-				() -> new ElectionException("Missing eligible voters information for root district \"%s\".",
-						getDistrict().getName()));
+	default OptionalInt getNumberOfEligibleVoters() {
+		return getNumberOfEligibleVoters(getDistrict());
 	}
 
 	/**

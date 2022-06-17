@@ -34,14 +34,12 @@ public class LocalElectionTest {
 	/**
 	 * Name des Wahlbezirks "Klein Boden"
 	 */
-	@PackagePrivate
-	static final String POLLING_STATION_NAME_KLEIN_BODEN = Finals.constant("Klein Boden");
+	public static final String POLLING_STATION_NAME_KLEIN_BODEN = Finals.constant("Klein Boden");
 
 	/**
 	 * Name des Wahlbezirks "Rethwischdorf"
 	 */
-	@PackagePrivate
-	static final String POLLING_STATION_NAME_RETHWISCHDORF = Finals.constant("Rethwischdorf");
+	public static final String POLLING_STATION_NAME_RETHWISCHDORF = Finals.constant("Rethwischdorf");
 
 	/**
 	 * Creates an election for testing purposes.
@@ -238,8 +236,7 @@ public class LocalElectionTest {
 	 * @param name     the polling station's name
 	 * @return the polling station
 	 */
-	@PackagePrivate
-	static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
+	public static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
 		return election.getDistrict()
 				.getChildren()
 				.stream()

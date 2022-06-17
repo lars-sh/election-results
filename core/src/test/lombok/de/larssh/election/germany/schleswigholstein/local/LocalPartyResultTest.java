@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.local.legacy.LegacyParserTest;
 import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
