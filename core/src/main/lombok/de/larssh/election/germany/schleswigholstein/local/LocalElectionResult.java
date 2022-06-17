@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -50,6 +49,7 @@ import de.larssh.utils.Nullables;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
+import de.larssh.utils.text.Strings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -646,9 +646,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		if (drawResults.size() > numberOfDrawSeats) {
 			throw new ElectionException("%d %s draw results given while expecting %d %s draw results at max.",
 					drawResults.size(),
-					currentResultType.toString().toLowerCase(Locale.ROOT),
+					Strings.toLowerCaseNeutral(currentResultType.toString()),
 					numberOfDrawSeats,
-					currentResultType.toString().toLowerCase(Locale.ROOT));
+					Strings.toLowerCaseNeutral(currentResultType.toString()));
 		}
 
 		for (final LocalNomination nomination : drawResults) {
@@ -656,7 +656,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					|| resultTypes.getOrDefault(nomination, currentResultType) != currentResultType) {
 				throw new ElectionException("\"%s\" is not part of the %s draw.",
 						nomination.getPerson().getKey(),
-						currentResultType.toString().toLowerCase(Locale.ROOT));
+						Strings.toLowerCaseNeutral(currentResultType.toString()));
 			}
 		}
 	}
