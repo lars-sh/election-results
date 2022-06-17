@@ -1,12 +1,12 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -127,11 +128,17 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 	/**
 	 * Bewerberinnen und Bewerber
+	 */
+	Set<LocalNomination> nominations = new LinkedHashSet<>();
+
+	/**
+	 * Bewerberinnen und Bewerber
 	 *
 	 * <p>
-	 * Elements of this list are guaranteed to be distinct.
+	 * This field stores an unmodifiable copy of the nominations as list for
+	 * internal purpose only, as some comparators need it.
 	 */
-	List<LocalNomination> nominations = new ArrayList<>();
+	List<LocalNomination> nominationsAsList = new ArrayList<>();
 
 	/**
 	 * Scale (decimal places) of Sainte Laguë values
@@ -293,8 +300,27 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 	/** {@inheritDoc} */
 	@Override
-	public List<LocalNomination> getNominations() {
-		return unmodifiableList(nominations);
+	public Set<LocalNomination> getNominations() {
+		return unmodifiableSet(nominations);
+	}
+
+	/**
+	 * Bewerberinnen und Bewerber
+	 *
+	 * <p>
+	 * This method returns an unmodifiable copy of the nominations as list for
+	 * internal purpose only, as some comparators need it.
+	 *
+	 * @return Bewerberinnen und Bewerber
+	 */
+	@PackagePrivate
+	List<LocalNomination> getNominationsAsList() {
+		final Set<LocalNomination> nominations = getNominations();
+		if (nominationsAsList.size() != nominations.size()) {
+			nominationsAsList.clear();
+			nominationsAsList.addAll(nominations);
+		}
+		return unmodifiableList(nominationsAsList);
 	}
 
 	/**
@@ -303,10 +329,10 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @param party Gruppierung
 	 * @return the nominations
 	 */
-	public List<LocalNomination> getNominationsOfParty(final Party party) {
+	public Set<LocalNomination> getNominationsOfParty(final Party party) {
 		return getNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
-				.collect(toList());
+				.collect(toLinkedHashSet());
 	}
 
 	/**

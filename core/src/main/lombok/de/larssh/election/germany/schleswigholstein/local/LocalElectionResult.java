@@ -453,7 +453,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
-		final List<LocalNomination> nominations = getElection().getNominations();
+		final List<LocalNomination> nominations = getElection().getNominationsAsList();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
 						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))

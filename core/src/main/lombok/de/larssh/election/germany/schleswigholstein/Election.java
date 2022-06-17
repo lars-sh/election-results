@@ -2,8 +2,8 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.List;
 import java.util.OptionalInt;
+import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
@@ -135,12 +135,9 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	/**
 	 * Bewerberinnen und Bewerber
 	 *
-	 * <p>
-	 * Elements of this list are guaranteed to be distinct.
-	 *
 	 * @return Bewerberinnen und Bewerber
 	 */
-	List<? extends N> getNominations();
+	Set<? extends N> getNominations();
 
 	/** {@inheritDoc} */
 	@Override

@@ -35,7 +35,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
 			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
-			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
+			.thenComparing(nomination -> nomination.getElection().getNominationsAsList().indexOf(nomination));
 
 	/**
 	 * Creates a unique key for the given person and party keys.
@@ -83,9 +83,12 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
 	 */
 	@JsonIgnore
+	@EqualsAndHashCode.Exclude
 	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
-			|| getElection().getNominationsOfParty(getParty().get()).indexOf(this) < getElection()
-					.getNumberOfDirectSeats() ? LocalNominationType.DIRECT : LocalNominationType.LIST);
+			|| getElection().getNominationsOfParty(getParty().get())
+					.stream()
+					.limit(getElection().getNumberOfDirectSeats())
+					.anyMatch(this::equals) ? LocalNominationType.DIRECT : LocalNominationType.LIST);
 
 	/** {@inheritDoc} */
 	@Override
