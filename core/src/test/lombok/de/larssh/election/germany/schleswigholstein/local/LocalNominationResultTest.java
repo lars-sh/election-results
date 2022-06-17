@@ -11,12 +11,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import de.larssh.election.germany.schleswigholstein.local.legacy.LegacyResultsFileTest;
+import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileTest;
 import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link LegacyParser}
+ * {@link LocalNominationResult}
  */
 @PackagePrivate
 @NoArgsConstructor
@@ -61,7 +61,7 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testSainteLagueRethwisch() {
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
@@ -113,7 +113,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeAllZero() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult result = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-all-zero.txt"));
 
@@ -130,7 +130,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeAllOne() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult result = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-all-one.txt"));
 
@@ -148,7 +148,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeBalanceAndOverhangSeats() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult result = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-balance-and-overhang-seats.txt"));
 
@@ -202,7 +202,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypePartiallyClosedDraws1() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult resultWithoutDrawResults = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult resultWithoutDrawResults = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
@@ -251,7 +251,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypePartiallyClosedDraws2() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult resultWithoutDrawResults = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult resultWithoutDrawResults = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
@@ -300,7 +300,7 @@ class LocalNominationResultTest {
 	@PackagePrivate
 	void testTypeOpenDraws() {
 		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result = LegacyResultsFileTest.readResult(election,
+		final LocalElectionResult result = PollingStationResultFileTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-draws.txt"));
 
@@ -341,7 +341,7 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testTypeRethwisch() {
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
@@ -392,7 +392,7 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testVotesKleinBoden() {
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch()
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
@@ -435,7 +435,7 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testVotesRethwisch() {
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
@@ -475,7 +475,7 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testVotesRethwischdorf() {
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch()
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));

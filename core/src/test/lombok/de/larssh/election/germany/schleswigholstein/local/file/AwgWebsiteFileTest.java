@@ -1,4 +1,4 @@
-package de.larssh.election.germany.schleswigholstein.local.legacy;
+package de.larssh.election.germany.schleswigholstein.local.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
+import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFile;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ class AwgWebsiteFileTest {
 	@PackagePrivate
 	void testRethwisch() throws IOException {
 		// given
-		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
 		final StringWriter writer = new StringWriter();
 
 		// when

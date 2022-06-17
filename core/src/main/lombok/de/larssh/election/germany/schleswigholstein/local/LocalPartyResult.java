@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -7,6 +8,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -101,6 +103,16 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	@Override
 	public List<LocalBallot> getBallots() {
 		return ballots.get();
+	}
+
+	public Set<LocalNomination> getDirectNominations() {
+		return getNominations().stream()
+				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
+				.collect(toLinkedHashSet());
+	}
+
+	public Set<LocalNomination> getNominations() {
+		return getElectionResult().getElection().getNominationsOfParty(getParty());
 	}
 
 	/**

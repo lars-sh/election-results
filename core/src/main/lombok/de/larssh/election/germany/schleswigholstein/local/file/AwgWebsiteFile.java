@@ -1,4 +1,4 @@
-package de.larssh.election.germany.schleswigholstein.local.legacy;
+package de.larssh.election.germany.schleswigholstein.local.file;
 
 import static de.larssh.utils.Collectors.toLinkedHashSet;
 
