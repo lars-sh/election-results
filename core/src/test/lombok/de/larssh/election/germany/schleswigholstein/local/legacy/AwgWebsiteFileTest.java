@@ -28,7 +28,7 @@ class AwgWebsiteFileTest {
 	@PackagePrivate
 	void testRethwisch() throws IOException {
 		// given
-		final LocalElectionResult result = LegacyParserTest.readResultsRethwisch();
+		final LocalElectionResult result = LegacyResultsFileTest.readResultsRethwisch();
 		final StringWriter writer = new StringWriter();
 
 		// when

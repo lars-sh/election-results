@@ -24,10 +24,10 @@ import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link LegacyParser}
+ * {@link LegacyResultsFile}
  */
 @NoArgsConstructor
-public class LegacyParserTest {
+public class LegacyResultsFileTest {
 	/**
 	 * Read the result file of a {@code pollingStationName} from a class-relative
 	 * text file
@@ -37,7 +37,7 @@ public class LegacyParserTest {
 	 * @return the {@link LocalElectionResult}
 	 */
 	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
-		return readResult(election, pollingStationName, Paths.get("LegacyParser-" + pollingStationName + ".txt"));
+		return readResult(election, pollingStationName, Paths.get("LegacyResultsFile-" + pollingStationName + ".txt"));
 	}
 
 	/**
@@ -52,11 +52,11 @@ public class LegacyParserTest {
 			final String pollingStationName,
 			final Path classRelativePath) {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
-		final Path path = Resources.getResourceRelativeTo(LegacyParserTest.class, classRelativePath)
+		final Path path = Resources.getResourceRelativeTo(LegacyResultsFileTest.class, classRelativePath)
 				.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
 						pollingStation.getKey()));
 		try (Reader reader = Files.newBufferedReader(path)) {
-			return LegacyParser.parse(election, pollingStation, reader);
+			return LegacyResultsFile.parse(election, pollingStation, reader);
 		} catch (final IOException e) {
 			throw new UncheckedIOException(e);
 		}

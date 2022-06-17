@@ -13,7 +13,7 @@ import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Test;
 
-import de.larssh.election.germany.schleswigholstein.local.legacy.LegacyParserTest;
+import de.larssh.election.germany.schleswigholstein.local.legacy.LegacyResultsFileTest;
 import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
@@ -60,7 +60,7 @@ class LocalElectionResultTest {
 	@PackagePrivate
 	void testJson() throws IOException {
 		// Original result
-		final LocalElectionResult originalResult = LegacyParserTest.readResultsRethwisch();
+		final LocalElectionResult originalResult = LegacyResultsFileTest.readResultsRethwisch();
 
 		// Write JSON
 		final Path path = Files.createTempFile("", ".json");
