@@ -27,7 +27,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNomination implements Nomination<LocalNomination>, Comparable<LocalNomination> {
 	/**
@@ -62,6 +62,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 *
 	 * @return Wahlkreis
 	 */
+	@EqualsAndHashCode.Include
 	LocalDistrict district;
 
 	/**
@@ -70,6 +71,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 *
 	 * @return Politische Partei, Wählergruppe oder empty
 	 */
+	@EqualsAndHashCode.Include
 	Optional<Party> party;
 
 	/**
@@ -77,13 +79,13 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 *
 	 * @return Bewerberin oder Bewerber
 	 */
+	@EqualsAndHashCode.Include
 	Person person;
 
 	/**
 	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
 	 */
 	@JsonIgnore
-	@EqualsAndHashCode.Exclude
 	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
 			|| getElection().getNominationsOfParty(getParty().get())
 					.stream()

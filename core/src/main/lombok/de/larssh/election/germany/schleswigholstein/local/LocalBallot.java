@@ -28,7 +28,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuppressWarnings("PMD.DataClass")
 public final class LocalBallot implements Ballot<LocalNomination> {
 	/**
@@ -69,6 +69,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	 * @return Wahl
 	 */
 	@JsonIgnore
+	@EqualsAndHashCode.Include
 	LocalElection election;
 
 	/**
@@ -77,6 +78,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	 * @return Wahlbezirk
 	 */
 	@JsonIgnore
+	@EqualsAndHashCode.Include
 	LocalPollingStation pollingStation;
 
 	/**
@@ -84,6 +86,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	 *
 	 * @return {@code true} for postal vote ballots, else {@code false}
 	 */
+	@EqualsAndHashCode.Include
 	boolean postalVote;
 
 	/**
@@ -91,6 +94,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	 *
 	 * @return {@code true} for valid ballots, else {@code false}
 	 */
+	@EqualsAndHashCode.Include
 	boolean valid;
 
 	/**
@@ -98,6 +102,7 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 	 *
 	 * @return Gewählte Bewerberinnen und Bewerber
 	 */
+	@EqualsAndHashCode.Include
 	Set<LocalNomination> nominations;
 
 	/**

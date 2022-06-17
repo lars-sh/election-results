@@ -58,8 +58,8 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@SuppressWarnings({ "PMD.ExcessiveImports", "PMD.GodClass" })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@SuppressWarnings({ "PMD.ExcessiveImports", "PMD.GodClass" })
 public class LocalElection implements Election<LocalDistrictRoot, LocalNomination> {
 	/**
 	 * A JSON {@link ObjectMapper} compatible with {@link LocalElection}
@@ -94,6 +94,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	/**
 	 * Wahlgebiet
 	 */
+	@EqualsAndHashCode.Include
 	LocalDistrictRoot district;
 
 	/**
@@ -116,6 +117,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
 	@JsonIgnore
+	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
 	Map<District<?>, OptionalInt> population = new TreeMap<>();
 
@@ -123,22 +125,15 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
 	@JsonIgnore
+	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
 	Map<District<?>, OptionalInt> numberOfEligibleVoters = new TreeMap<>();
 
 	/**
 	 * Bewerberinnen und Bewerber
 	 */
+	@ToString.Exclude
 	Set<LocalNomination> nominations = new LinkedHashSet<>();
-
-	/**
-	 * Bewerberinnen und Bewerber
-	 *
-	 * <p>
-	 * This field stores an unmodifiable copy of the nominations as list for
-	 * internal purpose only, as some comparators need it.
-	 */
-	List<LocalNomination> nominationsAsList = new ArrayList<>();
 
 	/**
 	 * Scale (decimal places) of Sainte Laguë values
@@ -153,6 +148,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	/**
 	 * Wahlgebiet, Wahlkreise und Wahlbezirke
 	 */
+	@ToString.Exclude
 	Supplier<Set<District<?>>> districts = lazy(() -> {
 		final Set<District<?>> districts = new HashSet<>();
 
@@ -169,6 +165,16 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 		return unmodifiableSet(districts);
 	});
+
+	/**
+	 * Bewerberinnen und Bewerber
+	 *
+	 * <p>
+	 * This field stores an unmodifiable copy of the nominations as list for
+	 * internal purpose only, as some comparators need it.
+	 */
+	@ToString.Exclude
+	List<LocalNomination> nominationsAsList = new ArrayList<>();
 
 	/**
 	 * Wahl

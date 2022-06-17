@@ -136,6 +136,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * @return Stimmzettel
 	 */
+	@ToString.Exclude
 	List<LocalBallot> ballots;
 
 	/**

@@ -17,7 +17,6 @@ import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -27,7 +26,6 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<LocalPartyResult> {
 	/**
@@ -58,6 +56,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	/**
 	 * Stimmzettel mit Stimmen für diese politische Partei oder Wählerguppe
 	 */
+	@ToString.Exclude
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)

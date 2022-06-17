@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
-import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFile;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;

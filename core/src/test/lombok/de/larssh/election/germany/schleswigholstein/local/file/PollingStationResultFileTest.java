@@ -19,7 +19,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionTest;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
-import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFile;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;

@@ -14,7 +14,6 @@ import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.NominationResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -24,7 +23,6 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNominationResult
 		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
@@ -66,6 +64,7 @@ public class LocalNominationResult
 	/**
 	 * Stimmzettel der Bewerberin oder des Bewerbers
 	 */
+	@ToString.Exclude
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
