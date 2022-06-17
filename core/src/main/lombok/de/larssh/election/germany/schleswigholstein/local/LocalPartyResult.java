@@ -29,11 +29,13 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<LocalPartyResult> {
 	/**
-	 * Comparator by election, number of votes and party
+	 * Comparator by election, number of votes (high to low) and party
 	 */
 	private static final Comparator<LocalPartyResult> COMPARATOR
 			= Comparator.<LocalPartyResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
+					.reversed()
 					.thenComparing(LocalPartyResult::getNumberOfVotes)
+					.reversed()
 					.thenComparing(LocalPartyResult::getParty);
 
 	/**

@@ -29,14 +29,12 @@ import lombok.ToString;
 public class LocalNominationResult
 		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
 	/**
-	 * Comparator by election, nomination result type, Sainte Laguë value and
-	 * nomination order
+	 * Comparator by election, number of votes (high to low) and nomination order
 	 */
 	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
 			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
-			.thenComparing(LocalNominationResult::getType)
 			.reversed()
-			.thenComparing(LocalNominationResult::getSainteLagueValue)
+			.thenComparing(LocalNominationResult::getNumberOfVotes)
 			.reversed()
 			.thenComparing(LocalNominationResult::getNomination);
 
