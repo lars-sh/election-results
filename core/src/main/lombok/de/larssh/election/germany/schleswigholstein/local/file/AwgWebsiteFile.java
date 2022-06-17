@@ -22,33 +22,33 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class AwgWebsiteFile {
-	private static String createPhpIdentifier(final String value) {
-		return "'"
-				+ Strings.toLowerCaseNeutral(value)
-						.replace("ä", "ae")
-						.replace("ö", "oe")
-						.replace("ü", "ue")
-						.replace("ß", "ss")
-						.replaceAll("[^a-z0-9]+", "-")
-						.replaceAll("(?:^[-0-9]+)|(?:-+$)", "")
-				+ "'";
-	}
-
-	private static String createPhpString(final String value) {
-		return "'"
-				+ value.replace("\r", "\\r") //
-						.replace("\n", "\\n")
-						.replace("\\", "\\\\")
-						.replace("'", "\\'")
-				+ "'";
-	}
-
 	public static void write(final LocalElectionResult result, final Writer writer) throws IOException {
 		new AwgWebsiteFileWriter(result, writer).write();
 	}
 
 	@RequiredArgsConstructor
 	private static class AwgWebsiteFileWriter {
+		private static String createPhpIdentifier(final String value) {
+			return "'"
+					+ Strings.toLowerCaseNeutral(value)
+							.replace("ä", "ae")
+							.replace("ö", "oe")
+							.replace("ü", "ue")
+							.replace("ß", "ss")
+							.replaceAll("[^a-z0-9]+", "-")
+							.replaceAll("(?:^[-0-9]+)|(?:-+$)", "")
+					+ "'";
+		}
+
+		private static String createPhpString(final String value) {
+			return "'"
+					+ value.replace("\r", "\\r") //
+							.replace("\n", "\\n")
+							.replace("\\", "\\\\")
+							.replace("'", "\\'")
+					+ "'";
+		}
+
 		LocalElectionResult result;
 
 		Writer writer;
@@ -152,7 +152,7 @@ public class AwgWebsiteFile {
 
 				final String gruppierungOrNull = nomination.getParty()
 						.map(Party::getShortName)
-						.map(AwgWebsiteFile::createPhpIdentifier)
+						.map(AwgWebsiteFileWriter::createPhpIdentifier)
 						.orElse("null");
 
 				write("\t\t%s => array(\n", createPhpIdentifier(nomination.getPerson().getKey()));
