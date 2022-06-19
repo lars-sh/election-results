@@ -8,7 +8,6 @@ import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
-import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.Nullables;
@@ -128,14 +127,6 @@ public abstract class LocalDistrictUiController extends ChildController<LocalEle
 		@SuppressWarnings("PMD.ShortMethodName")
 		public static LocalNominationChoiceEntry of(final DisplayableLocalNomination nomination) {
 			return new LocalNominationChoiceEntry(Optional.of(nomination));
-		}
-
-		@SuppressWarnings("PMD.ShortMethodName")
-		public static LocalNominationChoiceEntry of(final LocalNomination nomination) {
-			return of(new DisplayableLocalNomination(nomination.getType(),
-					nomination.getParty(),
-					nomination.getElection().getNominations().indexOf(nomination),
-					nomination.getPerson()));
 		}
 
 		Optional<DisplayableLocalNomination> nomination;
