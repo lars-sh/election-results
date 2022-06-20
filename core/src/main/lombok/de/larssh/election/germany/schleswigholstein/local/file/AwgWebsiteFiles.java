@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
@@ -22,6 +21,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.Finals;
 import de.larssh.utils.OptionalInts;
+import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import de.larssh.utils.text.Strings;
 import lombok.RequiredArgsConstructor;
@@ -32,45 +32,100 @@ import lombok.experimental.UtilityClass;
  * website.
  */
 @UtilityClass
-public class AwgWebsiteFile {
+public class AwgWebsiteFiles {
+	/**
+	 * Formats and writes {@code result} to {@code writer}.
+	 *
+	 * @param result the election result to to write
+	 * @param writer the AWG website file writer
+	 * @throws IOException on IO error
+	 */
 	public static void write(final LocalElectionResult result, final Writer writer) throws IOException {
 		new AwgWebsiteFileWriter(result, writer).write();
 	}
 
+	/**
+	 * This class writes data of a {@link LocalElectionResult} to a AWG website
+	 * file.
+	 */
 	@RequiredArgsConstructor
 	private static class AwgWebsiteFileWriter {
+		/**
+		 * Delimiter between PHP array entries
+		 */
 		private static final String PHP_ARRAY_ENTRIES_DELIMITER = ",\n";
 
+		/**
+		 * Prefix to start PHP array entries with
+		 */
 		@SuppressWarnings("checkstyle:MultipleStringLiterals")
 		private static final String PHP_ARRAY_ENTRIES_PREFIX = "\n";
 
+		/**
+		 * Suffix to end PHP array entries with
+		 */
 		private static final String PHP_ARRAY_ENTRIES_SUFFIX = "\n\t";
 
+		/**
+		 * Pattern matching sequences to convert to replace with a dash when stripping
+		 * down a value to a PHP compatible identifier.
+		 */
 		private static final Pattern PHP_IDENTIFIER_MAKE_DASH = Pattern.compile("[^a-z0-9]+");
 
+		/**
+		 * Pattern matching sequences to remove when stripping down a value to a PHP
+		 * compatible identifier.
+		 */
 		private static final Pattern PHP_IDENTIFIER_REMOVE = Pattern.compile("(?:^[-0-9]+)|(?:-+$)");
 
+		/**
+		 * PHP reserved literal for {@code null}
+		 */
 		private static final String PHP_NULL = "null";
 
+		/**
+		 * Character to start and end a PHP string literal with
+		 */
 		private static final String PHP_STRING_LITERAL = "'";
 
+		/**
+		 * Template file body (lazily loaded)
+		 */
 		private static final Supplier<String> TEMPLATE = Finals.lazy(() -> loadResourceRelativeToClass("template.php"));
 
+		/**
+		 * Template file body for a person object (lazily loaded)
+		 */
 		private static final Supplier<String> TEMPLATE_PERSONS
 				= Finals.lazy(() -> loadResourceRelativeToClass("template-person.php"));
 
+		/**
+		 * Creates a PHP string literal with a stripped-down {@code value} to be used
+		 * for identifiers.
+		 *
+		 * @param value the value to strip down
+		 * @return a PHP string literal with a stripped-down {@code value} to be used
+		 *         for identifiers
+		 */
+		@SuppressWarnings("checkstyle:MultipleStringLiterals")
 		private static String createPhpIdentifier(final String value) {
 			String identifier = Strings.toLowerCaseNeutral(value)
 					.replace("ä", "ae")
 					.replace("ö", "oe")
 					.replace("ü", "ue")
 					.replace("ß", "ss");
-			identifier = Strings.replaceAll(identifier, PHP_IDENTIFIER_MAKE_DASH, "");
+			identifier = Strings.replaceAll(identifier, PHP_IDENTIFIER_MAKE_DASH, "-");
 			identifier = Strings.replaceAll(identifier, PHP_IDENTIFIER_REMOVE, "");
 
 			return PHP_STRING_LITERAL + identifier + PHP_STRING_LITERAL;
 		}
 
+		/**
+		 * Creates a PHP string literal representing {@code value}.
+		 *
+		 * @param value the value to represent
+		 * @return a PHP string literal representing {@code value}
+		 */
 		private static String createPhpString(final String value) {
 			return PHP_STRING_LITERAL
 					+ value.replace("\r", "\\r")
@@ -80,6 +135,13 @@ public class AwgWebsiteFile {
 					+ PHP_STRING_LITERAL;
 		}
 
+		/**
+		 * Loads a resource from a folder next to this class. The file name is build by
+		 * concatenating the class name, a dash and {@code fileNameSuffix}.
+		 *
+		 * @param fileNameSuffix the file name's suffix
+		 * @return the resource file content
+		 */
 		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
 			final Class<?> clazz = MethodHandles.lookup().lookupClass();
 			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
@@ -92,11 +154,27 @@ public class AwgWebsiteFile {
 			}
 		}
 
+		/**
+		 * Election Result to write
+		 *
+		 * @return the election result to write
+		 */
 		LocalElectionResult result;
 
+		/**
+		 * AWG website file writer
+		 *
+		 * @return the AWG website file writer
+		 */
 		Writer writer;
 
-		private void write() throws IOException {
+		/**
+		 * Formats and writes {@link #result} to {@link #writer}.
+		 *
+		 * @throws IOException on IO error
+		 */
+		@PackagePrivate
+		void write() throws IOException {
 			final String wahlberechtigteOrNull
 					= OptionalInts.mapToObj(result.getElection().getNumberOfEligibleVoters(), Integer::toString)
 							.orElse(PHP_NULL);
@@ -134,8 +212,7 @@ public class AwgWebsiteFile {
 					.map(pollingStation -> String.format("\t\t%s => array(%s)",
 							createPhpIdentifier(pollingStation.getName()),
 							formatNominationVotes(pollingStation)))
-					.collect(Collectors
-							.joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_PREFIX, PHP_ARRAY_ENTRIES_SUFFIX));
+					.collect(joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_PREFIX, PHP_ARRAY_ENTRIES_SUFFIX));
 		}
 
 		/**
@@ -156,7 +233,7 @@ public class AwgWebsiteFile {
 					.map(nominationResult -> String.format("\t\t\t%s => %d",
 							createPhpIdentifier(nominationResult.getNomination().getPerson().getKey()),
 							nominationResult.getNumberOfVotes()))
-					.collect(Collectors.joining(PHP_ARRAY_ENTRIES_DELIMITER,
+					.collect(joining(PHP_ARRAY_ENTRIES_DELIMITER,
 							PHP_ARRAY_ENTRIES_PREFIX,
 							PHP_ARRAY_ENTRIES_SUFFIX + '\t'));
 		}
@@ -197,8 +274,7 @@ public class AwgWebsiteFile {
 					.map(partyResult -> String.format("\t\t%s => %d",
 							createPhpIdentifier(partyResult.getParty().getShortName()),
 							partyResult.getNumberOfSeats()))
-					.collect(Collectors
-							.joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_PREFIX, PHP_ARRAY_ENTRIES_SUFFIX));
+					.collect(joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_PREFIX, PHP_ARRAY_ENTRIES_SUFFIX));
 		}
 
 		/**
@@ -218,7 +294,7 @@ public class AwgWebsiteFile {
 					.map(pollingStation -> String.format("\t\t%s => %s",
 							createPhpIdentifier(pollingStation.getName()),
 							createPhpString(pollingStation.getName())))
-					.collect(Collectors.joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_DELIMITER, ""));
+					.collect(joining(PHP_ARRAY_ENTRIES_DELIMITER, PHP_ARRAY_ENTRIES_DELIMITER, ""));
 		}
 	}
 }

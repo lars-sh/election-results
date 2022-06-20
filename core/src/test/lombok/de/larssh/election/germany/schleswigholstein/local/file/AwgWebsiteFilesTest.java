@@ -16,11 +16,11 @@ import de.larssh.utils.text.Strings;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link AwgWebsiteFile}
+ * {@link AwgWebsiteFiles}
  */
 @PackagePrivate
 @NoArgsConstructor
-class AwgWebsiteFileTest {
+class AwgWebsiteFilesTest {
 	/**
 	 * Test writing using results of Rethwisch
 	 */
@@ -28,16 +28,16 @@ class AwgWebsiteFileTest {
 	@PackagePrivate
 	void testRethwisch() throws IOException {
 		// given
-		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
 		final StringWriter writer = new StringWriter();
 
 		// when
-		AwgWebsiteFile.write(result, writer);
+		AwgWebsiteFiles.write(result, writer);
 
 		// then
-		assertThat(writer.toString()).isEqualTo(new String(
-				Files.readAllBytes(
-						Resources.getResourceRelativeTo(getClass(), Paths.get("AwgWebsiteFile-2018.php")).get()),
-				Strings.DEFAULT_CHARSET));
+		final String expectedString = new String(Files.readAllBytes(Resources
+				.getResourceRelativeTo(getClass(), Paths.get(AwgWebsiteFiles.class.getSimpleName() + "-2018.php"))
+				.get()), Strings.DEFAULT_CHARSET);
+		assertThat(writer.toString()).isEqualTo(expectedString);
 	}
 }

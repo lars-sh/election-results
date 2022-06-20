@@ -43,8 +43,8 @@ import lombok.experimental.UtilityClass;
  * result file format.
  */
 @UtilityClass
-@SuppressWarnings("PMD.ClassNamingConventions")
-public class PollingStationResultFile {
+@SuppressWarnings("PMD.ExcessiveImports")
+public class PollingStationResultFiles {
 	/**
 	 * Invalid ballot character
 	 */
@@ -80,6 +80,27 @@ public class PollingStationResultFile {
 		return new PollingStationResultFileReader(election, pollingStation, reader).read();
 	}
 
+	/**
+	 * Formats and writes the {@code result} of {@code pollingStation} to
+	 * {@code writer}.
+	 *
+	 * @param result         the election result to to write
+	 * @param pollingStation the polling station to write
+	 * @param writer         the polling station result file writer
+	 * @throws IOException on IO error
+	 */
+	public static void write(final LocalElectionResult result,
+			final LocalPollingStation pollingStation,
+			final Writer writer) throws IOException {
+		new PollingStationResultFileWriter(result.filter(ballot -> ballot.getPollingStation().equals(pollingStation)),
+				pollingStation,
+				writer).write();
+	}
+
+	/**
+	 * This class reads data from a polling station result file to a
+	 * {@link LocalElectionResult}.
+	 */
 	@RequiredArgsConstructor
 	private static class PollingStationResultFileReader {
 		/**
@@ -121,10 +142,25 @@ public class PollingStationResultFile {
 					.replaceAll("[^a-z0-9]", "");
 		}
 
+		/**
+		 * {@link LOcalElection} to write
+		 *
+		 * @return the election result to write
+		 */
 		LocalElection election;
 
+		/**
+		 * Polling Station to read
+		 *
+		 * @return the polling station to read
+		 */
 		LocalPollingStation pollingStation;
 
+		/**
+		 * Polling Station Result file read
+		 *
+		 * @return the polling station result file read
+		 */
 		Reader reader;
 
 		/**
@@ -132,6 +168,13 @@ public class PollingStationResultFile {
 		 */
 		Map<String, Pattern> patternCache = new HashMap<>();
 
+		/**
+		 * Reads and parses {@link #reader} ands creates a {@link LocalElectionResult}
+		 * for {@link #election} in {@link #pollingStation}.
+		 *
+		 * @return the createed {@link LocalElectionResult}
+		 * @throws IOException on IO error
+		 */
 		public LocalElectionResult read() throws IOException {
 			try (BufferedReader bufferedReader = new BufferedReader(reader)) {
 				final AtomicReference<OptionalInt> numberOfAllBallots = new AtomicReference<>(OptionalInt.empty());
@@ -161,9 +204,7 @@ public class PollingStationResultFile {
 		/**
 		 * Parses a single {@code line} and creates ballots out of it.
 		 *
-		 * @param election       Wahl
-		 * @param pollingStation Wahlbezirk
-		 * @param line           single line
+		 * @param line the line to create a set of {qlink LocalBllot
 		 * @return Stimmzettel
 		 */
 		private Collection<LocalBallot> createBallotsFromLine(final String line) {
@@ -191,9 +232,7 @@ public class PollingStationResultFile {
 		 * <p>
 		 * This method takes care of the party prefix.
 		 *
-		 * @param election Wahl
-		 * @param district Wahlkreis
-		 * @param person   Bewerberin oder Bewerber
+		 * @param person Bewerberin oder Bewerber
 		 * @return Bewerberin oder Bewerber
 		 */
 		private LocalNomination findNomination(final String person) {
@@ -274,30 +313,57 @@ public class PollingStationResultFile {
 		}
 	}
 
-	public static void write(final LocalElectionResult result,
-			final LocalPollingStation pollingStation,
-			final Writer writer) throws IOException {
-		new PollingStationResultFileWriter(result.filter(ballot -> ballot.getPollingStation().equals(pollingStation)),
-				pollingStation,
-				writer).write();
-	}
-
+	/**
+	 * This class writes data of a {@link LocalElectionResult} to a polling station
+	 * result file.
+	 */
 	@RequiredArgsConstructor
 	private static class PollingStationResultFileWriter {
+		/**
+		 * Pattern matching exactly one space character
+		 */
 		private static final Pattern SINGLE_SPACE_PATTERN = Pattern.compile("\\s");
 
+		/**
+		 * Formats {@code nominations} file format.
+		 *
+		 * @param nominations the set of nominations to format
+		 * @return the formatted {@code nominations}
+		 */
 		private static String formatNominations(final Set<LocalNomination> nominations) {
 			return nominations.stream()
 					.map(nomination -> Strings.replaceAll(nomination.getKey(), SINGLE_SPACE_PATTERN, "_"))
 					.collect(joining(" "));
 		}
 
+		/**
+		 * Election Result to write
+		 *
+		 * @return the election result to write
+		 */
 		LocalElectionResult result;
 
+		/**
+		 * Polling Station to write
+		 *
+		 * @return the polling station to write
+		 */
 		LocalPollingStation pollingStation;
 
+		/**
+		 * Polling Station Result file writer
+		 *
+		 * @return the polling station result file writer
+		 */
 		Writer writer;
 
+		/**
+		 * Formats and writes the {@link #result} of {@link #pollingStation} to
+		 * {@link #writer}.
+		 *
+		 * @throws IOException on IO error
+		 */
+		@SuppressWarnings("checkstyle:MultipleStringLiterals")
 		public void write() throws IOException {
 			write("%s %s\n", LINE_COMMENT, pollingStation.getName());
 			if (result.getElection().getNumberOfEligibleVoters().isPresent()) {
@@ -311,8 +377,7 @@ public class PollingStationResultFile {
 			write("\n");
 			if (result.getNumberOfInvalidBallots() > 0) {
 				write("%s Ungültige Stimmzettel\n", LINE_COMMENT);
-				write("%d %s\n", result.getNumberOfInvalidBallots(), BALLOT_INVALID);
-				write("\n");
+				write("%d %s\n\n", result.getNumberOfInvalidBallots(), BALLOT_INVALID);
 			}
 
 			final Collection<LocalPartyResult> partyResults = result.getPartyResults().values();
@@ -334,6 +399,13 @@ public class PollingStationResultFile {
 			}
 		}
 
+		/**
+		 * Formats and writes the value {@code format} by applying {@code args}.
+		 *
+		 * @param format the format string
+		 * @param args   the arguments referenced by format specifiers in {@code format}
+		 * @throws IOException on IO error
+		 */
 		private void write(final String format, final Object... args) throws IOException {
 			writer.write(Strings.format(format, args));
 		}

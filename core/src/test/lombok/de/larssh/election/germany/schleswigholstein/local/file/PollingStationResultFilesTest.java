@@ -24,10 +24,10 @@ import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link PollingStationResultFile}
+ * {@link PollingStationResultFiles}
  */
 @NoArgsConstructor
-public class PollingStationResultFileTest {
+public class PollingStationResultFilesTest {
 	/**
 	 * Read the result file of a {@code pollingStationName} from a class-relative
 	 * text file
@@ -39,7 +39,7 @@ public class PollingStationResultFileTest {
 	private static LocalElectionResult readResult(final LocalElection election, final String pollingStationName) {
 		return readResult(election,
 				pollingStationName,
-				Paths.get("PollingStationResultFile-" + pollingStationName + ".txt"));
+				Paths.get(PollingStationResultFiles.class.getSimpleName() + "-" + pollingStationName + ".txt"));
 	}
 
 	/**
@@ -54,11 +54,11 @@ public class PollingStationResultFileTest {
 			final String pollingStationName,
 			final Path classRelativePath) {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
-		final Path path = Resources.getResourceRelativeTo(PollingStationResultFileTest.class, classRelativePath)
+		final Path path = Resources.getResourceRelativeTo(PollingStationResultFilesTest.class, classRelativePath)
 				.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
 						pollingStation.getKey()));
 		try (Reader reader = Files.newBufferedReader(path)) {
-			return PollingStationResultFile.read(election, pollingStation, reader);
+			return PollingStationResultFiles.read(election, pollingStation, reader);
 		} catch (final IOException e) {
 			throw new UncheckedIOException(e);
 		}

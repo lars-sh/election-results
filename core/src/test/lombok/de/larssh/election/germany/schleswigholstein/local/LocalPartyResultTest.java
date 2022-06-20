@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.Party;
-import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileTest;
+import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFilesTest;
 import de.larssh.utils.annotations.PackagePrivate;
 import lombok.NoArgsConstructor;
 
@@ -23,7 +23,7 @@ class LocalPartyResultTest {
 	@Test
 	@PackagePrivate
 	void testKleinBoden() {
-		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch()
+		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
@@ -53,7 +53,7 @@ class LocalPartyResultTest {
 	@Test
 	@PackagePrivate
 	void testRethwisch() {
-		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch();
+		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
@@ -80,7 +80,7 @@ class LocalPartyResultTest {
 	@Test
 	@PackagePrivate
 	void testRethwischdorf() {
-		final LocalElectionResult result = PollingStationResultFileTest.readResultsRethwisch()
+		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
 				.filter(ballot -> ballot.getPollingStation()
 						.getName()
 						.equals(LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
