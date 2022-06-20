@@ -9,4 +9,11 @@
 	<Match>
 		<Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING" />
 	</Match>
+	
+	
+	<!-- Method "writePerson" uses template file as String.format input. -->
+	<Match>
+		<Bug pattern="FORMAT_STRING_MANIPULATION" />
+		<Class name="de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles$AwgWebsiteFileWriter" />
+	</Match>
 </FindBugsFilter>

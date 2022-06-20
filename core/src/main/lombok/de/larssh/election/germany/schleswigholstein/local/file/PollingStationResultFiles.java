@@ -366,18 +366,22 @@ public class PollingStationResultFiles {
 		@SuppressWarnings("checkstyle:MultipleStringLiterals")
 		public void write() throws IOException {
 			write("%s %s\n", LINE_COMMENT, pollingStation.getName());
-			if (result.getElection().getNumberOfEligibleVoters().isPresent()) {
-				write("%s Anzahl Wahlberechtigte: %d\n",
-						LINE_COMMAND,
-						result.getElection().getNumberOfEligibleVoters().getAsInt());
+
+			final OptionalInt numberOfEligibleVoters = result.getElection().getNumberOfEligibleVoters();
+			if (numberOfEligibleVoters.isPresent()) {
+				write("%s Anzahl Wahlberechtigte: %d\n", LINE_COMMAND, numberOfEligibleVoters.getAsInt());
 			}
-			if (result.getNumberOfAllBallots().isPresent()) {
-				write("%s Anzahl Stimmzettel: %d\n", LINE_COMMAND, result.getNumberOfAllBallots().getAsInt());
+
+			final OptionalInt numberOfAllBallots = result.getNumberOfAllBallots();
+			if (numberOfAllBallots.isPresent()) {
+				write("%s Anzahl Stimmzettel: %d\n", LINE_COMMAND, numberOfAllBallots.getAsInt());
 			}
 			write("\n");
-			if (result.getNumberOfInvalidBallots() > 0) {
+
+			final int numberOfInvaliBallots = result.getNumberOfInvalidBallots();
+			if (numberOfInvaliBallots > 0) {
 				write("%s Ungültige Stimmzettel\n", LINE_COMMENT);
-				write("%d %s\n\n", result.getNumberOfInvalidBallots(), BALLOT_INVALID);
+				write("%d %s\n\n", numberOfInvaliBallots, BALLOT_INVALID);
 			}
 
 			final Collection<LocalPartyResult> partyResults = result.getPartyResults().values();

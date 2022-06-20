@@ -14,6 +14,7 @@ import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.NominationResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -23,18 +24,19 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalNominationResult
 		implements NominationResult<LocalBallot, LocalNomination>, Comparable<LocalNominationResult> {
 	/**
 	 * Comparator by election, number of votes (high to low) and nomination order
 	 */
-	private static final Comparator<LocalNominationResult> COMPARATOR = Comparator
-			.<LocalNominationResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
-			.reversed()
-			.thenComparing(LocalNominationResult::getNumberOfVotes)
-			.reversed()
-			.thenComparing(LocalNominationResult::getNomination);
+	private static final Comparator<LocalNominationResult> COMPARATOR
+			= Comparator.<LocalNominationResult, Election<?, ?>>comparing(LocalNominationResult::getElection)
+					.reversed()
+					.thenComparing(LocalNominationResult::getNumberOfVotes)
+					.reversed()
+					.thenComparing(LocalNominationResult::getNomination);
 
 	/**
 	 * Wahlergebnis
@@ -45,6 +47,7 @@ public class LocalNominationResult
 	/**
 	 * Bewerberin oder Bewerber
 	 */
+	@EqualsAndHashCode.Include
 	LocalNomination nomination;
 
 	/**
@@ -83,8 +86,19 @@ public class LocalNominationResult
 		return ballots.get();
 	}
 
+	/**
+	 * Wahl
+	 *
+	 * @return Wahl
+	 */
+	@EqualsAndHashCode.Include
+	private LocalElection getElection() {
+		return getElectionResult().getElection();
+	}
+
 	/** {@inheritDoc} */
 	@Override
+	@EqualsAndHashCode.Include
 	public int getNumberOfVotes() {
 		return getBallots().size();
 	}

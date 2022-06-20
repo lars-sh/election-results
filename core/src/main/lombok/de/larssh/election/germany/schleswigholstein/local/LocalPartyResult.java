@@ -17,6 +17,7 @@ import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -26,13 +27,14 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<LocalPartyResult> {
 	/**
 	 * Comparator by election, number of votes (high to low) and party
 	 */
 	private static final Comparator<LocalPartyResult> COMPARATOR
-			= Comparator.<LocalPartyResult, Election<?, ?>>comparing(result -> result.getElectionResult().getElection())
+			= Comparator.<LocalPartyResult, Election<?, ?>>comparing(LocalPartyResult::getElection)
 					.reversed()
 					.thenComparing(LocalPartyResult::getNumberOfVotes)
 					.reversed()
@@ -51,6 +53,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 *
 	 * @return Politische Partei oder Wählerguppe
 	 */
+	@EqualsAndHashCode.Include
 	Party party;
 
 	/**
@@ -116,6 +119,16 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	}
 
 	/**
+	 * Wahl
+	 *
+	 * @return Wahl
+	 */
+	@EqualsAndHashCode.Include
+	private LocalElection getElection() {
+		return getElectionResult().getElection();
+	}
+
+	/**
 	 * Bewerberinnen und Bewerber der Gruppierung
 	 *
 	 * @return Bewerberinnen und Bewerber
@@ -144,6 +157,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 
 	/** {@inheritDoc} */
 	@Override
+	@EqualsAndHashCode.Include
 	public int getNumberOfVotes() {
 		return numberOfVotes.get();
 	}

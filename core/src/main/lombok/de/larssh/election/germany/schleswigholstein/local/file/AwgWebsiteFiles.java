@@ -24,6 +24,7 @@ import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import de.larssh.utils.text.Strings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
@@ -142,6 +143,9 @@ public class AwgWebsiteFiles {
 		 * @param fileNameSuffix the file name's suffix
 		 * @return the resource file content
 		 */
+		@SuppressFBWarnings(value = { "EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS", "PATH_TRAVERSAL_IN" },
+				justification = "IOExceptions in here are not expected to be related to user input or behavior "
+						+ "and fileNameSuffix is expected to be a constant value within this class.")
 		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
 			final Class<?> clazz = MethodHandles.lookup().lookupClass();
 			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
@@ -244,9 +248,8 @@ public class AwgWebsiteFiles {
 		 * with its party, family name and given name.
 		 *
 		 * @return the PHP array entries
-		 * @throws IOException on IO error, reading the template file
 		 */
-		private String formatPersons() throws IOException {
+		private String formatPersons() {
 			return result.getElection()
 					.getNominations()
 					.stream()
