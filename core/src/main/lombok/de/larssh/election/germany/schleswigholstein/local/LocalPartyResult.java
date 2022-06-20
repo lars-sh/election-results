@@ -104,12 +104,22 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		return ballots.get();
 	}
 
+	/**
+	 * Unmittelbare Wahlvorschläge der Gruppierung
+	 *
+	 * @return Unmittelbare Wahlvorschläge der Gruppierung
+	 */
 	public Set<LocalNomination> getDirectNominations() {
 		return getNominations().stream()
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
 				.collect(toLinkedHashSet());
 	}
 
+	/**
+	 * Bewerberinnen und Bewerber der Gruppierung
+	 *
+	 * @return Bewerberinnen und Bewerber
+	 */
 	public Set<LocalNomination> getNominations() {
 		return getElectionResult().getElection().getNominationsOfParty(getParty());
 	}

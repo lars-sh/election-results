@@ -287,7 +287,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * Creates and registers a new nomination.
 	 *
 	 * @param district Wahlkreis
-	 * @param person   Berwerberin oder Bewerber
+	 * @param person   Bewerberin oder Bewerber
 	 * @param party    Gruppierung
 	 * @return the new nomination
 	 */
@@ -330,7 +330,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	}
 
 	/**
-	 * Berwerberinnen und Bewerber nach Gruppierung
+	 * Bewerberinnen und Bewerber nach Gruppierung
 	 *
 	 * @param party Gruppierung
 	 * @return the nominations
