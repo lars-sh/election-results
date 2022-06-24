@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -91,9 +93,9 @@ public class PollingStationResultFilesTest {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(273));
-		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(166));
+		assertThat(result.getNumberOfAllBallots(pollingStation)).isEqualTo(OptionalInt.of(166));
 		assertThat(result.getBallots()).hasSize(191);
-		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1151, 1)));
+		assertThat(result.getEvaluationProgress(1, pollingStation)).isEqualTo(Optional.of(BigDecimal.valueOf(1151, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(2);
 	}
 
@@ -126,9 +128,33 @@ public class PollingStationResultFilesTest {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 
 		assertThat(election.getNumberOfEligibleVoters(pollingStation)).isEqualTo(OptionalInt.of(717));
-		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.of(435));
+		assertThat(result.getNumberOfAllBallots(pollingStation)).isEqualTo(OptionalInt.of(435));
 		assertThat(result.getBallots()).hasSize(436);
-		assertThat(result.getEvaluationProgress(1)).isEqualTo(Optional.of(BigDecimal.valueOf(1002, 1)));
+		assertThat(result.getEvaluationProgress(1, pollingStation)).isEqualTo(Optional.of(BigDecimal.valueOf(1002, 1)));
 		assertThat(result.getNumberOfInvalidBallots()).isEqualTo(1);
+	}
+
+	/**
+	 * Test writing using results of Rethwisch
+	 */
+	@Test
+	@PackagePrivate
+	void test_given_result_when_writeAndRead_then_equals() throws IOException {
+		// given
+		final LocalElection election = LocalElectionTest.createElection();
+		final LocalElectionResult originalResult
+				= readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN);
+
+		final LocalPollingStation pollingStation
+				= LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN);
+
+		// when
+		final StringWriter writer = new StringWriter();
+		PollingStationResultFiles.write(originalResult, pollingStation, writer);
+
+		// then
+		final LocalElectionResult newResult
+				= PollingStationResultFiles.read(election, pollingStation, new StringReader(writer.toString()));
+		assertThat(newResult).isEqualTo(originalResult);
 	}
 }

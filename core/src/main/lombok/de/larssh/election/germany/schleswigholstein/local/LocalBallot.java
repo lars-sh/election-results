@@ -7,6 +7,8 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,7 +34,30 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuppressWarnings("PMD.DataClass")
-public final class LocalBallot implements Ballot<LocalNomination> {
+public final class LocalBallot implements Ballot<LocalNomination>, Comparable<LocalBallot> {
+	/**
+	 * Comparator by election, polling station, postal vote, validity, block voting
+	 * and nominations
+	 */
+	private static final Comparator<LocalBallot> COMPARATOR = Comparator.comparing(LocalBallot::getElection)
+			.thenComparing(LocalBallot::getPollingStation)
+			.thenComparing(LocalBallot::isPostalVote)
+			.thenComparing(LocalBallot::isValid)
+			.thenComparing(LocalBallot::isBlockVoting)
+			.thenComparing((a, b) -> {
+				final Iterator<LocalNomination> otherNomination = b.getNominations().iterator();
+				for (final LocalNomination thisNomination : a.getNominations()) {
+					if (!otherNomination.hasNext()) {
+						return 1;
+					}
+					final int compare = thisNomination.compareTo(otherNomination.next());
+					if (compare != 0) {
+						return compare;
+					}
+				}
+				return otherNomination.hasNext() ? -1 : 0;
+			});
+
 	/**
 	 * Creates an invalid ballot
 	 *
@@ -182,6 +208,12 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 				}
 			}
 		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int compareTo(@Nullable final LocalBallot ballot) {
+		return COMPARATOR.compare(this, ballot);
 	}
 
 	/**

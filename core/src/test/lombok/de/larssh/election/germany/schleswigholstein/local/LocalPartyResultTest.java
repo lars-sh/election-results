@@ -23,11 +23,10 @@ class LocalPartyResultTest {
 	@Test
 	@PackagePrivate
 	void testKleinBoden() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
-				.filter(ballot -> ballot.getPollingStation()
-						.getName()
-						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
-		final LocalElection election = result.getElection();
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
+		final LocalElection election = resultRethwisch.getElection();
+		final LocalElectionResult result = resultRethwisch.filterByDistrict(
+				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
@@ -80,11 +79,10 @@ class LocalPartyResultTest {
 	@Test
 	@PackagePrivate
 	void testRethwischdorf() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
-				.filter(ballot -> ballot.getPollingStation()
-						.getName()
-						.equals(LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
-		final LocalElection election = result.getElection();
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
+		final LocalElection election = resultRethwisch.getElection();
+		final LocalElectionResult result = resultRethwisch.filterByDistrict(
+				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties

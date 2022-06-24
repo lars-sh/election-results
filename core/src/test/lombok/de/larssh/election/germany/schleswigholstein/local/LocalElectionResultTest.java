@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +32,7 @@ class LocalElectionResultTest {
 	void testEmpty() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result
-				= new LocalElectionResult(election, OptionalInt.empty(), emptyList(), emptySet(), emptySet());
+				= new LocalElectionResult(election, emptyMap(), emptyList(), emptySet(), emptySet());
 
 		assertThat(result.getBallots()).isEmpty();
 		assertThat(result.getEvaluationProgress(1)).isEmpty();

@@ -228,7 +228,7 @@ public class AwgWebsiteFiles {
 		 * @return the PHP array entries
 		 */
 		private String formatNominationVotes(final LocalPollingStation pollingStation) {
-			return result.filter(ballot -> ballot.getPollingStation().equals(pollingStation))
+			return result.filterByDistrict(pollingStation)
 					.getNominationResults()
 					.values()
 					.stream()

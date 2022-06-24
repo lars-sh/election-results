@@ -1,6 +1,7 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -206,7 +207,7 @@ class LocalNominationResultTest {
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
-				resultWithoutDrawResults.getNumberOfAllBallots(),
+				emptyMap(),
 				resultWithoutDrawResults.getBallots(),
 				new HashSet<>(asList(LocalElectionTest.findNomination(election, "Böttger", "Johannes"),
 						LocalElectionTest.findNomination(election, "Eggers", "Dirk"))),
@@ -255,7 +256,7 @@ class LocalNominationResultTest {
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
-				resultWithoutDrawResults.getNumberOfAllBallots(),
+				emptyMap(),
 				resultWithoutDrawResults.getBallots(),
 				singleton(LocalElectionTest.findNomination(election, "Böttger", "Johannes")),
 				new HashSet<>(asList(LocalElectionTest.findNomination(election, "Beck", "Karsten"),
@@ -392,11 +393,10 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testVotesKleinBoden() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
-				.filter(ballot -> ballot.getPollingStation()
-						.getName()
-						.equals(LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
-		final LocalElection election = result.getElection();
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
+		final LocalElection election = resultRethwisch.getElection();
+		final LocalElectionResult result = resultRethwisch.filterByDistrict(
+				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);
@@ -475,11 +475,10 @@ class LocalNominationResultTest {
 	@Test
 	@PackagePrivate
 	void testVotesRethwischdorf() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch()
-				.filter(ballot -> ballot.getPollingStation()
-						.getName()
-						.equals(LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
-		final LocalElection election = result.getElection();
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
+		final LocalElection election = resultRethwisch.getElection();
+		final LocalElectionResult result = resultRethwisch.filterByDistrict(
+				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);

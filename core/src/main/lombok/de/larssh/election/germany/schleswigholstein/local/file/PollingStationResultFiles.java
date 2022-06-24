@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
@@ -32,6 +33,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
+import de.larssh.utils.collection.Maps;
 import de.larssh.utils.text.Patterns;
 import de.larssh.utils.text.SplitLimit;
 import de.larssh.utils.text.Strings;
@@ -92,9 +94,8 @@ public class PollingStationResultFiles {
 	public static void write(final LocalElectionResult result,
 			final LocalPollingStation pollingStation,
 			final Writer writer) throws IOException {
-		new PollingStationResultFileWriter(result.filter(ballot -> ballot.getPollingStation().equals(pollingStation)),
-				pollingStation,
-				writer).write();
+		new PollingStationResultFileWriter(result.filterByDistrict(pollingStation), pollingStation, writer)
+				.write();
 	}
 
 	/**
@@ -197,7 +198,11 @@ public class PollingStationResultFiles {
 								ballots.addAll(createBallotsFromLine(line));
 							}
 						});
-				return new LocalElectionResult(election, numberOfAllBallots.get(), ballots, emptySet(), emptySet());
+				return new LocalElectionResult(election,
+						Maps.<District<?>, OptionalInt>builder().put(pollingStation, numberOfAllBallots.get()).get(),
+						ballots,
+						emptySet(),
+						emptySet());
 			}
 		}
 
@@ -332,7 +337,9 @@ public class PollingStationResultFiles {
 		 */
 		private static String formatNominations(final Set<LocalNomination> nominations) {
 			return nominations.stream()
-					.map(nomination -> Strings.replaceAll(nomination.getKey(), SINGLE_SPACE_PATTERN, "_"))
+					.map(LocalNomination::getPerson)
+					.map(person -> person.getFamilyName() + ',' + person.getGivenName())
+					.map(value -> Strings.replaceAll(value, SINGLE_SPACE_PATTERN, "_"))
 					.collect(joining(" "));
 		}
 
@@ -372,7 +379,7 @@ public class PollingStationResultFiles {
 				write("%s Anzahl Wahlberechtigte: %d\n", LINE_COMMAND, numberOfEligibleVoters.getAsInt());
 			}
 
-			final OptionalInt numberOfAllBallots = result.getNumberOfAllBallots();
+			final OptionalInt numberOfAllBallots = result.getNumberOfAllBallots(pollingStation);
 			if (numberOfAllBallots.isPresent()) {
 				write("%s Anzahl Stimmzettel: %d\n", LINE_COMMAND, numberOfAllBallots.getAsInt());
 			}
