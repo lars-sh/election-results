@@ -2,9 +2,9 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -53,7 +53,7 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	 * Children of this district
 	 */
 	@ToString.Exclude
-	Set<C> children = new TreeSet<>();
+	Set<C> children = new HashSet<>();
 
 	/** {@inheritDoc} */
 	@Override

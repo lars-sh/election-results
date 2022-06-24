@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -118,7 +119,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@JsonIgnore
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> population = new TreeMap<>();
+	Map<District<?>, OptionalInt> population = new HashMap<>();
 
 	/**
 	 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
@@ -126,7 +127,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@JsonIgnore
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> numberOfEligibleVoters = new TreeMap<>();
+	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();
 
 	/**
 	 * Bewerberinnen und Bewerber
