@@ -769,6 +769,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@Getter
 	@RequiredArgsConstructor
 	private static class ParsableLocalElectionResult {
+		/**
+		 * Finds a set of {@link LocalNomination}s by their keys.
+		 *
+		 * @param nominationKeys the keys to find
+		 * @return a set of {@link LocalNomination}s, found by their keys
+		 */
 		public static Set<LocalNomination> findNominations(final Set<String> nominationKeys) {
 			final LocalElection election = ELECTION_FOR_JSON_CREATOR.get();
 			return nominationKeys.stream()
