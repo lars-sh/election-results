@@ -14,6 +14,7 @@ import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Optionals;
+import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
@@ -44,7 +45,8 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 * @param partyKey  the key of a party
 	 * @return unique key for the given person and party keys
 	 */
-	public static String createKey(final String personKey, final Optional<String> partyKey) {
+	@PackagePrivate
+	static String createKey(final String personKey, final Optional<String> partyKey) {
 		return Keys.escape(personKey, " (", partyKey.orElse(""), ")");
 	}
 
@@ -121,15 +123,6 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	}
 
 	/**
-	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
-	 *
-	 * @return Art des Wahlvorschlags
-	 */
-	public LocalNominationType getType() {
-		return type.get();
-	}
-
-	/**
 	 * Party as JSON property
 	 *
 	 * @return Politische Partei, Wählergruppe oder empty
@@ -139,5 +132,14 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Optional<String> getPartyForJackson() {
 		return getParty().map(Party::getKey);
+	}
+
+	/**
+	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
+	 *
+	 * @return Art des Wahlvorschlags
+	 */
+	public LocalNominationType getType() {
+		return type.get();
 	}
 }

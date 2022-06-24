@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
@@ -181,6 +182,18 @@ public final class LocalBallot implements Ballot<LocalNomination> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Nominations as JSON property
+	 *
+	 * @return Gewählte Bewerberinnen und Bewerber
+	 */
+	@JsonProperty("nominations")
+	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
+	private Set<String> getNominationsForJackson() {
+		return getNominations().stream().map(LocalNomination::getKey).collect(toLinkedHashSet());
 	}
 
 	/**

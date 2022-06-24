@@ -7,7 +7,6 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -627,38 +626,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * JSON delegate for {@link LocalNomination}
 	 */
 	@Getter
-	@PackagePrivate
 	@RequiredArgsConstructor
-	static class ParsableLocalNomination {
-		/**
-		 * Creates a set of {@link LocalNomination} based on a given set of
-		 * {@link ParsableLocalNomination}.
-		 *
-		 * @param election Wahl
-		 * @param set      the set of {@link ParsableLocalNomination}
-		 * @return the set of {@link LocalNomination}
-		 */
-		public static Set<LocalNomination> convert(final LocalElection election,
-				final Set<ParsableLocalNomination> set) {
-			final Map<String, LocalNomination> nominations
-					= election.getNominations().stream().collect(toMap(LocalNomination::getKey, identity()));
-
-			return set.stream()
-					.map(nomination -> LocalNomination.createKey(nomination.getPerson().getKey(),
-							nomination.getParty()))
-					.map(key -> {
-						final LocalNomination nomination = nominations.get(key);
-						if (nomination == null) {
-							throw new ElectionException(
-									"Could not find nomination with key \"%s\" for election \"%s\".",
-									key,
-									election.getName());
-						}
-						return nomination;
-					})
-					.collect(toSet());
-		}
-
+	private static class ParsableLocalNomination {
 		/**
 		 * Wahlkreis
 		 *

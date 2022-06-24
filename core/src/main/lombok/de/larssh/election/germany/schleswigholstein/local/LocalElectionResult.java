@@ -44,9 +44,9 @@ import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
-import de.larssh.election.germany.schleswigholstein.local.LocalElection.ParsableLocalNomination;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.OptionalInts;
+import de.larssh.utils.Optionals;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
 import de.larssh.utils.text.Strings;
@@ -769,6 +769,20 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@Getter
 	@RequiredArgsConstructor
 	private static class ParsableLocalElectionResult {
+		public static Set<LocalNomination> findNominations(final Set<String> nominationKeys) {
+			final LocalElection election = ELECTION_FOR_JSON_CREATOR.get();
+			return nominationKeys.stream()
+					.map(nominationKey -> Optionals
+							.ofSingle(election.getNominations()
+									.stream()
+									.filter(nomination -> nomination.getKey().equals(nominationKey)))
+							.orElseThrow(() -> new ElectionException(
+									"Could not find nomination with key \"%s\" for election \"%s\".",
+									nominationKey,
+									election.getName())))
+					.collect(toLinkedHashSet());
+		}
+
 		/**
 		 * Optional number of all ballots of the election
 		 *
@@ -788,12 +802,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		/**
 		 * Ausgeloste Loskandidaten mit Direktmandat
 		 */
-		Set<ParsableLocalNomination> directDrawResults;
+		Set<String> directDrawResults;
 
 		/**
 		 * Ausgeloste Loskandidaten mit Listenmandat
 		 */
-		Set<ParsableLocalNomination> listDrawResults;
+		Set<String> listDrawResults;
 
 		/**
 		 * Stimmzettel
@@ -819,7 +833,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Ausgeloste Loskandidaten mit Direktmandat
 		 */
 		public Set<LocalNomination> getDirectDrawResults() {
-			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), directDrawResults);
+			return findNominations(directDrawResults);
 		}
 
 		/**
@@ -828,7 +842,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Ausgeloste Loskandidaten mit Listenmandat
 		 */
 		public Set<LocalNomination> getListDrawResults() {
-			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), listDrawResults);
+			return findNominations(listDrawResults);
 		}
 	}
 
@@ -860,7 +874,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		/**
 		 * Gewählte Bewerberinnen und Bewerber
 		 */
-		Set<ParsableLocalNomination> nominations;
+		Set<String> nominations;
 
 		/**
 		 * Wahlbezirk
@@ -888,7 +902,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * @return Gewählte Bewerberinnen und Bewerber
 		 */
 		public Set<LocalNomination> getNominations() {
-			return ParsableLocalNomination.convert(ELECTION_FOR_JSON_CREATOR.get(), nominations);
+			return ParsableLocalElectionResult.findNominations(nominations);
 		}
 	}
 }
