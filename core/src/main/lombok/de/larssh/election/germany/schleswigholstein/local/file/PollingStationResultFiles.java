@@ -94,8 +94,7 @@ public class PollingStationResultFiles {
 	public static void write(final LocalElectionResult result,
 			final LocalPollingStation pollingStation,
 			final Writer writer) throws IOException {
-		new PollingStationResultFileWriter(result.filterByDistrict(pollingStation), pollingStation, writer)
-				.write();
+		new PollingStationResultFileWriter(result.filterByDistrict(pollingStation), pollingStation, writer).write();
 	}
 
 	/**
