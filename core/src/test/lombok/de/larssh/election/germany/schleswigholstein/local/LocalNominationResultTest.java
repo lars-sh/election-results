@@ -116,7 +116,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-all-zero.txt"));
+				Paths.get("../LocalNominationResult-all-zero.txt"));
 
 		getAndAssertNominationResults(result, true).values()
 				.forEach(nominationResult -> assertThat(nominationResult.getType())
@@ -133,7 +133,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-all-one.txt"));
+				Paths.get("../LocalNominationResult-all-one.txt"));
 
 		getAndAssertNominationResults(result, true).values()
 				.stream()
@@ -151,7 +151,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-balance-and-overhang-seats.txt"));
+				Paths.get("../LocalNominationResult-balance-and-overhang-seats.txt"));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, false);
@@ -205,7 +205,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-draws.txt"));
+				Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				emptyMap(),
 				resultWithoutDrawResults.getBallots(),
@@ -254,7 +254,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-draws.txt"));
+				Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				emptyMap(),
 				resultWithoutDrawResults.getBallots(),
@@ -303,7 +303,7 @@ class LocalNominationResultTest {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
-				Paths.get("LocalNominationResult-draws.txt"));
+				Paths.get("../LocalNominationResult-draws.txt"));
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);
