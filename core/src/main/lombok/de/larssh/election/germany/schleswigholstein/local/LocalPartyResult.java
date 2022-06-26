@@ -1,14 +1,13 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static de.larssh.utils.Collectors.toLinkedHashSet;
+import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -80,42 +79,28 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	Supplier<Integer> numberOfSeats = lazy(() -> (int) getElectionResult().getNominationResults()
 			.values()
 			.stream()
-			.filter(nominationResult -> nominationResult.getType() != LocalNominationResultType.NOT_ELECTED
+			.filter(nominationResult -> nominationResult.getType().isElected()
 					&& nominationResult.getNomination().getParty().filter(getParty()::equals).isPresent())
 			.count());
 
 	/**
 	 * Anzahl der Stimmen für diese politische Partei oder Wählerguppe
 	 */
-	Supplier<Integer> numberOfVotes = lazy(() -> (int) getElectionResult().getBallots()
+	Supplier<Integer> numberOfVotes = lazy(() -> getNominationResults().values()
 			.stream()
-			.filter(Ballot::isValid)
-			.map(Ballot::getNominations)
-			.flatMap(Collection::stream)
-			.filter(nomination -> nomination.getParty().filter(getParty()::equals).isPresent())
-			.count());
+			.mapToInt(nominationResult -> nominationResult.getBallots().size())
+			.sum());
 
 	/** {@inheritDoc} */
 	@Override
-	public int compareTo(@Nullable final LocalPartyResult nominationResult) {
-		return COMPARATOR.compare(this, nominationResult);
+	public int compareTo(@Nullable final LocalPartyResult partyResult) {
+		return COMPARATOR.compare(this, partyResult);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public List<LocalBallot> getBallots() {
 		return ballots.get();
-	}
-
-	/**
-	 * Unmittelbare Wahlvorschläge der Gruppierung
-	 *
-	 * @return Unmittelbare Wahlvorschläge der Gruppierung
-	 */
-	public Set<LocalNomination> getDirectNominations() {
-		return getNominations().stream()
-				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
-				.collect(toLinkedHashSet());
 	}
 
 	/**
@@ -133,8 +118,12 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 *
 	 * @return Bewerberinnen und Bewerber
 	 */
-	public Set<LocalNomination> getNominations() {
-		return getElectionResult().getElection().getNominationsOfParty(getParty());
+	public Map<LocalNomination, LocalNominationResult> getNominationResults() {
+		return getElectionResult().getNominationResults()
+				.entrySet()
+				.stream()
+				.filter(entry -> entry.getKey().getParty().filter(getParty()::equals).isPresent())
+				.collect(toLinkedHashMap());
 	}
 
 	/**

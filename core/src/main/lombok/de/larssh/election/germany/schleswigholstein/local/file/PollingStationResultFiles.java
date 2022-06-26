@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local.file;
 
+import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -25,6 +26,7 @@ import java.util.stream.IntStream;
 
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
+import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
@@ -172,7 +174,7 @@ public class PollingStationResultFiles {
 		 * Reads and parses {@link #reader} ands creates a {@link LocalElectionResult}
 		 * for {@link #election} in {@link #pollingStation}.
 		 *
-		 * @return the createed {@link LocalElectionResult}
+		 * @return the created {@link LocalElectionResult}
 		 * @throws IOException on IO error
 		 */
 		public LocalElectionResult read() throws IOException {
@@ -329,7 +331,26 @@ public class PollingStationResultFiles {
 		private static final Pattern SINGLE_SPACE_PATTERN = Pattern.compile("\\s");
 
 		/**
-		 * Formats {@code nominations} file format.
+		 * Formats the direct nominations of {@code party} according to the polling
+		 * station result file format.
+		 *
+		 * @param party the party to format the direct nominations for
+		 * @return the formatted direct nominations
+		 */
+		private String formatDirectNominations(final Party party) {
+			final LocalDistrict district = pollingStation.getParent().get();
+
+			return formatNominations(result.getElection()
+					.getNominationsOfParty(party)
+					.stream()
+					.filter(nomination -> nomination.getDistrict().equals(district)
+							&& nomination.getType() == LocalNominationType.DIRECT)
+					.collect(toLinkedHashSet()));
+		}
+
+		/**
+		 * Formats {@code nominations} according to the polling station result file
+		 * format.
 		 *
 		 * @param nominations the set of nominations to format
 		 * @return the formatted {@code nominations}
@@ -396,7 +417,7 @@ public class PollingStationResultFiles {
 				for (final LocalPartyResult partyResult : partyResults) {
 					write("%d %s\n",
 							partyResult.getNumberOfBlockVotings(),
-							formatNominations(partyResult.getDirectNominations()));
+							formatDirectNominations(partyResult.getParty()));
 				}
 				write("\n");
 			}
