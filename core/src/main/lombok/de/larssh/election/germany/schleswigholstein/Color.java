@@ -85,11 +85,18 @@ public class Color {
 	 */
 	double alpha;
 
+	/**
+	 * Formats the color in any CSS compliant way.
+	 *
+	 * @return the formatted color
+	 */
 	public String toCssColor() {
-		return String.format("rgba(%.0f%%, %.0f%%, %.0f%%, %.0f%%)",
-				100 * getRed(),
-				100 * getGreen(),
-				100 * getBlue(),
-				100 * getAlpha());
+		final String cssColor = String.format("#%02x%02x%02x",
+				(int) (MAX_UNSIGNED_BYTE_VALUE * getRed()),
+				(int) (MAX_UNSIGNED_BYTE_VALUE * getGreen()),
+				(int) (MAX_UNSIGNED_BYTE_VALUE * getBlue()));
+
+		final int alpha = (int) (MAX_UNSIGNED_BYTE_VALUE * getAlpha());
+		return cssColor + (alpha < MAX_UNSIGNED_BYTE_VALUE ? String.format("%02x", alpha) : "");
 	}
 }

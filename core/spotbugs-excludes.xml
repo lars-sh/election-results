@@ -11,9 +11,12 @@
 	</Match>
 	
 	
-	<!-- Method "writePerson" uses template file as String.format input. -->
+	<!-- Methods use template files as String.format input -->
 	<Match>
 		<Bug pattern="FORMAT_STRING_MANIPULATION" />
-		<Class name="de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles$AwgWebsiteFileWriter" />
+		<Or>
+			<Class name="de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles$AwgWebsiteFileWriter" />
+			<Class name="de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles$PresentationFileWriter" />
+		</Or>
 	</Match>
 </FindBugsFilter>

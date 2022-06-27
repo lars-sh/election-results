@@ -75,15 +75,17 @@ public class LocalElectionTest {
 		election.setPopulation(districtLocal, 1186);
 		election.setNumberOfEligibleVoters(districtLocal, OptionalInt.empty());
 
-		final LocalPollingStation pollingStationRethwischdorf
-				= districtLocal.createChild(POLLING_STATION_NAME_RETHWISCHDORF);
-		election.setPopulation(pollingStationRethwischdorf, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 717);
-
 		final LocalPollingStation pollingStationKleinBoden
 				= districtLocal.createChild(POLLING_STATION_NAME_KLEIN_BODEN);
+		pollingStationKleinBoden.setBackgroundColor(Color.rgb(7, 98, 188));
 		election.setPopulation(pollingStationKleinBoden, OptionalInt.empty());
 		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 273);
+
+		final LocalPollingStation pollingStationRethwischdorf
+				= districtLocal.createChild(POLLING_STATION_NAME_RETHWISCHDORF);
+		pollingStationRethwischdorf.setBackgroundColor(Color.rgb(237, 28, 36));
+		election.setPopulation(pollingStationRethwischdorf, OptionalInt.empty());
+		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 717);
 	}
 
 	/**
@@ -92,30 +94,23 @@ public class LocalElectionTest {
 	 * @param election Wahl
 	 */
 	private static void addPartiesAndNominations(final LocalElection election) {
-		final Party partyCdu = new Party("CDU",
+		final Party partyCdu = new Party("CDU", //
 				"Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
-				PartyType.POLITICAL_PARTY,
-				Color.rgb(51, 51, 51),
-				Color.WHITE,
-				Optional.empty());
-		final Party partySpd = new Party("SPD",
+				PartyType.POLITICAL_PARTY);
+		partyCdu.setBackgroundColor(Color.rgb(51, 51, 51));
+		final Party partySpd = new Party("SPD", //
 				"Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch",
-				PartyType.POLITICAL_PARTY,
-				Color.rgb(237, 28, 36),
-				Color.WHITE,
-				Optional.empty());
-		final Party partyAwg = new Party("AWG",
+				PartyType.POLITICAL_PARTY);
+		partySpd.setBackgroundColor(Color.rgb(237, 28, 36));
+		final Party partyAwg = new Party("AWG", //
 				"Allgemeine Wählergemeinschaft Rethwisch",
-				PartyType.ASSOCIATION_OF_VOTERS,
-				Color.rgb(255, 204, 0),
-				Color.BLACK,
-				Optional.empty());
-		final Party partyFwr = new Party("FWR",
+				PartyType.ASSOCIATION_OF_VOTERS);
+		partyAwg.setBackgroundColor(Color.rgb(255, 204, 0));
+		partyAwg.setFontColor(Color.BLACK);
+		final Party partyFwr = new Party("FWR", //
 				"Freie Wählergemeinschaft Rethwisch",
-				PartyType.ASSOCIATION_OF_VOTERS,
-				Color.rgb(7, 98, 188),
-				Color.WHITE,
-				Optional.empty());
+				PartyType.ASSOCIATION_OF_VOTERS);
+		partyFwr.setBackgroundColor(Color.rgb(7, 98, 188));
 
 		addNomination(election, partyCdu, "Poppinga", "Jens", Gender.MALE);
 		addNomination(election, partyCdu, "Eggers", "Dirk", Gender.MALE);

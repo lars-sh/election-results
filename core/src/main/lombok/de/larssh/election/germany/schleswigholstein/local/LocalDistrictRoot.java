@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.Nullables;
@@ -21,6 +22,7 @@ import lombok.Getter;
  * Wahlgebiet (§ 2 GKWG)
  */
 @Getter
+@SuppressWarnings("PMD.DataClass")
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class LocalDistrictRoot extends District<LocalDistrict> {
 	/**
@@ -40,12 +42,19 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 			justification = "passing this to createChild, but made sure, it's done in last position")
 	private LocalDistrictRoot(final ParsableLocalDistrictRoot parseable) {
 		this(parseable.getName(), parseable.getType());
+		setBackgroundColor(parseable.getBackgroundColor());
+		setFontColor(parseable.getFontColor());
 
 		for (final ParsableLocalDistrict parsableLocalDistrict : parseable.getChildren()) {
 			final LocalDistrict localDistrict = createChild(parsableLocalDistrict.getName());
+			localDistrict.setBackgroundColor(parsableLocalDistrict.getBackgroundColor());
+			localDistrict.setFontColor(parsableLocalDistrict.getFontColor());
 
 			for (final ParsableLocalPollingStation parsableLocalPollingStation : parsableLocalDistrict.getChildren()) {
-				localDistrict.createChild(parsableLocalPollingStation.getName());
+				final LocalPollingStation pollingStation
+						= localDistrict.createChild(parsableLocalPollingStation.getName());
+				pollingStation.setBackgroundColor(parsableLocalPollingStation.getBackgroundColor());
+				pollingStation.setFontColor(parsableLocalPollingStation.getFontColor());
 			}
 		}
 	}
@@ -95,13 +104,6 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		final String name;
 
 		/**
-		 * Wahlkreise des Wahlgebiets
-		 *
-		 * @return Wahlkreise
-		 */
-		final Set<ParsableLocalDistrict> children;
-
-		/**
 		 * Art des Wahlgebiets
 		 *
 		 * @return Art des Wahlgebiets
@@ -109,21 +111,48 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		final LocalDistrictType type;
 
 		/**
+		 * Background color to use in diagrams
+		 *
+		 * @return the background color
+		 */
+		Color backgroundColor;
+
+		/**
+		 * Font color to use in diagrams
+		 *
+		 * @return the font color
+		 */
+		Color fontColor;
+
+		/**
+		 * Wahlkreise des Wahlgebiets
+		 *
+		 * @return Wahlkreise
+		 */
+		final Set<ParsableLocalDistrict> children;
+
+		/**
 		 * Wahlgebiet (§ 2 GKWG)
 		 *
-		 * @param name     Name
-		 * @param children Wahlkreise des Wahlgebiets
-		 * @param type     Art des Wahlgebiets
+		 * @param name            Name
+		 * @param type            Art des Wahlgebiets
+		 * @param backgroundColor the background color
+		 * @param fontColor       the font color
+		 * @param children        Wahlkreise des Wahlgebiets
 		 */
 		@PackagePrivate
 		ParsableLocalDistrictRoot(@Nullable final String name,
-				@Nullable final Set<ParsableLocalDistrict> children,
-				@Nullable final LocalDistrictType type) {
+				@Nullable final LocalDistrictType type,
+				@Nullable final Color backgroundColor,
+				@Nullable final Color fontColor,
+				@Nullable final Set<ParsableLocalDistrict> children) {
 			this.name = Nullables.orElseThrow(name,
 					() -> new ElectionException("Missing required parameter \"name\" for local district root."));
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
 			this.type = Nullables.orElseThrow(type,
 					() -> new ElectionException("Missing required parameter \"type\" for root district."));
+			this.backgroundColor = Nullables.orElse(backgroundColor, Color.BLACK);
+			this.fontColor = Nullables.orElse(fontColor, Color.WHITE);
 		}
 	}
 
@@ -140,6 +169,20 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		final String name;
 
 		/**
+		 * Background color to use in diagrams
+		 *
+		 * @return the background color
+		 */
+		Color backgroundColor;
+
+		/**
+		 * Font color to use in diagrams
+		 *
+		 * @return the font color
+		 */
+		Color fontColor;
+
+		/**
 		 * Wahlbezirke des Wahlkreises
 		 */
 		final Set<ParsableLocalPollingStation> children;
@@ -147,13 +190,20 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		/**
 		 * Wahlkreis (§ 15 GKWG)
 		 *
-		 * @param name     Name
-		 * @param children Wahlbezirke des Wahlkreises
+		 * @param name            Name
+		 * @param backgroundColor the background color
+		 * @param fontColor       the font color
+		 * @param children        Wahlbezirke des Wahlkreises
 		 */
 		@PackagePrivate
-		ParsableLocalDistrict(@Nullable final String name, @Nullable final Set<ParsableLocalPollingStation> children) {
+		ParsableLocalDistrict(@Nullable final String name,
+				@Nullable final Color backgroundColor,
+				@Nullable final Color fontColor,
+				@Nullable final Set<ParsableLocalPollingStation> children) {
 			this.name = Nullables.orElseThrow(name,
 					() -> new ElectionException("Missing required parameter \"name\" for local district."));
+			this.backgroundColor = Nullables.orElse(backgroundColor, Color.BLACK);
+			this.fontColor = Nullables.orElse(fontColor, Color.WHITE);
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
 		}
 
@@ -180,14 +230,34 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		final String name;
 
 		/**
+		 * Background color to use in diagrams
+		 *
+		 * @return the background color
+		 */
+		Color backgroundColor;
+
+		/**
+		 * Font color to use in diagrams
+		 *
+		 * @return the font color
+		 */
+		Color fontColor;
+
+		/**
 		 * Wahlbezirk (§ 16 GKWG)
 		 *
-		 * @param name Name
+		 * @param name            Name
+		 * @param backgroundColor the background color
+		 * @param fontColor       the font color
 		 */
 		@JsonCreator(mode = Mode.PROPERTIES)
-		private ParsableLocalPollingStation(@Nullable final String name) {
+		private ParsableLocalPollingStation(@Nullable final String name,
+				@Nullable final Color backgroundColor,
+				@Nullable final Color fontColor) {
 			this.name = Nullables.orElseThrow(name,
 					() -> new ElectionException("Missing required parameter \"name\" for local polling station."));
+			this.backgroundColor = Nullables.orElse(backgroundColor, Color.BLACK);
+			this.fontColor = Nullables.orElse(fontColor, Color.WHITE);
 		}
 	}
 }

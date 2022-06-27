@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -68,7 +67,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@SuppressWarnings({ "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
+@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot, LocalNomination> {
 	/**
 	 * Thread-local temporary storage of a {@link LocalElection}, used while parsing
@@ -226,8 +225,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		this.election = election;
 		this.ballots = unmodifiableList(ballots);
 		this.numberOfAllBallots = unmodifiableMap(new HashMap<>(numberOfAllBallots));
-		this.directDrawResults = unmodifiableSet(new HashSet<>(directDrawResults));
-		this.listDrawResults = unmodifiableSet(new HashSet<>(listDrawResults));
+		this.directDrawResults = unmodifiableSet(new LinkedHashSet<>(directDrawResults));
+		this.listDrawResults = unmodifiableSet(new LinkedHashSet<>(listDrawResults));
 
 		for (final LocalBallot ballot : ballots) {
 			if (!ballot.getElection().equals(election)) {
@@ -257,8 +256,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Create a new set including this
-		final Set<LocalElectionResult> results = new HashSet<>(Arrays.asList(resultsToAdd));
+		final Set<LocalElectionResult> results = new LinkedHashSet<>();
 		results.add(this);
+		results.addAll(Arrays.asList(resultsToAdd));
 
 		// Calculate number of all ballots
 		final Map<District<?>, OptionalInt> numberOfAllBallots = new HashMap<>();

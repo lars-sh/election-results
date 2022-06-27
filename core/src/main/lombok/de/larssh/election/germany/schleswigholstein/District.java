@@ -2,7 +2,7 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,7 +13,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.NonFinal;
 
 /**
  * Generic representation of a district, which can be split into children.
@@ -50,10 +52,30 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	String name;
 
 	/**
+	 * Background color to use in diagrams
+	 *
+	 * @param backgroundColor the background color
+	 * @return the background color
+	 */
+	@Setter
+	@NonFinal
+	Color backgroundColor = Color.BLACK;
+
+	/**
+	 * Font color to use in diagrams
+	 *
+	 * @param fontColor the font color
+	 * @return the font color
+	 */
+	@Setter
+	@NonFinal
+	Color fontColor = Color.WHITE;
+
+	/**
 	 * Children of this district
 	 */
 	@ToString.Exclude
-	Set<C> children = new HashSet<>();
+	Set<C> children = new LinkedHashSet<>();
 
 	/** {@inheritDoc} */
 	@Override

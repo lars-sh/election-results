@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -29,6 +30,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.Finals;
+import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import de.larssh.utils.text.Strings;
@@ -41,6 +43,7 @@ import lombok.experimental.UtilityClass;
  * presentations.
  */
 @UtilityClass
+@SuppressWarnings("PMD.ExcessiveImports")
 public class PresentationFiles {
 	/**
 	 * Formats and writes {@code result} to {@code writer}.
@@ -111,6 +114,17 @@ public class PresentationFiles {
 		}
 
 		/**
+		 * Formats {@code value} according to {@link Locale#GERMAN} and using the
+		 * precision of one decimal.
+		 *
+		 * @param value the value
+		 * @return the formatted value
+		 */
+		private static String formatBigDecimal(final BigDecimal value) {
+			return String.format(Locale.GERMAN, "%.1f", value);
+		}
+
+		/**
 		 * Election Result to write
 		 *
 		 * @return the election result to write
@@ -145,31 +159,81 @@ public class PresentationFiles {
 		 * @return the polling stations overview
 		 */
 		private String formatPollingStations() {
-			return result.getElection()
+			final Set<LocalPollingStation> pollingStations = result.getElection()
 					.getDistricts()
 					.stream()
 					.filter(LocalPollingStation.class::isInstance)
 					.map(LocalPollingStation.class::cast)
-					.map(this::formatPollingStation)
+					.collect(toLinkedHashSet());
+
+			return pollingStations.stream()
+					.map(pollingStation -> formatPollingStation(pollingStation,
+							estimateNumberOfAllBallots(pollingStations),
+							HUNDRED.divide(BigDecimal.valueOf(pollingStations.size()), 1, RoundingMode.HALF_UP)))
 					.collect(joining());
+		}
+
+		/**
+		 * Returns the exact number of all ballots if available. ELse the number of all
+		 * ballots is estimated.
+		 *
+		 * @param pollingStations the polling stations
+		 * @return the estimated number of all ballots
+		 */
+		@SuppressWarnings("checkstyle:MagicNumber")
+		private BigDecimal estimateNumberOfAllBallots(final Set<LocalPollingStation> pollingStations) {
+			// Start by calculating the known numbers of ballots
+			int numberOfPresent = 0;
+			int sumOfAllBallots = 0;
+			for (final LocalPollingStation pollingStation : pollingStations) {
+				final OptionalInt numberOfAllBallots = result.getNumberOfAllBallots(pollingStation);
+				if (numberOfAllBallots.isPresent()) {
+					sumOfAllBallots += numberOfAllBallots.getAsInt();
+					numberOfPresent += 1;
+				}
+			}
+
+			// In case no information about the number of ballots is available, let's
+			// estimate exactly one ballot per polling station.
+			if (numberOfPresent == 0) {
+				return BigDecimal.valueOf(pollingStations.size() - numberOfPresent);
+			}
+
+			// Increase the sum of known ballots proportionally
+			return BigDecimal.valueOf(sumOfAllBallots)
+					.multiply(BigDecimal.valueOf(pollingStations.size()))
+					.divide(BigDecimal.valueOf(numberOfPresent), 3, RoundingMode.HALF_UP);
 		}
 
 		/**
 		 * Formats the given {@code pollingStation}.
 		 *
-		 * @param pollingStation the polling station to format
+		 * @param pollingStation              the polling station to format
+		 * @param estimatedNumberOfAllBallots the (probably estimated) number of all
+		 *                                    ballots
+		 * @param evaluationProgressIfUnknown the evaluation progress in case the number
+		 *                                    of all ballots is unknown
 		 * @return the formatted polling station
 		 */
-		private String formatPollingStation(final LocalPollingStation pollingStation) {
+		private String formatPollingStation(final LocalPollingStation pollingStation,
+				final BigDecimal estimatedNumberOfAllBallots,
+				final BigDecimal evaluationProgressIfUnknown) {
+			final BigDecimal evaluationProgress
+					= result.getEvaluationProgress(1, pollingStation).orElse(BigDecimal.ZERO).min(HUNDRED);
+
 			return String.format(Locale.ROOT,
 					TEMPLATE_POLLING_STATION.get(),
-					Color.BLUE.toCssColor(), // TODO
-					Color.WHITE.toCssColor(), // TODO
-					50.0, // TODO
+					pollingStation.getBackgroundColor().toCssColor(),
+					pollingStation.getFontColor().toCssColor(),
+					OptionalInts
+							.mapToObj(result.getNumberOfAllBallots(pollingStation),
+									numOfBallots -> BigDecimal.valueOf(numOfBallots)
+											.multiply(HUNDRED)
+											.divide(estimatedNumberOfAllBallots, 1, RoundingMode.HALF_UP))
+							.orElse(evaluationProgressIfUnknown),
 					pollingStation.getName(),
-					result.getEvaluationProgress(1, pollingStation).orElse(BigDecimal.ZERO).min(HUNDRED),
-					// TODO: format with comma
-					15.0);
+					formatBigDecimal(evaluationProgress),
+					evaluationProgress);
 		}
 
 		/**
@@ -210,7 +274,7 @@ public class PresentationFiles {
 					result.getNumberOfVotes(),
 					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toCssColor(),
 					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toCssColor(),
-					maxNumberOfVotes.equals(BigDecimal.ZERO)
+					maxNumberOfVotes.compareTo(BigDecimal.ZERO) == 0
 							? BigDecimal.ZERO
 							: BigDecimal.valueOf(result.getNumberOfVotes())
 									.multiply(HUNDRED)
@@ -301,12 +365,11 @@ public class PresentationFiles {
 					fontColor.toCssColor(),
 					name,
 					numberOfSeats,
-					numberOfAllVotes.equals(BigDecimal.ZERO)
+					formatBigDecimal(numberOfAllVotes.compareTo(BigDecimal.ZERO) == 0
 							? BigDecimal.ZERO
 							: BigDecimal.valueOf(numberOfVotes)
 									.multiply(HUNDRED)
-									.divide(numberOfAllVotes, 1, RoundingMode.HALF_UP),
-					// TODO: format with comma
+									.divide(numberOfAllVotes, 1, RoundingMode.HALF_UP)),
 					nominationResults.stream()
 							.filter(nominationResult -> nominationResult.getType().isElected())
 							.map(nominationResult -> nominationResult.getNomination().getPerson().getKey())

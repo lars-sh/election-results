@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +149,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@ToString.Exclude
 	Supplier<Set<District<?>>> districts = lazy(() -> {
-		final Set<District<?>> districts = new HashSet<>();
+		final Set<District<?>> districts = new LinkedHashSet<>();
 
 		// Root
 		districts.add(getDistrict());

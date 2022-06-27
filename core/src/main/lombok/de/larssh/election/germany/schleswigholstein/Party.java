@@ -1,8 +1,6 @@
 package de.larssh.election.germany.schleswigholstein;
 
-import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -10,7 +8,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.NonFinal;
 
 /**
  * Politische Partei oder Wählergruppe
@@ -48,28 +48,28 @@ public class Party implements Comparable<Party> {
 	 *
 	 * @return the type of the party
 	 */
+	@EqualsAndHashCode.Include
 	PartyType type;
 
 	/**
 	 * Background color to use in diagrams
 	 *
+	 * @param backgroundColor the background color
 	 * @return the background color
 	 */
-	Color backgroundColor;
+	@Setter
+	@NonFinal
+	Color backgroundColor = Color.BLACK;
 
 	/**
 	 * Font color to use in diagrams
 	 *
+	 * @param fontColor the font color
 	 * @return the font color
 	 */
-	Color fontColor;
-
-	/**
-	 * Optional path to the logo as image file
-	 *
-	 * @return optional path to the logo
-	 */
-	Optional<Path> logo;
+	@Setter
+	@NonFinal
+	Color fontColor = Color.WHITE;
 
 	/** {@inheritDoc} */
 	@Override
