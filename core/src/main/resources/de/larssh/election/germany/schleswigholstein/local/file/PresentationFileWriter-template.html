@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="xxx-refresh" content="5" />
+		<style>/*<![CDATA[*/
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap');
+
+body {
+	align-items: center;
+	box-sizing: border-box;
+	display: grid;
+	font-family: 'Source Sans 3', Verdana, Arial, sans;
+	font-size: 13pt;
+	grid-template-columns: 1fr 5fr 1fr auto 1fr;
+	grid-template-rows: auto 1fr 1fr auto;
+	margin: 0;
+	min-height: 100%%;
+	padding: 1em;
+	row-gap: 1em;
+	white-space: nowrap;
+}
+html {
+	height: 100%%;
+}
+ol {
+	list-style-type: none;
+	margin-bottom: 0;
+	margin-top: 0;
+	padding-left: 0;
+}
+.footer {
+	grid-column: 1 / 6;
+	grid-row: 4;
+}
+.footer > .left {
+	float: left;
+}
+.footer > .right {
+	float: right;
+}
+.nomination-result,
+.party-result {
+	display: table-row;
+}
+.nomination-result > * {
+	display: table-cell;
+	vertical-align: middle;
+}
+.nomination-result.type-direct + * {
+	border-top: 1em solid transparent;
+}
+.nomination-result.type-direct {
+	border-top: 0;
+}
+.nomination-result > .name {
+	text-align: right;
+	width: 0;
+}
+.nomination-result > .type {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	text-align: center;
+	width: 0;
+}
+.nomination-result > .type::before {
+	content: "X";
+	display: inline-block;
+	font-size: 110%%;
+	width: 1em;
+}
+.nomination-result.type-direct > .type::before {
+	content: "\2605";
+}
+.nomination-result.type-direct_draw > .type::before {
+	content: "?";
+}
+.nomination-result.type-direct_balance_seat > .type::before {
+	content: "M";
+}
+.nomination-result.type-list > .type::before {
+	content: "\2606";
+}
+.nomination-result.type-list_draw > .type::before {
+	content: "?";
+}
+.nomination-result.type-list_overhang_seat > .type::before {
+	content: "Ü";
+}
+.nomination-result.type-not_elected > .type::before {
+	content: "";
+}
+.nomination-result > .votes > .background,
+.nomination-result > .votes > .foreground > *,
+.polling-station > .background,
+.polling-station > .foreground > * {
+	box-sizing: border-box;
+	padding: 0.125em 0.5em;
+}
+.nomination-result > .votes > .background,
+.polling-station > .background {
+	position: absolute;
+	z-index: -1;
+}
+.nomination-result > .votes > .foreground,
+.polling-station > .foreground {
+	overflow: hidden;
+}
+.nomination-results {
+	border-collapse: collapse;
+	display: table;
+	grid-column: 2;
+	grid-row: 2 / 4;
+}
+.party-result + * {
+	border-top: 1em solid #ffffff;
+}
+.party-result > * {
+	display: table-cell;
+	vertical-align: middle;
+}
+.party-result > .box {
+	padding: 0.5em 0.75em;
+	text-align: center;
+	width: 0;
+}
+.party-result > .box > .seats {
+	font-size: 200%%;
+}
+.party-result > .elected-nominations {
+	padding: 0.5em 1em;
+}
+.party-results {
+	border-collapse: collapse;
+	display: table;
+	font-size: 110%%;
+	grid-column: 4;
+	grid-row: 2 / 4;
+}
+.polling-station {
+	position: relative;
+	z-index: 0;
+}
+.polling-station > .background {
+	width: 100%%;
+}
+.polling-station > .background::after {
+	background-color: #000000;
+	bottom: 0;
+	content: "";
+	left: 0;
+	opacity: 60%%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: -1;
+}
+.polling-station > .foreground {
+	background-color: inherit;
+}
+.polling-stations {
+	grid-column: 1 / 6;
+	grid-row: 1;
+	line-height: 0;
+}
+.polling-stations > * {
+	display: inline-block;
+	line-height: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #000000;
+		color: #ffffff;
+	}
+	.party-result {
+		border-color: #000000;
+	}
+}
+		/*]]>*/</style>
+		<title>Kommunalwahl %tY</title>
+	</head>
+	<body>
+		<ol class="polling-stations">%s</ol>
+		<ol class="nomination-results">%s
+		</ol>
+		<ol class="party-results">%s
+		</ol>
+		<div class="footer">
+			<div class="left">© Lars Knickrehm</div>
+			<div class="right">Stand: %tT Uhr</div>
+		</div>
+	</body>
+</html>

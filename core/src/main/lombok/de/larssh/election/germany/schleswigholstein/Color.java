@@ -84,4 +84,12 @@ public class Color {
 	 * @return the alpha of the red channel
 	 */
 	double alpha;
+
+	public String toCssColor() {
+		return String.format("rgba(%.0f%%, %.0f%%, %.0f%%, %.0f%%)",
+				100 * getRed(),
+				100 * getGreen(),
+				100 * getBlue(),
+				100 * getAlpha());
+	}
 }

@@ -95,7 +95,7 @@ public class LocalElectionTest {
 		final Party partyCdu = new Party("CDU",
 				"Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
 				PartyType.POLITICAL_PARTY,
-				Color.BLACK,
+				Color.rgb(51, 51, 51),
 				Color.WHITE,
 				Optional.empty());
 		final Party partySpd = new Party("SPD",
