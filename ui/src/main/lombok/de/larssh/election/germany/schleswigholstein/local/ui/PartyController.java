@@ -1,7 +1,5 @@
 package de.larssh.election.germany.schleswigholstein.local.ui;
 
-import java.util.Optional;
-
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyType;
 import javafx.collections.FXCollections;
@@ -24,12 +22,10 @@ public class PartyController extends PartyUiController {
 	}
 
 	public Party getParty() {
-		return new Party(getShortName().getText(),
-				getName().getText(),
-				getType().getValue(),
-				colorFromJavaFx(getBackgroundColor().getValue()),
-				colorFromJavaFx(getFontColor().getValue()),
-				Optional.empty());
+		final Party party = new Party(getShortName().getText(), getName().getText(), getType().getValue());
+		party.setBackgroundColor(colorFromJavaFx(getBackgroundColor().getValue()));
+		party.setFontColor(colorFromJavaFx(getFontColor().getValue()));
+		return party;
 	}
 
 	@Override
