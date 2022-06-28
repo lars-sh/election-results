@@ -470,12 +470,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					getDirectDrawResults(district),
 					LocalNominationResultType.DIRECT,
 					LocalNominationResultType.DIRECT_DRAW);
-
 			resultTypes.putAll(localResultTypes);
 		}
 
-		// Result Type: List
+		// Result Type: Direct Balance Seat
 		final Map<LocalNomination, BigDecimal> sainteLague = getSainteLague(votes);
+		for (final LocalNomination nomination : getBalanceSeats(resultTypes, sainteLague)) {
+			resultTypes.put(nomination, LocalNominationResultType.DIRECT_BALANCE_SEAT);
+		}
+
+		// Result Type: List
 		for (final LocalNomination nomination : getListResults(votes, sainteLague)) {
 			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
 		}
@@ -487,19 +491,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				LocalNominationResultType.LIST,
 				LocalNominationResultType.LIST_DRAW);
 
-		// Result Type: Direct Balance Seat
-		final Set<LocalNomination> balanceAndOverhangSeats = getBalanceAndOverhangSeats(sainteLague, resultTypes);
-		for (final LocalNomination nomination : balanceAndOverhangSeats) {
-			if (resultTypes.get(nomination) == LocalNominationResultType.DIRECT) {
-				resultTypes.put(nomination, LocalNominationResultType.DIRECT_BALANCE_SEAT);
-			}
-		}
-
 		// Result Type: List Overhang Seat
-		for (final LocalNomination nomination : balanceAndOverhangSeats) {
-			if (resultTypes.get(nomination) == LocalNominationResultType.LIST) {
-				resultTypes.put(nomination, LocalNominationResultType.LIST_OVERHANG_SEAT);
-			}
+		for (final LocalNomination nomination : getOverhangSeats(resultTypes, votes, sainteLague)) {
+			resultTypes.put(nomination, LocalNominationResultType.LIST_OVERHANG_SEAT);
 		}
 
 		// Result Type: Not Elected
@@ -809,6 +803,22 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
+	 * Returns nominations, which have balance seats.
+	 *
+	 * @param resultTypes result types per nomination
+	 * @param sainteLague the Sainte Laguë value per nomination
+	 * @return the nominations, which have balance seats
+	 */
+	private Set<LocalNomination> getBalanceSeats(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, BigDecimal> sainteLague) {
+		return sainteLague.keySet()
+				.stream()
+				.skip(getElection().getNumberOfSeats())
+				.filter(nomination -> resultTypes.get(nomination) == LocalNominationResultType.DIRECT)
+				.collect(toSet());
+	}
+
+	/**
 	 * Returns a set of nominations, which were elected by list.
 	 *
 	 * <p>
@@ -846,18 +856,21 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
-	 * Returns nominations, which have either balance or overhang seats.
+	 * Returns nominations, which have overhang seats.
 	 *
-	 * @param sainteLague the Sainte Laguë value per nomination
 	 * @param resultTypes result types per nomination
-	 * @return the nominations, which have either balance or overhang seats
+	 * @param votes       the number of votes per nomination
+	 * @param sainteLague the Sainte Laguë value per nomination
+	 * @return the nominations, which have overhang seats
 	 */
-	private Set<LocalNomination> getBalanceAndOverhangSeats(final Map<LocalNomination, BigDecimal> sainteLague,
-			final Map<LocalNomination, LocalNominationResultType> resultTypes) {
+	private Set<LocalNomination> getOverhangSeats(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, Integer> votes,
+			final Map<LocalNomination, BigDecimal> sainteLague) {
 		return sainteLague.keySet()
 				.stream()
-				.limit(resultTypes.size())
-				.skip(getElection().getNumberOfSeats())
+				.filter(nomination -> !getDirectResults(votes).contains(nomination))
+				.skip(getElection().getNumberOfListSeats())
+				.filter(nomination -> resultTypes.get(nomination) == LocalNominationResultType.LIST)
 				.collect(toSet());
 	}
 
