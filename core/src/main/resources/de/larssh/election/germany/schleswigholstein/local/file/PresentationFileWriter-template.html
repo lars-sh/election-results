@@ -37,6 +37,22 @@ ol {
 .footer > .left {
 	float: left;
 }
+.footer > .legend {
+	text-align: center;
+}
+.footer > .legend::before {
+	content: "Legende: ";
+}
+.footer > .legend > * {
+	display: inline-block;
+	margin-left: 0.75em;
+}
+.footer > .legend > *::before {
+	margin-right: 0.25em;
+}
+.footer > .legend > .safe::before {
+	content: "\2713";
+}
 .footer > .right {
 	float: right;
 }
@@ -48,10 +64,14 @@ ol {
 	display: table-cell;
 	vertical-align: middle;
 }
-.nomination-result.type-direct + * {
+.nomination-result.type-direct + *,
+.nomination-result.type-direct_draw + *,
+.nomination-result.type-direct_balance_seat + * {
 	border-top: 1em solid transparent;
 }
-.nomination-result.type-direct {
+.nomination-result.type-direct,
+.nomination-result.type-direct_draw,
+.nomination-result.type-direct_balance_seat {
 	border-top: 0;
 }
 .nomination-result > .name {
@@ -70,22 +90,27 @@ ol {
 	font-size: 110%%;
 	width: 1em;
 }
-.nomination-result.type-direct > .type::before {
+.nomination-result.type-direct > .type::before,
+.footer > .legend > .direct::before {
 	content: "\2605";
 }
-.nomination-result.type-direct_draw > .type::before {
+.nomination-result.type-direct_draw > .type::before,
+.footer > .legend > .draws::before {
 	content: "?";
 }
-.nomination-result.type-direct_balance_seat > .type::before {
+.nomination-result.type-direct_balance_seat > .type::before,
+.footer > .legend > .direct_balance_seat::before {
 	content: "M";
 }
-.nomination-result.type-list > .type::before {
+.nomination-result.type-list > .type::before,
+.footer > .legend > .list::before {
 	content: "\2606";
 }
 .nomination-result.type-list_draw > .type::before {
 	content: "?";
 }
-.nomination-result.type-list_overhang_seat > .type::before {
+.nomination-result.type-list_overhang_seat > .type::before,
+.footer > .legend > .list_overhang_seat::before {
 	content: "Ü";
 }
 .nomination-result.type-not_elected > .type::before {
@@ -190,6 +215,14 @@ ol {
 		<div class="footer">
 			<div class="left">© Lars Knickrehm</div>
 			<div class="right">Stand: %tT Uhr</div>
+			<ol class="legend">
+				<li class="direct">Direktmandat</li>
+				<li class="list">Listenmandat</li>
+				<li class="direct_balance_seat">Mehrsitz</li>
+				<li class="list_overhang_seat">Überhangmandat</li>
+				<li class="draws">Loskandidat</li>
+				<li class="safe">rechnerich sicher</li>
+			</ol>
 		</div>
 	</body>
 </html>
