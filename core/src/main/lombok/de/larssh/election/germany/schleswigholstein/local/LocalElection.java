@@ -310,6 +310,18 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	}
 
 	/**
+	 * Bewerberinnen und Bewerber nach Gruppierung
+	 *
+	 * @param party Gruppierung
+	 * @return the nominations
+	 */
+	public Set<LocalNomination> getNominations(final Party party) {
+		return getNominations().stream()
+				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
+				.collect(toLinkedHashSet());
+	}
+
+	/**
 	 * Bewerberinnen und Bewerber
 	 *
 	 * <p>
@@ -326,18 +338,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			nominationsAsList.addAll(nominations);
 		}
 		return unmodifiableList(nominationsAsList);
-	}
-
-	/**
-	 * Bewerberinnen und Bewerber nach Gruppierung
-	 *
-	 * @param party Gruppierung
-	 * @return the nominations
-	 */
-	public Set<LocalNomination> getNominations(final Party party) {
-		return getNominations().stream()
-				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
-				.collect(toLinkedHashSet());
 	}
 
 	/**

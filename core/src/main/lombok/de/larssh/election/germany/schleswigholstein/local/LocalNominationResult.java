@@ -80,11 +80,15 @@ public class LocalNominationResult
 			.filter(ballot -> ballot.getNominations().contains(getNomination()))
 			.collect(toList())));
 
+	/**
+	 * Determines if the nomination's result is a certain
+	 * {@link LocalNominationResultType#DIRECT}.
+	 */
 	@ToString.Exclude
 	Supplier<Boolean> certainDirectResult = lazy(() -> {
 		// In case of no votes there's no election
 		if (getNumberOfVotes() < 1) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		// The number of all ballots of the nomination's district is required to
@@ -92,7 +96,7 @@ public class LocalNominationResult
 		final LocalDistrict district = getNomination().getDistrict();
 		final OptionalInt numberOfAllBallotsOfDistrict = getElectionResult().getNumberOfAllBallots(district);
 		if (!numberOfAllBallotsOfDistrict.isPresent()) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		// The number of already evaluated ballots of the nomination's district is
@@ -106,6 +110,15 @@ public class LocalNominationResult
 				- numberOfEvaluatedBallotsOfDistrict;
 	});
 
+	/**
+	 * Determines if the nomination's election is certain and returns the guaranteed
+	 * {@link LocalNominationResultType}. In case no result type is certain empty is
+	 * returned.
+	 *
+	 * <p>
+	 * This value is not 100% precise in case not all ballots were evaluated, yet.
+	 * Even if it returns empty there might be very rare cases of a certainty.
+	 */
 	@ToString.Exclude
 	Supplier<Optional<LocalNominationResultType>> certainResultType = lazy(() -> {
 		if (isCertainDirectResult()) {
@@ -120,12 +133,16 @@ public class LocalNominationResult
 		return Optional.empty();
 	});
 
+	/**
+	 * Determines if the nomination is a candidate for
+	 * {@link LocalNominationResultType#DIRECT}.
+	 */
 	Supplier<Boolean> directResultCandidate = lazy(() -> {
 		// The number of all ballots is required to calculate the number of direct
 		// result candidates.
 		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
 		if (!numberOfAllBallots.isPresent()) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		// In case of no votes there's no direct election unless there are remaining
@@ -190,7 +207,7 @@ public class LocalNominationResult
 
 	/**
 	 * Determines if the nomination's result is a certain
-	 * {@link LocalNominationResultType.DIRECT}.
+	 * {@link LocalNominationResultType#DIRECT}.
 	 *
 	 * @return {@code true} if the nomination's result is a certain direct result,
 	 *         else {@code false}
@@ -202,7 +219,7 @@ public class LocalNominationResult
 
 	/**
 	 * Determines if the nomination's result is a certain
-	 * {@link LocalNominationResultType.LIST}.
+	 * {@link LocalNominationResultType#LIST}.
 	 *
 	 * <p>
 	 * This method is not 100% precise in case not all ballots were evaluated, yet.
@@ -259,7 +276,7 @@ public class LocalNominationResult
 				.stream()
 				.filter(nomination -> !getNomination().equals(nomination)
 						&& !certainDirectNominationsOfParty.contains(nomination)
-						&& getElectionResult().getNominationResults().get(nomination).isDirectResultCandidate())
+						&& getElectionResult().getNominationResults().get(nomination).directResultCandidate.get())
 				.count();
 		return indexInNominationsOfPartyWithoutCertainDirectResults < numberOfPossiblyCertainListSeatsOfParty
 				- numberOfDirectResultCandidatesOfParty;
@@ -279,16 +296,5 @@ public class LocalNominationResult
 	 */
 	private boolean isCertainNotElectedResult() {
 		return false; // TODO
-	}
-
-	/**
-	 * Determines if the nomination is a candidate for
-	 * {@link LocalNominationResultType.DIRECT}.
-	 *
-	 * @return {@code true} is the nomination is a candidate for a direct result,
-	 *         else {@code false}
-	 */
-	private boolean isDirectResultCandidate() {
-		return directResultCandidate.get();
 	}
 }
