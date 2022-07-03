@@ -302,20 +302,28 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return a new {@link ElectionResult} with filtered ballots
 	 */
 	public LocalElectionResult filterByDistrict(final District<?> district) {
-		final List<LocalBallot> filteredBallots = getBallots().stream()
-				.filter(ballot -> ballot.getPollingStation().equals(district)
-						|| ballot.getPollingStation().getParent().get().equals(district)
-						|| ballot.getPollingStation().getParent().get().getParent().get().equals(district))
-				.collect(toList());
-
 		final Map<District<?>, OptionalInt> numberOfFilteredBallots
 				= Maps.<District<?>, OptionalInt>builder().put(district, getNumberOfAllBallots(district)).get();
 
 		return new LocalElectionResult(getElection(),
 				numberOfFilteredBallots,
-				filteredBallots,
+				getBallots(district),
 				getDirectDrawResults(),
 				getListDrawResults());
+	}
+
+	/**
+	 * Stimmzettel eines Wahlgebiets, Wahlkreises oder Wahlbezirks
+	 *
+	 * @param district the district to filter for
+	 * @return Stimmzettel
+	 */
+	public List<LocalBallot> getBallots(final District<?> district) {
+		return ballots.stream()
+				.filter(ballot -> ballot.getPollingStation().equals(district)
+						|| ballot.getPollingStation().getParent().get().equals(district)
+						|| ballot.getPollingStation().getParent().get().getParent().get().equals(district))
+				.collect(toList());
 	}
 
 	/**
@@ -349,11 +357,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	public Optional<BigDecimal> getEvaluationProgress(final int scale, final District<?> district) {
 		return OptionalInts.mapToObj(getNumberOfAllBallots(district),
-				numberOfAllBallots -> BigDecimal.valueOf(getBallots().stream()
-						.filter(ballot -> ballot.getPollingStation().equals(district)
-								|| ballot.getPollingStation().getParent().get().equals(district)
-								|| ballot.getPollingStation().getParent().get().getParent().get().equals(district))
-						.count())
+				numberOfAllBallots -> BigDecimal.valueOf(getBallots(district).size())
 						.multiply(BigDecimal.TEN)
 						.multiply(BigDecimal.TEN)
 						.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
@@ -392,7 +396,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	public OptionalInt getNumberOfAllBallots(final District<?> district) {
 		final OptionalInt numberOfAllBallots = this.numberOfAllBallots.get(district);
 		if (numberOfAllBallots != null && numberOfAllBallots.isPresent()) {
-			return numberOfAllBallots;
+			return OptionalInt.of(Math.max(numberOfAllBallots.getAsInt(), getBallots(district).size()));
 		}
 
 		final Set<? extends District<?>> children = district.getChildren();
@@ -408,7 +412,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			}
 			calculated += numberOfAllBallotsOfChild.getAsInt();
 		}
-		return OptionalInt.of(calculated);
+		return OptionalInt.of(Math.max(calculated, getBallots(district).size()));
 	}
 
 	/**
@@ -424,9 +428,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, OptionalInt> getNumberOfAllBallotsForJackson() {
-		return numberOfAllBallots.entrySet()
+		return numberOfAllBallots.keySet()
 				.stream()
-				.collect(toMap(entry -> entry.getKey().getKey(), Entry::getValue, TreeMap::new));
+				.collect(toMap(District::getKey, this::getNumberOfAllBallots, TreeMap::new));
 	}
 
 	/**

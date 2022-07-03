@@ -233,7 +233,7 @@ public class PresentationFiles {
 				final BigDecimal estimatedNumberOfAllBallots,
 				final BigDecimal evaluationProgressIfUnknown) {
 			final BigDecimal evaluationProgress
-					= result.getEvaluationProgress(1, pollingStation).orElse(BigDecimal.ZERO).min(HUNDRED);
+					= result.getEvaluationProgress(1, pollingStation).orElse(BigDecimal.ZERO);
 
 			return String.format(Locale.ROOT,
 					TEMPLATE_POLLING_STATION.get(),
