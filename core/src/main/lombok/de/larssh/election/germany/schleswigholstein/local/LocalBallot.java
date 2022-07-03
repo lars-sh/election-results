@@ -149,7 +149,7 @@ public final class LocalBallot implements Ballot<LocalNomination>, Comparable<Lo
 			return Boolean.FALSE;
 		}
 
-		final long directNominationsOfThatParty = getElection().getNominationsOfParty(parties.get(0))
+		final long directNominationsOfThatParty = getElection().getNominations(parties.get(0))
 				.stream()
 				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
 				.count();

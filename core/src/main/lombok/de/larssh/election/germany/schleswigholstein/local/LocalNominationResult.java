@@ -1,5 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
+import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -7,11 +8,16 @@ import static java.util.stream.Collectors.toList;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.NominationResult;
+import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -87,6 +93,30 @@ public class LocalNominationResult
 	}
 
 	/**
+	 * Determines if the nomination's election is certain and returns the guaranteed
+	 * {@link LocalNominationResultType}. In case no result type is certain empty is
+	 * returned.
+	 *
+	 * <p>
+	 * This method is not 100% precise. Even if it returns empty there might be very
+	 * rare cases of a certainty.
+	 *
+	 * @return the guaranteed result type or empty
+	 */
+	public Optional<LocalNominationResultType> getCertainResultType() {
+		if (isCertainDirectResult()) {
+			return Optional.of(LocalNominationResultType.DIRECT);
+		}
+		if (isCertainListResult()) {
+			return Optional.of(LocalNominationResultType.LIST);
+		}
+		if (isCertainNotElectedResult()) {
+			return Optional.of(LocalNominationResultType.NOT_ELECTED);
+		}
+		return Optional.empty();
+	}
+
+	/**
 	 * Wahl
 	 *
 	 * @return Wahl
@@ -101,5 +131,154 @@ public class LocalNominationResult
 	@EqualsAndHashCode.Include
 	public int getNumberOfVotes() {
 		return getBallots().size();
+	}
+
+	/**
+	 * Determines if the nomination's result is a certain
+	 * {@link LocalNominationResultType.DIRECT}.
+	 *
+	 * @return {@code true} if the nomination's result is a certain direct result,
+	 *         else {@code false}
+	 */
+	@PackagePrivate
+	boolean isCertainDirectResult() {
+		// In case of no votes there's no election
+		if (getNumberOfVotes() < 1) {
+			return false;
+		}
+
+		// The number of all ballots of the nomination's district is required to
+		// calculate the number of remaining ballots in that district.
+		final LocalDistrict district = getNomination().getDistrict();
+		final OptionalInt numberOfAllBallotsOfDistrict = getElectionResult().getNumberOfAllBallots(district);
+		if (!numberOfAllBallotsOfDistrict.isPresent()) {
+			return false;
+		}
+
+		// The number of already evaluated ballots of the nomination's district is
+		// required to calculate the number of remaining ballots in that district.
+		final long numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots()
+				.stream()
+				.filter(ballot -> ballot.getPollingStation().getParent().get().equals(district))
+				.count();
+		return getNumberOfVotes() >= getElectionResult().getNumberOfVotesOfLastDirectNomination(district)
+				+ numberOfAllBallotsOfDistrict.getAsInt()
+				- numberOfEvaluatedBallotsOfDistrict;
+	}
+
+	/**
+	 * Determines if the nomination's result is a certain
+	 * {@link LocalNominationResultType.LIST}.
+	 *
+	 * <p>
+	 * This method is not 100% precise. Even if it returns {@code false} there might
+	 * be very rare cases of a certain election.
+	 *
+	 * @return {@code true} if the nomination's result is a certain list result,
+	 *         else {@code false}
+	 */
+	private boolean isCertainListResult() {
+		// List results are based on parties.
+		final Optional<Party> party = getNomination().getParty();
+		if (!party.isPresent()) {
+			return false;
+		}
+
+		// The nomination's party needs at least one certain seat
+		final LocalPartyResult partyResult = getElectionResult().getPartyResults().get(party.get());
+		final int numberOfCertainSeatsOfParty = partyResult.getNumberOfCertainSeats();
+		if (numberOfCertainSeatsOfParty <= 0) {
+			return false;
+		}
+
+		// The number of all ballots is required to calculate the number of possibly
+		// remaining votes.
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return false;
+		}
+
+		// In case of certain directly elected nominations of the party the number of
+		// possibly certain list seats needs to be reduced.
+		final Set<LocalNomination> certainDirectNominationsOfParty = partyResult.getNominationResults()
+				.values()
+				.stream()
+				.filter(LocalNominationResult::isCertainDirectResult)
+				.map(LocalNominationResult::getNomination)
+				.collect(toLinkedHashSet());
+		final int numberOfPossiblyCertainListSeatsOfParty
+				= numberOfCertainSeatsOfParty - certainDirectNominationsOfParty.size();
+		if (numberOfPossiblyCertainListSeatsOfParty <= 0) {
+			return false;
+		}
+
+		// The nomination must be part of the nominations of that party without a
+		// certain direct seat and in the position of a possibly certain list seat.
+		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getNominations(party.get())
+				.stream()
+				.filter(nomination -> !certainDirectNominationsOfParty.contains(nomination))
+				.collect(toList())
+				.indexOf(getNomination());
+		if (indexInNominationsOfPartyWithoutCertainDirectResults == -1
+				|| indexInNominationsOfPartyWithoutCertainDirectResults >= numberOfPossiblyCertainListSeatsOfParty) {
+			return false;
+		}
+
+		// Because direct result candidates of that party could still take a seat, their
+		// number needs to be subtracted from the number of possible certain list seats.
+		// The index of the nomination needs to be less than that number.
+		final long numberOfDirectResultCandidatesOfParty = getElection().getNominations(party.get())
+				.stream()
+				.filter(nomination -> !getNomination().equals(nomination)
+						&& !certainDirectNominationsOfParty.contains(nomination)
+						&& getElectionResult().getNominationResults().get(nomination).isDirectResultCandidate())
+				.count();
+		return indexInNominationsOfPartyWithoutCertainDirectResults < numberOfPossiblyCertainListSeatsOfParty
+				- numberOfDirectResultCandidatesOfParty;
+	}
+
+	/**
+	 * Determines if the nomination's result is a certain
+	 * {@link LocalNominationResultType.NOT_ELECTED}.
+	 *
+	 * <p>
+	 * This method is not 100% precise. Even if it returns {@code false} there might
+	 * be very rare cases of a certain election.
+	 *
+	 * @return {@code true} if the nomination's result is a certain list result,
+	 *         else {@code false}
+	 */
+	private boolean isCertainNotElectedResult() {
+	}
+
+	/**
+	 * Determines if the nomination is a candidate for
+	 * {@link LocalNominationResultType.DIRECT}.
+	 *
+	 * @return {@code true} is the nomination is a candidate for a direct result,
+	 *         else {@code false}
+	 */
+	private boolean isDirectResultCandidate() {
+		// The number of all ballots is required to calculate the number of direct
+		// result candidates.
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return false;
+		}
+
+		// In case of no votes there's no direct election unless there are remaining
+		// unevaluated ballots.
+		final int numberfOfEvaluatedBallots = getElectionResult().getBallots().size();
+		if (getNumberOfVotes() < 1) {
+			return numberfOfEvaluatedBallots < numberOfAllBallots.getAsInt();
+		}
+
+		// The number of votes plus possibly remaining ballots need to be at least as
+		// great as the number of votes of the last direct nomination.
+		final int numberOfVotesOfLastDirectNomination
+				= getElectionResult().getNumberOfVotesOfLastDirectNomination(getNomination().getDistrict());
+		return getNumberOfVotes()
+				+ numberOfAllBallots.getAsInt()
+				- numberfOfEvaluatedBallots >= numberOfVotesOfLastDirectNomination;
 	}
 }

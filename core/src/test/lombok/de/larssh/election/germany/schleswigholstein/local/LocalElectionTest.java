@@ -195,9 +195,9 @@ public class LocalElectionTest {
 				.filter(nomination -> familyName.equals(nomination.getPerson().getFamilyName())
 						&& givenName.equals(nomination.getPerson().getGivenName()))
 				.findAny()
-				.orElseThrow(() -> new ElectionException("Cannot find a nomination named \"%s %s\".",
-						givenName,
-						familyName));
+				.orElseThrow(() -> new ElectionException("Cannot find a nomination named \"%s, %s\".",
+						familyName,
+						givenName));
 	}
 
 	/**

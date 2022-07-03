@@ -341,7 +341,7 @@ public class PollingStationResultFiles {
 			final LocalDistrict district = pollingStation.getParent().get();
 
 			return formatNominations(result.getElection()
-					.getNominationsOfParty(party)
+					.getNominations(party)
 					.stream()
 					.filter(nomination -> nomination.getDistrict().equals(district)
 							&& nomination.getType() == LocalNominationType.DIRECT)

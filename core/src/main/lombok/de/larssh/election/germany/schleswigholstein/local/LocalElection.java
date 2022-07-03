@@ -334,7 +334,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @param party Gruppierung
 	 * @return the nominations
 	 */
-	public Set<LocalNomination> getNominationsOfParty(final Party party) {
+	public Set<LocalNomination> getNominations(final Party party) {
 		return getNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
 				.collect(toLinkedHashSet());

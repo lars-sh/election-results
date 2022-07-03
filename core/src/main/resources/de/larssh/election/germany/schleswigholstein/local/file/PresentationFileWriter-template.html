@@ -50,8 +50,10 @@ ol {
 .footer > .legend > *::before {
 	margin-right: 0.25em;
 }
-.footer > .legend > .safe::before {
-	content: "\2713";
+.footer > .legend > .direct_balance_seat::first-letter,
+.footer > .legend > .draws::first-letter,
+.footer > .legend > .list_overhang_seat::first-letter {
+	text-decoration: underline;
 }
 .footer > .right {
 	float: right;
@@ -78,6 +80,16 @@ ol {
 	text-align: right;
 	width: 0;
 }
+.nomination-result.certain-direct > .name,
+.nomination-result.certain-list > .name,
+.footer > .legend > .certain {
+	text-decoration: underline;
+	text-decoration-thickness: 0.05em;
+}
+.nomination-result.certain-not_elected > .name,
+.footer > .legend > .certain-not_elected {
+	opacity: 60%%;
+}
 .nomination-result > .type {
 	padding-left: 0.5em;
 	padding-right: 0.5em;
@@ -94,12 +106,10 @@ ol {
 .footer > .legend > .direct::before {
 	content: "\2605";
 }
-.nomination-result.type-direct_draw > .type::before,
-.footer > .legend > .draws::before {
-	content: "?";
+.nomination-result.type-direct_draw > .type::before {
+	content: "L";
 }
-.nomination-result.type-direct_balance_seat > .type::before,
-.footer > .legend > .direct_balance_seat::before {
+.nomination-result.type-direct_balance_seat > .type::before {
 	content: "M";
 }
 .nomination-result.type-list > .type::before,
@@ -107,10 +117,9 @@ ol {
 	content: "\2606";
 }
 .nomination-result.type-list_draw > .type::before {
-	content: "?";
+	content: "L";
 }
-.nomination-result.type-list_overhang_seat > .type::before,
-.footer > .legend > .list_overhang_seat::before {
+.nomination-result.type-list_overhang_seat > .type::before {
 	content: "Ü";
 }
 .nomination-result.type-not_elected > .type::before {
@@ -220,8 +229,9 @@ ol {
 				<li class="list">Listenmandat</li>
 				<li class="direct_balance_seat">Mehrsitz</li>
 				<li class="list_overhang_seat">Überhangmandat</li>
-				<li class="draws">Loskandidat</li>
-				<li class="safe">rechnerich sicher</li>
+				<li class="draws">Losentscheid</li>
+				<li class="certain">sicher gewählt</li>
+				<li class="certain-not_elected">nicht gewählt</li>
 			</ol>
 		</div>
 	</body>

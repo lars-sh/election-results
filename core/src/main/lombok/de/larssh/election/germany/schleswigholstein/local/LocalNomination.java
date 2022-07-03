@@ -89,7 +89,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	@JsonIgnore
 	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
-			|| getElection().getNominationsOfParty(getParty().get())
+			|| getElection().getNominations(getParty().get())
 					.stream()
 					.limit(getElection().getNumberOfDirectSeats())
 					.anyMatch(this::equals) ? LocalNominationType.DIRECT : LocalNominationType.LIST);

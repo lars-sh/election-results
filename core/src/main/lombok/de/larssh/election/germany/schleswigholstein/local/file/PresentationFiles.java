@@ -114,6 +114,20 @@ public class PresentationFiles {
 		}
 
 		/**
+		 * Encodes {@code value} according to the XML standards.
+		 *
+		 * @param value the value to encode
+		 * @return the encoded value
+		 */
+		private static String encodeXml(final String value) {
+			return value.replace("&", "&amp;")
+					.replace("<", "&lt;")
+					.replace(">", "&gt;")
+					.replace("\"", "&quot;")
+					.replace("'", "&apos;");
+		}
+
+		/**
 		 * Formats {@code value} according to {@link Locale#GERMAN} and using the
 		 * precision of one decimal.
 		 *
@@ -231,7 +245,7 @@ public class PresentationFiles {
 											.multiply(HUNDRED)
 											.divide(estimatedNumberOfAllBallots, 1, RoundingMode.HALF_UP))
 							.orElse(evaluationProgressIfUnknown),
-					pollingStation.getName(),
+					encodeXml(pollingStation.getName()),
 					formatBigDecimal(evaluationProgress),
 					evaluationProgress);
 		}
@@ -270,7 +284,10 @@ public class PresentationFiles {
 			return String.format(Locale.ROOT,
 					TEMPLATE_NOMINATION_RESULT.get(),
 					Strings.toLowerCaseAscii(result.getType().toString()),
-					result.getNomination().getPerson().getKey(),
+					result.getCertainResultType()
+							.map(certain -> "certain-" + Strings.toLowerCaseAscii(certain.toString()))
+							.orElse("uncertain"),
+					encodeXml(result.getNomination().getPerson().getKey()),
 					result.getNumberOfVotes(),
 					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toCssColor(),
 					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toCssColor(),
@@ -334,7 +351,7 @@ public class PresentationFiles {
 			return formatPartyResult(result.getParty().getBackgroundColor(),
 					result.getParty().getFontColor(),
 					result.getParty().getShortName(),
-					result.getNumberOfSeats(),
+					result.getNumberOfCertainSeats(),
 					result.getNumberOfVotes(),
 					numberOfAllVotes,
 					result.getNominationResults().values());
@@ -363,7 +380,7 @@ public class PresentationFiles {
 					TEMPLATE_PARTY_RESULT.get(),
 					backgroundColor.toCssColor(),
 					fontColor.toCssColor(),
-					name,
+					encodeXml(name),
 					numberOfSeats,
 					formatBigDecimal(numberOfAllVotes.compareTo(BigDecimal.ZERO) == 0
 							? BigDecimal.ZERO
@@ -372,8 +389,10 @@ public class PresentationFiles {
 									.divide(numberOfAllVotes, 1, RoundingMode.HALF_UP)),
 					nominationResults.stream()
 							.filter(nominationResult -> nominationResult.getType().isElected())
-							.map(nominationResult -> nominationResult.getNomination().getPerson().getKey())
-							.collect(joining("</li><li>", "<li>", "</li>")));
+							.map(nominationResult -> "<li>"
+									+ encodeXml(nominationResult.getNomination().getPerson().getKey())
+									+ "</li>")
+							.collect(joining()));
 		}
 	}
 }

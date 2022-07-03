@@ -8,6 +8,8 @@ import static java.util.stream.Collectors.toList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -133,6 +135,37 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 */
 	public int getNumberOfBlockVotings() {
 		return numberOfBlockVotings.get();
+	}
+
+	public int getNumberOfCertainSeats() {
+		return Math.max(getNumberOfCertainDirectSeats(), getNumberOfCertainListSeats());
+	}
+
+	public int getNumberOfCertainDirectSeats() {
+		return (int) getNominationResults().values() //
+				.stream()
+				.filter(LocalNominationResult::isCertainDirectResult)
+				.count();
+	}
+
+	public int getNumberOfCertainListSeats() {
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return 0;
+		}
+
+		final int numberOfAllVotes = getElectionResult().getBallots()
+				.stream()
+				.filter(LocalBallot::isValid)
+				.map(LocalBallot::getNominations)
+				.mapToInt(Set::size)
+				.sum();
+		return (int) Math.floor((double) getNumberOfVotes()
+				/ (numberOfAllVotes
+						+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
+								* getElection().getNumberOfVotesPerBallot())
+				* (getElection().getNumberOfSeats() + 1 - 0.5 * getElection().getParties().size())
+				+ 0.5);
 	}
 
 	/**
