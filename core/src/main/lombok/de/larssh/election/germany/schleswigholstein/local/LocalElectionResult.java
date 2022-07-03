@@ -443,6 +443,30 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
+	 * Number of votes
+	 *
+	 * @return the number of votes
+	 */
+	@JsonIgnore
+	public int getNumberOfVotes() {
+		return getNumberOfVotes(getElection().getDistrict());
+	}
+
+	/**
+	 * Anzahl der Stimmen nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @return the number of votes
+	 */
+	public int getNumberOfVotes(final District<?> district) {
+		return getBallots(district).stream()
+				.filter(LocalBallot::isValid)
+				.map(LocalBallot::getNominations)
+				.mapToInt(Set::size)
+				.sum();
+	}
+
+	/**
 	 * Calculates the number of votes of the last direct nomination inside
 	 * {@code district}.
 	 *

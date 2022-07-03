@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -137,35 +136,75 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		return numberOfBlockVotings.get();
 	}
 
+	/**
+	 * Determines the number of certain seats of this party.
+	 *
+	 * <p>
+	 * This method might not be 100% precise in case not all ballots were evaluated,
+	 * yet. There might be very rare cases of more certain seats.
+	 *
+	 * @return the number of certain seats of this party
+	 */
 	public int getNumberOfCertainSeats() {
+		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()) {
+			return getNumberOfSeats();
+		}
 		return Math.max(getNumberOfCertainDirectSeats(), getNumberOfCertainListSeats());
 	}
 
-	public int getNumberOfCertainDirectSeats() {
+	/**
+	 * Determines the number of certain direct seats of this party.
+	 *
+	 * @return the number of certain direct seats of this party
+	 */
+	private int getNumberOfCertainDirectSeats() {
 		return (int) getNominationResults().values() //
 				.stream()
 				.filter(LocalNominationResult::isCertainDirectResult)
 				.count();
 	}
 
-	public int getNumberOfCertainListSeats() {
+	/**
+	 * Determines the number of certain list seats of this party, including possibly
+	 * certain direct seats.
+	 *
+	 * <p>
+	 * This method might not be 100% precise in case not all ballots were evaluated,
+	 * yet. There might be very rare cases of more certain seats.
+	 *
+	 * @return the number of certain list seats of this party
+	 */
+	private int getNumberOfCertainListSeats() {
+		// The number of all ballots is required to calculate the number of not yet
+		// evaluated ballots.
 		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
 		if (!numberOfAllBallots.isPresent()) {
 			return 0;
 		}
 
-		final int numberOfAllVotes = getElectionResult().getBallots()
-				.stream()
-				.filter(LocalBallot::isValid)
-				.map(LocalBallot::getNominations)
-				.mapToInt(Set::size)
-				.sum();
-		return (int) Math.floor((double) getNumberOfVotes()
-				/ (numberOfAllVotes
-						+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
-								* getElection().getNumberOfVotesPerBallot())
-				* (getElection().getNumberOfSeats() + 1 - 0.5 * getElection().getParties().size())
-				+ 0.5);
+		// In case all ballots were evaluated we already know the precise result.
+		if (getBallots().size() >= numberOfAllBallots.getAsInt()) {
+			return getNumberOfSeats();
+		}
+
+		// Determine the number of all possible votes to use it as divisor.
+		final int numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
+				+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
+						* getElection().getNumberOfVotesPerBallot();
+		if (numberOfAllPossibleVotes == 0) {
+			return 0;
+		}
+
+		// Determine the natural threshold (max percentage for one seat or "natürliche
+		// Sperrklausel") based on the corresponding formula for Sainte Laguë
+		// see https://www.wahlrecht.de/verfahren/faktische-sperrklausel.html
+		final double maxPercentageForOneSeat
+				= 0.5 / (getElection().getNumberOfSeats() - 0.5 * getElection().getParties().size() + 1);
+
+		//
+		final double percentageOfAllBallots = (double) getNumberOfVotes() / numberOfAllPossibleVotes;
+		return (int) Math
+				.nextDown(getElection().getNumberOfSeats() * (percentageOfAllBallots - maxPercentageForOneSeat) + 1);
 	}
 
 	/**

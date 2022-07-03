@@ -162,8 +162,8 @@ public class LocalNominationResult
 	 * returned.
 	 *
 	 * <p>
-	 * This method is not 100% precise. Even if it returns empty there might be very
-	 * rare cases of a certainty.
+	 * This method is not 100% precise in case not all ballots were evaluated, yet.
+	 * Even if it returns empty there might be very rare cases of a certainty.
 	 *
 	 * @return the guaranteed result type or empty
 	 */
@@ -205,8 +205,9 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType.LIST}.
 	 *
 	 * <p>
-	 * This method is not 100% precise. Even if it returns {@code false} there might
-	 * be very rare cases of a certain election.
+	 * This method is not 100% precise in case not all ballots were evaluated, yet.
+	 * Even if it returns {@code false} there might be very rare cases of a certain
+	 * election.
 	 *
 	 * @return {@code true} if the nomination's result is a certain list result,
 	 *         else {@code false}
@@ -222,13 +223,6 @@ public class LocalNominationResult
 		final LocalPartyResult partyResult = getElectionResult().getPartyResults().get(party.get());
 		final int numberOfCertainSeatsOfParty = partyResult.getNumberOfCertainSeats();
 		if (numberOfCertainSeatsOfParty <= 0) {
-			return false;
-		}
-
-		// The number of all ballots is required to calculate the number of possibly
-		// remaining votes.
-		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
-		if (!numberOfAllBallots.isPresent()) {
 			return false;
 		}
 
@@ -276,8 +270,9 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType.NOT_ELECTED}.
 	 *
 	 * <p>
-	 * This method is not 100% precise. Even if it returns {@code false} there might
-	 * be very rare cases of a certain election.
+	 * This method is not 100% precise in case not all ballots were evaluated, yet.
+	 * Even if it returns {@code false} there might be very rare cases of a certain
+	 * election.
 	 *
 	 * @return {@code true} if the nomination's result is a certain list result,
 	 *         else {@code false}
