@@ -357,10 +357,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	public Optional<BigDecimal> getEvaluationProgress(final int scale, final District<?> district) {
 		return OptionalInts.mapToObj(getNumberOfAllBallots(district),
-				numberOfAllBallots -> BigDecimal.valueOf(getBallots(district).size())
-						.multiply(BigDecimal.TEN)
-						.multiply(BigDecimal.TEN)
-						.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
+				numberOfAllBallots -> numberOfAllBallots == 0
+						? BigDecimal.ZERO
+						: BigDecimal.valueOf(getBallots(district).size())
+								.multiply(BigDecimal.TEN)
+								.multiply(BigDecimal.TEN)
+								.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
 	}
 
 	/**

@@ -223,8 +223,7 @@ public class PresentationFiles {
 		 * Formats the given {@code pollingStation}.
 		 *
 		 * @param pollingStation              the polling station to format
-		 * @param estimatedNumberOfAllBallots the (probably estimated) number of all
-		 *                                    ballots
+		 * @param estimatedNumberOfAllBallots the estimated number of all ballots
 		 * @param evaluationProgressIfUnknown the evaluation progress in case the number
 		 *                                    of all ballots is unknown
 		 * @return the formatted polling station
@@ -241,9 +240,11 @@ public class PresentationFiles {
 					pollingStation.getFontColor().toCssColor(),
 					OptionalInts
 							.mapToObj(result.getNumberOfAllBallots(pollingStation),
-									numOfBallots -> BigDecimal.valueOf(numOfBallots)
-											.multiply(HUNDRED)
-											.divide(estimatedNumberOfAllBallots, 1, RoundingMode.HALF_UP))
+									numOfBallots -> estimatedNumberOfAllBallots.compareTo(BigDecimal.ZERO) == 0
+											? null
+											: BigDecimal.valueOf(numOfBallots)
+													.multiply(HUNDRED)
+													.divide(estimatedNumberOfAllBallots, 1, RoundingMode.HALF_UP))
 							.orElse(evaluationProgressIfUnknown),
 					encodeXml(pollingStation.getName()),
 					formatBigDecimal(evaluationProgress),
