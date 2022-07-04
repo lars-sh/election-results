@@ -99,13 +99,25 @@ public class LocalNominationResult
 			return Boolean.FALSE;
 		}
 
+		// The number of votes of the last direct nomination (excluding the current
+		// nomination) is used as comparison value.
+		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
+				.values()
+				.stream()
+				.filter(nominationResult -> !equals(nominationResult))
+				.filter(nominationResult -> nominationResult.getNomination().getDistrict().equals(district))
+				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
+				.mapToInt(LocalNominationResult::getNumberOfVotes)
+				.findFirst()
+				.orElse(0);
+
 		// The number of already evaluated ballots of the nomination's district is
 		// required to calculate the number of remaining ballots in that district.
 		final long numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots()
 				.stream()
 				.filter(ballot -> ballot.getPollingStation().getParent().get().equals(district))
 				.count();
-		return getNumberOfVotes() >= getElectionResult().getNumberOfVotesOfLastDirectNomination(district)
+		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
 				+ numberOfAllBallotsOfDistrict.getAsInt()
 				- numberOfEvaluatedBallotsOfDistrict;
 	});
@@ -154,8 +166,16 @@ public class LocalNominationResult
 
 		// The number of votes plus possibly remaining ballots need to be at least as
 		// great as the number of votes of the last direct nomination.
-		final int numberOfVotesOfLastDirectNomination
-				= getElectionResult().getNumberOfVotesOfLastDirectNomination(getNomination().getDistrict());
+		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
+				.values()
+				.stream()
+				.filter(nominationResult -> nominationResult.getNomination()
+						.getDistrict()
+						.equals(getNomination().getDistrict()))
+				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
+				.mapToInt(LocalNominationResult::getNumberOfVotes)
+				.findFirst()
+				.orElse(0);
 		return getNumberOfVotes()
 				+ numberOfAllBallots.getAsInt()
 				- numberfOfEvaluatedBallots >= numberOfVotesOfLastDirectNomination;

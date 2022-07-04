@@ -469,28 +469,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
-	 * Calculates the number of votes of the last direct nomination inside
-	 * {@code district}.
-	 *
-	 * <p>
-	 * In case of no nominations zero is returned.
-	 *
-	 * @param district the district
-	 * @return the number of votes of the last direct nomination inside
-	 *         {@code district}
-	 */
-	@PackagePrivate
-	int getNumberOfVotesOfLastDirectNomination(final LocalDistrict district) {
-		return getNominationResults().values()
-				.stream()
-				.filter(nominationResult -> nominationResult.getNomination().getDistrict().equals(district))
-				.limit(getElection().getNumberOfDirectSeatsPerLocalDistrict())
-				.mapToInt(LocalNominationResult::getNumberOfVotes)
-				.reduce((first, second) -> second)
-				.orElse(0);
-	}
-
-	/**
 	 * Calculates the nomination results.
 	 *
 	 * <p>
