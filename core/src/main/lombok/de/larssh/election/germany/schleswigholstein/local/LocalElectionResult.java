@@ -692,7 +692,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private BigDecimal getSainteLagueValue(final BigDecimal votesOfParty, final int step) {
-		return votesOfParty.divide(BigDecimal.valueOf(step * 10L + 5, 1),
+		return votesOfParty.divide(BigDecimal.valueOf(step * 10 + 5, 1),
 				getElection().getSainteLagueScale(),
 				RoundingMode.HALF_UP);
 	}

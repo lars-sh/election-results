@@ -183,7 +183,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		}
 
 		// In case all ballots were evaluated we already know the precise result.
-		if (getBallots().size() >= numberOfAllBallots.getAsInt()) {
+		if (getElectionResult().getBallots().size() >= numberOfAllBallots.getAsInt()) {
 			return getNumberOfSeats();
 		}
 
