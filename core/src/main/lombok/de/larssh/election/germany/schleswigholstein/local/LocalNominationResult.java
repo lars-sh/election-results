@@ -295,6 +295,18 @@ public class LocalNominationResult
 	 *         else {@code false}
 	 */
 	private boolean isCertainNotElectedResult() {
+		// The number of all ballots is required to calculate the number of not yet
+		// evaluated ballots.
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return false;
+		}
+
+		// In case all ballots were evaluated we already know the precise result.
+		if (getElectionResult().getBallots().size() >= numberOfAllBallots.getAsInt()) {
+			return getType() == LocalNominationResultType.NOT_ELECTED;
+		}
+
 		return false; // TODO
 	}
 }
