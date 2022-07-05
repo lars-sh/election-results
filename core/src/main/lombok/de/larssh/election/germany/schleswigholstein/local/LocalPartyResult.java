@@ -15,6 +15,7 @@ import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
+import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -149,19 +150,22 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()) {
 			return getNumberOfSeats();
 		}
-		return Math.max(getNumberOfCertainDirectSeats(), getNumberOfCertainListSeats());
+		return Math.max(getCertainDirectNominationResults().size(), getNumberOfCertainListSeats());
 	}
 
 	/**
 	 * Determines the number of certain direct seats of this party.
 	 *
+	 * TODO
+	 *
 	 * @return the number of certain direct seats of this party
 	 */
-	private int getNumberOfCertainDirectSeats() {
-		return (int) getNominationResults().values() //
+	@PackagePrivate
+	Map<LocalNomination, LocalNominationResult> getCertainDirectNominationResults() {
+		return getNominationResults().entrySet()
 				.stream()
-				.filter(LocalNominationResult::isCertainDirectResult)
-				.count();
+				.filter(entry -> entry.getValue().isCertainDirectResult())
+				.collect(toLinkedHashMap());
 	}
 
 	/**
@@ -195,16 +199,50 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			return 0;
 		}
 
-		// Determine the natural threshold (max percentage for one seat or "natürliche
-		// Sperrklausel") based on the corresponding formula for Sainte Laguë
+		// Determine the maximum percentage to be sure to get one seat ("obere
+		// natürliche Sperrklausel") based on the corresponding formula for Sainte Laguë
 		// see https://www.wahlrecht.de/verfahren/faktische-sperrklausel.html
 		final double maxPercentageForOneSeat
 				= 0.5 / (getElection().getNumberOfSeats() - 0.5 * getElection().getParties().size() + 1);
 
-		//
+		// TODO
 		final double percentageOfAllBallots = (double) getNumberOfVotes() / numberOfAllPossibleVotes;
 		return (int) Math
 				.nextDown(getElection().getNumberOfSeats() * (percentageOfAllBallots - maxPercentageForOneSeat) + 1);
+	}
+
+	@PackagePrivate
+	int getNumberOfListResultCandidates() {
+		// The number of all ballots is required to calculate the number of not yet
+		// evaluated ballots.
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return 0;
+		}
+
+		// In case all ballots were evaluated we already know the precise result.
+		if (getElectionResult().getBallots().size() >= numberOfAllBallots.getAsInt()) {
+			return getNumberOfSeats();
+		}
+
+		// Determine the number of all possible votes to use it as divisor.
+		final int numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
+				+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
+						* getElection().getNumberOfVotesPerBallot();
+		if (numberOfAllPossibleVotes == 0) {
+			return 0;
+		}
+
+		// Determine the minimum percentage for the chance of one seat ("untere
+		// natürliche Sperrklausel") based on the corresponding formula for Sainte Laguë
+		// see https://www.wahlrecht.de/verfahren/faktische-sperrklausel.html
+		final double minPercentageForOneSeat
+				= 0.5 / (getElection().getNumberOfSeats() + 0.5 * getElection().getParties().size() - 1);
+
+		// TODO
+		final double percentageOfAllBallots = (double) getNumberOfVotes() / numberOfAllPossibleVotes;
+		return (int) Math
+				.nextUp(getElection().getNumberOfSeats() * (percentageOfAllBallots - minPercentageForOneSeat) + 1);
 	}
 
 	/**

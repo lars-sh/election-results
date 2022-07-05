@@ -1,6 +1,5 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -8,9 +7,9 @@ import static java.util.stream.Collectors.toList;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
@@ -157,13 +156,6 @@ public class LocalNominationResult
 			return Boolean.FALSE;
 		}
 
-		// In case of no votes there's no direct election unless there are remaining
-		// unevaluated ballots.
-		final int numberfOfEvaluatedBallots = getElectionResult().getBallots().size();
-		if (getNumberOfVotes() < 1) {
-			return numberfOfEvaluatedBallots < numberOfAllBallots.getAsInt();
-		}
-
 		// The number of votes plus possibly remaining ballots need to be at least as
 		// great as the number of votes of the last direct nomination.
 		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
@@ -178,7 +170,7 @@ public class LocalNominationResult
 				.orElse(0);
 		return getNumberOfVotes()
 				+ numberOfAllBallots.getAsInt()
-				- numberfOfEvaluatedBallots >= numberOfVotesOfLastDirectNomination;
+				- getElectionResult().getBallots().size() >= numberOfVotesOfLastDirectNomination;
 	});
 
 	/** {@inheritDoc} */
@@ -256,23 +248,14 @@ public class LocalNominationResult
 			return false;
 		}
 
-		// The nomination's party needs at least one certain seat
+		// The nomination's party needs at least one certain seat. In case of certain
+		// directly elected nominations of the party the number of possibly certain list
+		// seats needs to be reduced.
 		final LocalPartyResult partyResult = getElectionResult().getPartyResults().get(party.get());
-		final int numberOfCertainSeatsOfParty = partyResult.getNumberOfCertainSeats();
-		if (numberOfCertainSeatsOfParty <= 0) {
-			return false;
-		}
-
-		// In case of certain directly elected nominations of the party the number of
-		// possibly certain list seats needs to be reduced.
-		final Set<LocalNomination> certainDirectNominationsOfParty = partyResult.getNominationResults()
-				.values()
-				.stream()
-				.filter(LocalNominationResult::isCertainDirectResult)
-				.map(LocalNominationResult::getNomination)
-				.collect(toLinkedHashSet());
+		final Map<LocalNomination, LocalNominationResult> certainDirectNominationsOfParty
+				= partyResult.getCertainDirectNominationResults();
 		final int numberOfPossiblyCertainListSeatsOfParty
-				= numberOfCertainSeatsOfParty - certainDirectNominationsOfParty.size();
+				= partyResult.getNumberOfCertainSeats() - certainDirectNominationsOfParty.size();
 		if (numberOfPossiblyCertainListSeatsOfParty <= 0) {
 			return false;
 		}
@@ -281,7 +264,7 @@ public class LocalNominationResult
 		// certain direct seat and in the position of a possibly certain list seat.
 		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getNominations(party.get())
 				.stream()
-				.filter(nomination -> !certainDirectNominationsOfParty.contains(nomination))
+				.filter(nomination -> !certainDirectNominationsOfParty.containsKey(nomination))
 				.collect(toList())
 				.indexOf(getNomination());
 		if (indexInNominationsOfPartyWithoutCertainDirectResults == -1
@@ -295,8 +278,8 @@ public class LocalNominationResult
 		final long numberOfDirectResultCandidatesOfParty = getElection().getNominations(party.get())
 				.stream()
 				.filter(nomination -> !getNomination().equals(nomination)
-						&& !certainDirectNominationsOfParty.contains(nomination)
-						&& getElectionResult().getNominationResults().get(nomination).directResultCandidate.get())
+						&& !certainDirectNominationsOfParty.containsKey(nomination)
+						&& getElectionResult().getNominationResults().get(nomination).isDirectResultCandidate())
 				.count();
 		return indexInNominationsOfPartyWithoutCertainDirectResults < numberOfPossiblyCertainListSeatsOfParty
 				- numberOfDirectResultCandidatesOfParty;
@@ -315,18 +298,59 @@ public class LocalNominationResult
 	 *         else {@code false}
 	 */
 	private boolean isCertainNotElectedResult() {
-		// The number of all ballots is required to calculate the number of not yet
-		// evaluated ballots.
-		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
-		if (!numberOfAllBallots.isPresent()) {
+		return !isDirectResultCandidate() && !isListResultCandidate();
+	}
+
+	/**
+	 * Determines if the nomination is a candidate for
+	 * {@link LocalNominationResultType#DIRECT}.
+	 *
+	 * @return {@code true} if the nomination is a candidate for a direct result or
+	 *         {@code false}
+	 */
+	private boolean isDirectResultCandidate() {
+		return directResultCandidate.get();
+	}
+
+	/**
+	 * Determines if the nomination is a candidate for
+	 * {@link LocalNominationResultType#LIST}.
+	 *
+	 * <p>
+	 * This method is not 100% precise in case not all ballots were evaluated, yet.
+	 * Even if it returns {@code false} there might be very rare cases of a certain
+	 * election.
+	 *
+	 * @return {@code true} if the nomination is a candidate for a list result or
+	 *         {@code false}
+	 */
+	private boolean isListResultCandidate() {
+		// List results are based on parties.
+		final Optional<Party> party = getNomination().getParty();
+		if (!party.isPresent()) {
 			return false;
 		}
 
-		// In case all ballots were evaluated we already know the precise result.
-		if (getElectionResult().getBallots().size() >= numberOfAllBallots.getAsInt()) {
-			return getType() == LocalNominationResultType.NOT_ELECTED;
+		// The nomination's party needs at least one list result candidate. In case of
+		// certain directly elected nominations of the party the number of list result
+		// candidates needs to be reduced.
+		final LocalPartyResult partyResult = getElectionResult().getPartyResults().get(party.get());
+		final Map<LocalNomination, LocalNominationResult> certainDirectNominationResultsOfParty
+				= partyResult.getCertainDirectNominationResults();
+		final int numberOfListResultCandidatesOfParty
+				= partyResult.getNumberOfListResultCandidates() - certainDirectNominationResultsOfParty.size();
+		if (numberOfListResultCandidatesOfParty <= 0) {
+			return false;
 		}
 
-		return false; // TODO
+		// The nomination must be part of the nominations of that party without a
+		// certain direct seat and part of the list result candidates.
+		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getNominations(party.get())
+				.stream()
+				.filter(nomination -> !certainDirectNominationResultsOfParty.containsKey(nomination))
+				.collect(toList())
+				.indexOf(getNomination());
+		return indexInNominationsOfPartyWithoutCertainDirectResults != -1
+				&& indexInNominationsOfPartyWithoutCertainDirectResults < numberOfListResultCandidatesOfParty;
 	}
 }
