@@ -140,10 +140,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	/**
 	 * Determines the number of certain seats of this party.
 	 *
-	 * <p>
-	 * This method might not be 100% precise in case not all ballots were evaluated,
-	 * yet. There might be very rare cases of more certain seats.
-	 *
 	 * @return the number of certain seats of this party
 	 */
 	public int getNumberOfCertainSeats() {
@@ -171,10 +167,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	/**
 	 * Determines the number of certain list seats of this party, including possibly
 	 * certain direct seats.
-	 *
-	 * <p>
-	 * This method might not be 100% precise in case not all ballots were evaluated,
-	 * yet. There might be very rare cases of more certain seats.
 	 *
 	 * @return the number of certain list seats of this party
 	 */

@@ -125,10 +125,6 @@ public class LocalNominationResult
 	 * Determines if the nomination's election is certain and returns the guaranteed
 	 * {@link LocalNominationResultType}. In case no result type is certain empty is
 	 * returned.
-	 *
-	 * <p>
-	 * This value is not 100% precise in case not all ballots were evaluated, yet.
-	 * Even if it returns empty there might be very rare cases of a certainty.
 	 */
 	@ToString.Exclude
 	Supplier<Optional<LocalNominationResultType>> certainResultType = lazy(() -> {
@@ -190,10 +186,6 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType}. In case no result type is certain empty is
 	 * returned.
 	 *
-	 * <p>
-	 * This method is not 100% precise in case not all ballots were evaluated, yet.
-	 * Even if it returns empty there might be very rare cases of a certainty.
-	 *
 	 * @return the guaranteed result type or empty
 	 */
 	public Optional<LocalNominationResultType> getCertainResultType() {
@@ -232,11 +224,6 @@ public class LocalNominationResult
 	/**
 	 * Determines if the nomination's result is a certain
 	 * {@link LocalNominationResultType#LIST}.
-	 *
-	 * <p>
-	 * This method is not 100% precise in case not all ballots were evaluated, yet.
-	 * Even if it returns {@code false} there might be very rare cases of a certain
-	 * election.
 	 *
 	 * @return {@code true} if the nomination's result is a certain list result,
 	 *         else {@code false}
@@ -289,11 +276,6 @@ public class LocalNominationResult
 	 * Determines if the nomination's result is a certain
 	 * {@link LocalNominationResultType.NOT_ELECTED}.
 	 *
-	 * <p>
-	 * This method is not 100% precise in case not all ballots were evaluated, yet.
-	 * Even if it returns {@code false} there might be very rare cases of a certain
-	 * election.
-	 *
 	 * @return {@code true} if the nomination's result is a certain list result,
 	 *         else {@code false}
 	 */
@@ -315,11 +297,6 @@ public class LocalNominationResult
 	/**
 	 * Determines if the nomination is a candidate for
 	 * {@link LocalNominationResultType#LIST}.
-	 *
-	 * <p>
-	 * This method is not 100% precise in case not all ballots were evaluated, yet.
-	 * Even if it returns {@code false} there might be very rare cases of a certain
-	 * election.
 	 *
 	 * @return {@code true} if the nomination is a candidate for a list result or
 	 *         {@code false}
