@@ -112,6 +112,7 @@ public class LocalElectionTest {
 				PartyType.ASSOCIATION_OF_VOTERS);
 		partyFwr.setBackgroundColor(Color.rgb(7, 98, 188));
 
+		// CDU
 		addNomination(election, partyCdu, "Poppinga", "Jens", Gender.MALE);
 		addNomination(election, partyCdu, "Eggers", "Dirk", Gender.MALE);
 		addNomination(election, partyCdu, "Beck", "Karsten", Gender.MALE);
@@ -124,18 +125,24 @@ public class LocalElectionTest {
 		addNomination(election, partyCdu, "Dohrendorf", "Martina", Gender.FEMALE);
 		addNomination(election, partyCdu, "Bernhardt", "Christian", Gender.MALE);
 		addNomination(election, partyCdu, "Topel", "Andreas", Gender.MALE);
+
+		// SPD
 		addNomination(election, partySpd, "Kröger", "Dirk", Gender.MALE);
 		addNomination(election, partySpd, "Eick", "Ernst", Gender.MALE);
 		addNomination(election, partySpd, "Jögimar", "Helga", Gender.FEMALE);
 		addNomination(election, partySpd, "Ehlert", "Armin", Gender.MALE);
 		addNomination(election, partySpd, "Ziebarth", "Angelika", Gender.FEMALE);
 		addNomination(election, partySpd, "Sauer", "Joachim", Gender.MALE);
+
+		// AWG
 		addNomination(election, partyAwg, "Gäde", "Jan-Hendrik", Gender.MALE);
 		addNomination(election, partyAwg, "Böttger", "Johannes", Gender.MALE);
 		addNomination(election, partyAwg, "Böttger", "Volker", Gender.MALE);
 		addNomination(election, partyAwg, "Winter", "Martin", Gender.MALE);
 		addNomination(election, partyAwg, "Gäde", "Henning", Gender.MALE);
 		addNomination(election, partyAwg, "Stapelfeldt", "Albert", Gender.MALE);
+
+		// FWR
 		addNomination(election, partyFwr, "Kühn", "Steffen", Gender.MALE);
 		addNomination(election, partyFwr, "Wahl", "Joachim", Gender.MALE);
 		addNomination(election, partyFwr, "Kraus", "Michael", Gender.MALE);

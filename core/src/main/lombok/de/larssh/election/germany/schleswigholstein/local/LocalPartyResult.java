@@ -150,11 +150,9 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	}
 
 	/**
-	 * Determines the number of certain direct seats of this party.
+	 * Determines the party's direct nomination results, which are certain.
 	 *
-	 * TODO
-	 *
-	 * @return the number of certain direct seats of this party
+	 * @return the party's direct nomination results, which are certain
 	 */
 	@PackagePrivate
 	Map<LocalNomination, LocalNominationResult> getCertainDirectNominationResults() {
@@ -184,25 +182,34 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		}
 
 		// Determine the number of all possible votes to use it as divisor.
-		final int numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
+		final long numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
 				+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
-						* getElection().getNumberOfVotesPerBallot();
+						* Math.min(getElection().getNumberOfVotesPerBallot(),
+								getElection().getNominations(getParty()).size());
 		if (numberOfAllPossibleVotes == 0) {
 			return 0;
 		}
 
-		// Determine the maximum percentage to be sure to get one seat ("obere
+		// Determine the maximum percentage to be sure to get at least one seat ("obere
 		// natürliche Sperrklausel") based on the corresponding formula for Sainte Laguë
 		// see https://www.wahlrecht.de/verfahren/faktische-sperrklausel.html
-		final double maxPercentageForOneSeat
+		final double maxPercentageForFirstSeat
 				= 0.5 / (getElection().getNumberOfSeats() - 0.5 * getElection().getParties().size() + 1);
 
-		// TODO
+		// Calculate the number of certain list seats in relation of the number of votes
+		// for this party to all possible votes, taking care of the maximum percentage
+		// for the first seat.
 		final double percentageOfAllBallots = (double) getNumberOfVotes() / numberOfAllPossibleVotes;
 		return (int) Math
-				.nextDown(getElection().getNumberOfSeats() * (percentageOfAllBallots - maxPercentageForOneSeat) + 1);
+				.nextDown(getElection().getNumberOfSeats() * (percentageOfAllBallots - maxPercentageForFirstSeat) + 1);
 	}
 
+	/**
+	 * Calculates the maximum number of nominations, which are a candidate for
+	 * {@link LocalNominationResultType#LIST}.
+	 *
+	 * @return the maximum number of list result candidates
+	 */
 	@PackagePrivate
 	int getNumberOfListResultCandidates() {
 		// The number of all ballots is required to calculate the number of not yet
@@ -217,24 +224,27 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			return getNumberOfSeats();
 		}
 
-		// Determine the number of all possible votes to use it as divisor.
-		final int numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
-				+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
-						* getElection().getNumberOfVotesPerBallot();
-		if (numberOfAllPossibleVotes == 0) {
+		// Determine the maximum number of unevaluated votes to use it as divisor.
+		final int numberOfPossiblyMissingVotes
+				= (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
+						* Math.min(getElection().getNumberOfVotesPerBallot(),
+								getElection().getNominations(getParty()).size());
+		if (numberOfPossiblyMissingVotes == 0) {
 			return 0;
 		}
 
-		// Determine the minimum percentage for the chance of one seat ("untere
+		// Determine the minimum percentage for the chance to get one seat ("untere
 		// natürliche Sperrklausel") based on the corresponding formula for Sainte Laguë
 		// see https://www.wahlrecht.de/verfahren/faktische-sperrklausel.html
-		final double minPercentageForOneSeat
+		final double minPercentageForFirstSeat
 				= 0.5 / (getElection().getNumberOfSeats() + 0.5 * getElection().getParties().size() - 1);
 
-		// TODO
-		final double percentageOfAllBallots = (double) getNumberOfVotes() / numberOfAllPossibleVotes;
+		// Calculate the number of list result candidates, taking care of the minimum
+		// percentage for the first seat.
+		final double percentageOfAllBallots = (double) (getNumberOfVotes() + numberOfPossiblyMissingVotes)
+				/ (getElectionResult().getNumberOfVotes() + numberOfPossiblyMissingVotes);
 		return (int) Math
-				.nextUp(getElection().getNumberOfSeats() * (percentageOfAllBallots - minPercentageForOneSeat) + 1);
+				.nextUp(getElection().getNumberOfSeats() * (percentageOfAllBallots - minPercentageForFirstSeat) + 1);
 	}
 
 	/**
