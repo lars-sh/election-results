@@ -37,7 +37,7 @@ ol {
 	grid-template-columns: 1fr auto 1fr;
 }
 .footer::before {
-	content: "© Lars Knickrehm";
+	content: "© Lars Knickrehm, Angaben ohne Gewähr";
 	grid-column: 1;
 }
 .footer > .legend {
@@ -64,7 +64,7 @@ ol {
 	text-align: right;
 }
 .footer > .timestamp::after {
-	content: " Uhr, Angaben ohne Gewähr";
+	content: " Uhr";
 }
 .footer > .timestamp::before {
 	content: "Stand: ";
@@ -95,7 +95,6 @@ ol {
 .nomination-result.certain-list > .name,
 .footer > .legend > .certain {
 	text-decoration: underline;
-	text-decoration-thickness: 0.05em;
 }
 .nomination-result.certain-not_elected > .name,
 .footer > .legend > .certain-not_elected {
@@ -115,7 +114,7 @@ ol {
 }
 .nomination-result.type-direct > .type::before,
 .footer > .legend > .direct::before {
-	content: "\2605";
+	content: "\25cf";
 }
 .nomination-result.type-direct_draw > .type::before {
 	content: "L";
@@ -125,7 +124,7 @@ ol {
 }
 .nomination-result.type-list > .type::before,
 .footer > .legend > .list::before {
-	content: "\2606";
+	content: "\25cb";
 }
 .nomination-result.type-list_draw > .type::before {
 	content: "L";
@@ -226,7 +225,8 @@ ol {
 	.footer > .legend::before {
 		content: "Legende:";
 	}
-	.footer > .legend > * {
+	.footer > .legend > *,
+	.footer > .legend > *:first-child {
 		display: block;
 		margin-left: 2em;
 	}
