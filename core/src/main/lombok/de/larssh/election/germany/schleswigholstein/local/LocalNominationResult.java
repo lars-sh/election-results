@@ -65,9 +65,12 @@ public class LocalNominationResult
 	/**
 	 * Sainte Laguë value
 	 *
-	 * @return the Sainte Laguë value
+	 * <p>
+	 * This value is empty in case of a nomination without party.
+	 *
+	 * @return the Sainte Laguë value or empty
 	 */
-	BigDecimal sainteLagueValue;
+	Optional<BigDecimal> sainteLagueValue;
 
 	/**
 	 * Stimmzettel der Bewerberin oder des Bewerbers

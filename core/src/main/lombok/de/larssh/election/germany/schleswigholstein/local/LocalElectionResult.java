@@ -532,7 +532,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.map(nomination -> new LocalNominationResult(this,
 						nomination,
 						resultTypes.getOrDefault(nomination, LocalNominationResultType.NOT_ELECTED),
-						sainteLague.getOrDefault(nomination, BigDecimal.ZERO)))
+						Optional.ofNullable(sainteLague.get(nomination))))
 				.sorted()
 				.collect(toLinkedHashMap(LocalNominationResult::getNomination, identity()));
 	}

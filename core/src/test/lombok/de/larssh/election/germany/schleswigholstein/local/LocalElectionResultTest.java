@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.OptionalInt;
@@ -40,7 +39,7 @@ class LocalElectionResultTest {
 		result.getNominationResults().values().forEach(nominationResult -> {
 			assertThat(nominationResult.getBallots()).isEmpty();
 			assertThat(nominationResult.getNumberOfVotes()).isZero();
-			assertThat(nominationResult.getSainteLagueValue()).isEqualTo(BigDecimal.ZERO);
+			assertThat(nominationResult.getSainteLagueValue()).isEmpty();
 			assertThat(nominationResult.getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
 		});
 		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.empty());
