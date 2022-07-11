@@ -63,6 +63,8 @@ public class PresentationFiles {
 	 * presentation file.
 	 */
 	@RequiredArgsConstructor
+	@SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE",
+			justification = "Creating system independent output by design")
 	private static class PresentationFileWriter {
 		/**
 		 * The value 100, with a scale of 0.
