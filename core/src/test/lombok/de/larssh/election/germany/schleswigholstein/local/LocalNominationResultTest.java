@@ -207,11 +207,12 @@ class LocalNominationResultTest {
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
+				2,
 				emptyMap(),
-				resultWithoutDrawResults.getBallots(),
 				new HashSet<>(asList(LocalElectionTest.findNomination(election, "Böttger", "Johannes"),
 						LocalElectionTest.findNomination(election, "Eggers", "Dirk"))),
-				singleton(LocalElectionTest.findNomination(election, "Beck", "Karsten")));
+				singleton(LocalElectionTest.findNomination(election, "Beck", "Karsten")),
+				resultWithoutDrawResults.getBallots());
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);
@@ -256,12 +257,13 @@ class LocalNominationResultTest {
 				LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN,
 				Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
+				2,
 				emptyMap(),
-				resultWithoutDrawResults.getBallots(),
 				singleton(LocalElectionTest.findNomination(election, "Böttger", "Johannes")),
 				new HashSet<>(asList(LocalElectionTest.findNomination(election, "Beck", "Karsten"),
 						LocalElectionTest.findNomination(election, "Böttger", "Volker"),
-						LocalElectionTest.findNomination(election, "Jögimar", "Helga"))));
+						LocalElectionTest.findNomination(election, "Jögimar", "Helga"))),
+				resultWithoutDrawResults.getBallots());
 
 		final Map<LocalNomination, LocalNominationResult> nominationResults
 				= getAndAssertNominationResults(result, true);

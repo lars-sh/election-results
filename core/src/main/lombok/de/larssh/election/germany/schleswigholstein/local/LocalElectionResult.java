@@ -129,6 +129,17 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	LocalElection election;
 
 	/**
+	 * Scale (decimal places) of Sainte Laguë values
+	 *
+	 * <p>
+	 * Usually this is {@code 2}.
+	 *
+	 * @return the scale (decimal places) of Sainte Laguë values
+	 */
+	@JsonProperty(index = 0)
+	int sainteLagueScale;
+
+	/**
 	 * Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 *
 	 * <p>
@@ -140,14 +151,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@Getter(AccessLevel.NONE)
 	@EqualsAndHashCode.Include
 	Map<District<?>, OptionalInt> numberOfAllBallots;
-
-	/**
-	 * Stimmzettel
-	 *
-	 * @return Stimmzettel
-	 */
-	@ToString.Exclude
-	List<LocalBallot> ballots;
 
 	/**
 	 * Ausgeloste Loskandidaten mit Direktmandat
@@ -166,6 +169,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@ToString.Exclude
 	@EqualsAndHashCode.Include
 	Set<LocalNomination> listDrawResults;
+
+	/**
+	 * Stimmzettel
+	 *
+	 * @return Stimmzettel
+	 */
+	@ToString.Exclude
+	List<LocalBallot> ballots;
 
 	/**
 	 * Wahlergebnis einzelner Bewerberinnen und Bewerber
@@ -201,32 +212,36 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@JsonCreator(mode = Mode.DELEGATING)
 	private LocalElectionResult(final ParsableLocalElectionResult parsable) {
 		this(ELECTION_FOR_JSON_CREATOR.get(),
+				parsable.getSainteLagueScale(),
 				parsable.getNumberOfAllBallots(),
-				parsable.getLocalBallots(),
 				parsable.getDirectDrawResults(),
-				parsable.getListDrawResults());
+				parsable.getListDrawResults(),
+				parsable.getLocalBallots());
 	}
 
 	/**
 	 * Wahlergebnis
 	 *
 	 * @param election           Wahl
+	 * @param sainteLagueScale   Scale (decimal places) of Sainte Laguë values
 	 * @param numberOfAllBallots optional number of all ballots of the election
-	 * @param ballots            Stimmzettel
 	 * @param directDrawResults  Ausgeloste Loskandidaten mit Direktmandat
 	 * @param listDrawResults    Ausgeloste Loskandidaten mit Listenmandat
+	 * @param ballots            Stimmzettel
 	 */
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Election is no longer modifiable when passed here.")
 	public LocalElectionResult(final LocalElection election,
+			final int sainteLagueScale,
 			final Map<District<?>, OptionalInt> numberOfAllBallots,
-			final List<LocalBallot> ballots,
 			final Set<LocalNomination> directDrawResults,
-			final Set<LocalNomination> listDrawResults) {
+			final Set<LocalNomination> listDrawResults,
+			final List<LocalBallot> ballots) {
 		this.election = election;
-		this.ballots = unmodifiableList(ballots);
+		this.sainteLagueScale = sainteLagueScale;
 		this.numberOfAllBallots = unmodifiableMap(new HashMap<>(numberOfAllBallots));
 		this.directDrawResults = unmodifiableSet(new LinkedHashSet<>(directDrawResults));
 		this.listDrawResults = unmodifiableSet(new LinkedHashSet<>(listDrawResults));
+		this.ballots = unmodifiableList(ballots);
 
 		for (final LocalBallot ballot : ballots) {
 			if (!ballot.getElection().equals(election)) {
@@ -269,8 +284,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					.distinct()).ifPresent(value -> numberOfAllBallots.put(district, value));
 		}
 
-		final List<LocalBallot> ballots
-				= results.stream().map(LocalElectionResult::getBallots).flatMap(Collection::stream).collect(toList());
 		final Set<LocalNomination> directDrawResults = results.stream()
 				.map(LocalElectionResult::getDirectDrawResults)
 				.flatMap(Collection::stream)
@@ -279,7 +292,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.map(LocalElectionResult::getListDrawResults)
 				.flatMap(Collection::stream)
 				.collect(toSet());
-		return new LocalElectionResult(getElection(), numberOfAllBallots, ballots, directDrawResults, listDrawResults);
+		final List<LocalBallot> ballots
+				= results.stream().map(LocalElectionResult::getBallots).flatMap(Collection::stream).collect(toList());
+		return new LocalElectionResult(getElection(),
+				sainteLagueScale,
+				numberOfAllBallots,
+				directDrawResults,
+				listDrawResults,
+				ballots);
 	}
 
 	/** {@inheritDoc} */
@@ -288,10 +308,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		final List<LocalBallot> filteredBallots = getBallots().stream().filter(filter).collect(toList());
 
 		return new LocalElectionResult(getElection(),
+				sainteLagueScale,
 				emptyMap(),
-				filteredBallots,
 				getDirectDrawResults(),
-				getListDrawResults());
+				getListDrawResults(),
+				filteredBallots);
 	}
 
 	/**
@@ -306,10 +327,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				= Maps.<District<?>, OptionalInt>builder().put(district, getNumberOfAllBallots(district)).get();
 
 		return new LocalElectionResult(getElection(),
+				sainteLagueScale,
 				numberOfFilteredBallots,
-				getBallots(district),
 				getDirectDrawResults(),
-				getListDrawResults());
+				getListDrawResults(),
+				getBallots(district));
 	}
 
 	/**
@@ -426,13 +448,15 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@JsonProperty("numberOfAllBallots")
+	@JsonProperty(value = "numberOfAllBallots", index = 1)
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, OptionalInt> getNumberOfAllBallotsForJackson() {
+	private Map<String, Integer> getNumberOfAllBallotsForJackson() {
 		return numberOfAllBallots.keySet()
 				.stream()
-				.collect(toMap(District::getKey, this::getNumberOfAllBallots, TreeMap::new));
+				.map(district -> Maps.entry(district.getKey(), getNumberOfAllBallots(district)))
+				.filter(entry -> entry.getValue().isPresent())
+				.collect(toMap(Entry::getKey, entry -> entry.getValue().getAsInt(), TreeMap::new));
 	}
 
 	/**
@@ -670,9 +694,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private BigDecimal getSainteLagueValue(final BigDecimal votesOfParty, final int step) {
-		return votesOfParty.divide(BigDecimal.valueOf(step * 10 + 5, 1),
-				getElection().getSainteLagueScale(),
-				RoundingMode.HALF_UP);
+		return votesOfParty.divide(BigDecimal.valueOf(step * 10 + 5, 1), getSainteLagueScale(), RoundingMode.HALF_UP);
 	}
 
 	/**
@@ -958,9 +980,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		Map<String, OptionalInt> numberOfAllBallots;
 
 		/**
-		 * Stimmzettel
+		 * Scale (decimal places) of Sainte Laguë values
+		 *
+		 * <p>
+		 * Usually this is {@code 2}.
+		 *
+		 * @return the scale (decimal places) of Sainte Laguë values
 		 */
-		List<ParsableLocalBallot> ballots;
+		int sainteLagueScale;
 
 		/**
 		 * Ausgeloste Loskandidaten mit Direktmandat
@@ -971,6 +998,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 * Ausgeloste Loskandidaten mit Listenmandat
 		 */
 		Set<String> listDrawResults;
+
+		/**
+		 * Stimmzettel
+		 */
+		List<ParsableLocalBallot> ballots;
 
 		/**
 		 * Stimmzettel

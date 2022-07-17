@@ -200,10 +200,11 @@ public class PollingStationResultFiles {
 							}
 						});
 				return new LocalElectionResult(election,
+						2,
 						Maps.<District<?>, OptionalInt>builder().put(pollingStation, numberOfAllBallots.get()).get(),
-						ballots,
 						emptySet(),
-						emptySet());
+						emptySet(),
+						ballots);
 			}
 		}
 

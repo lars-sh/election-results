@@ -244,8 +244,8 @@ public class PresentationFiles {
 
 			return String.format(Locale.ROOT,
 					TEMPLATE_POLLING_STATION.get(),
-					pollingStation.getBackgroundColor().toCssColor(),
-					pollingStation.getFontColor().toCssColor(),
+					pollingStation.getBackgroundColor().toHex(),
+					pollingStation.getFontColor().toHex(),
 					OptionalInts
 							.mapToObj(result.getNumberOfAllBallots(pollingStation),
 									numOfBallots -> estimatedNumberOfAllBallots.compareTo(BigDecimal.ZERO) == 0
@@ -362,8 +362,8 @@ public class PresentationFiles {
 					encodeXml(formatNominationResultTitle(result)),
 					encodeXml(result.getNomination().getPerson().getKey()),
 					result.getNumberOfVotes(),
-					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toCssColor(),
-					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toCssColor(),
+					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toHex(),
+					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toHex(),
 					maxNumberOfVotes.compareTo(BigDecimal.ZERO) == 0
 							? BigDecimal.ZERO
 							: BigDecimal.valueOf(result.getNumberOfVotes())
@@ -506,8 +506,8 @@ public class PresentationFiles {
 				final Collection<LocalNominationResult> nominationResults) {
 			return String.format(Locale.ROOT,
 					TEMPLATE_PARTY_RESULT.get(),
-					backgroundColor.toCssColor(),
-					fontColor.toCssColor(),
+					backgroundColor.toHex(),
+					fontColor.toHex(),
 					encodeXml(title),
 					encodeXml(name),
 					numberOfSeats,

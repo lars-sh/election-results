@@ -1,12 +1,14 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.District;
@@ -30,6 +32,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	 *
 	 * @return Art des Wahlgebiets
 	 */
+	@JsonProperty(index = 0)
 	LocalDistrictType type;
 
 	/**
@@ -145,7 +148,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 				@Nullable final LocalDistrictType type,
 				@Nullable final Color backgroundColor,
 				@Nullable final Color fontColor,
-				@Nullable final Set<ParsableLocalDistrict> children) {
+				@Nullable final LinkedHashSet<ParsableLocalDistrict> children) {
 			this.name = Nullables.orElseThrow(name,
 					() -> new ElectionException("Missing required parameter \"name\" for local district root."));
 			this.children = Nullables.orElseGet(children, Collections::emptySet);
@@ -185,7 +188,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		/**
 		 * Wahlbezirke des Wahlkreises
 		 */
-		final Set<ParsableLocalPollingStation> children;
+		Set<ParsableLocalPollingStation> children;
 
 		/**
 		 * Wahlkreis (§ 15 GKWG)
@@ -199,7 +202,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		ParsableLocalDistrict(@Nullable final String name,
 				@Nullable final Color backgroundColor,
 				@Nullable final Color fontColor,
-				@Nullable final Set<ParsableLocalPollingStation> children) {
+				@Nullable final LinkedHashSet<ParsableLocalPollingStation> children) {
 			this.name = Nullables.orElseThrow(name,
 					() -> new ElectionException("Missing required parameter \"name\" for local district."));
 			this.backgroundColor = Nullables.orElse(backgroundColor, Color.BLACK);

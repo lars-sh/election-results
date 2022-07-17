@@ -28,6 +28,14 @@ public class Party implements Comparable<Party> {
 			.thenComparing(Party::getName);
 
 	/**
+	 * Type of the party
+	 *
+	 * @return the type of the party
+	 */
+	@EqualsAndHashCode.Include
+	PartyType type;
+
+	/**
 	 * Short Name
 	 *
 	 * @return the short name
@@ -42,14 +50,6 @@ public class Party implements Comparable<Party> {
 	 */
 	@EqualsAndHashCode.Include
 	String name;
-
-	/**
-	 * Type of the party
-	 *
-	 * @return the type of the party
-	 */
-	@EqualsAndHashCode.Include
-	PartyType type;
 
 	/**
 	 * Background color to use in diagrams

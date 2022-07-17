@@ -1,0 +1,485 @@
+{
+	"name": "Gemeindewahl",
+	"date": [2018, 5, 6],
+	"district": {
+		"type": "KREISANGEHOERIGE_GEMEINDE",
+		"name": "Gemeinde Rethwisch",
+		"backgroundColor": "#000000",
+		"fontColor": "#ffffff",
+		"children": [
+			{
+				"name": "Rethwisch",
+				"backgroundColor": "#000000",
+				"fontColor": "#ffffff",
+				"children": [
+					{
+						"name": "Klein Boden",
+						"backgroundColor": "#0762bc",
+						"fontColor": "#ffffff"
+					}, {
+						"name": "Rethwischdorf",
+						"backgroundColor": "#ed1c24",
+						"fontColor": "#ffffff"
+					}
+				]
+			}
+		]
+	},
+	"population": {
+		"Rethwisch": 1186
+	},
+	"numberOfEligibleVoters": {
+		"Rethwisch, Klein Boden": 273,
+		"Rethwisch, Rethwischdorf": 717
+	},
+	"parties": [
+		{
+			"type": "POLITICAL_PARTY",
+			"shortName": "CDU",
+			"name": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
+			"backgroundColor": "#333333",
+			"fontColor": "#ffffff"
+		}, {
+			"type": "POLITICAL_PARTY",
+			"shortName": "SPD",
+			"name": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch",
+			"backgroundColor": "#ed1c24",
+			"fontColor": "#ffffff"
+		}, {
+			"type": "ASSOCIATION_OF_VOTERS",
+			"shortName": "AWG",
+			"name": "Allgemeine Wählergemeinschaft Rethwisch",
+			"backgroundColor": "#ffcc00",
+			"fontColor": "#000000"
+		}, {
+			"type": "ASSOCIATION_OF_VOTERS",
+			"shortName": "FWR",
+			"name": "Freie Wählergemeinschaft Rethwisch",
+			"backgroundColor": "#0762bc",
+			"fontColor": "#ffffff"
+		}
+	],
+	"nominations": [
+		{
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Poppinga",
+				"givenName": "Jens",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Eggers",
+				"givenName": "Dirk",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Beck",
+				"givenName": "Karsten",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Motzkus",
+				"givenName": "Dietrich",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Behnk",
+				"givenName": "Sönke",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Weger",
+				"givenName": "Marcel",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Gräpel",
+				"givenName": "Carola",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Schwarz",
+				"givenName": "Rupert",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Klein",
+				"givenName": "Erik",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Dohrendorf",
+				"givenName": "Martina",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Bernhardt",
+				"givenName": "Christian",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"person": {
+				"familyName": "Topel",
+				"givenName": "Andreas",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Kröger",
+				"givenName": "Dirk",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Eick",
+				"givenName": "Ernst",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Jögimar",
+				"givenName": "Helga",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Ehlert",
+				"givenName": "Armin",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Ziebarth",
+				"givenName": "Angelika",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"person": {
+				"familyName": "Sauer",
+				"givenName": "Joachim",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Gäde",
+				"givenName": "Jan-Hendrik",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Böttger",
+				"givenName": "Johannes",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Böttger",
+				"givenName": "Volker",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Winter",
+				"givenName": "Martin",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Gäde",
+				"givenName": "Henning",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Allgemeine Wählergemeinschaft Rethwisch (AWG)",
+			"person": {
+				"familyName": "Stapelfeldt",
+				"givenName": "Albert",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Kühn",
+				"givenName": "Steffen",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Wahl",
+				"givenName": "Joachim",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Kraus",
+				"givenName": "Michael",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Breede",
+				"givenName": "Rolf",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Schöning",
+				"givenName": "Mathias",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "König",
+				"givenName": "Eva-Maria",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Hartz",
+				"givenName": "Catrin",
+				"gender": "FEMALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Dohrendorf",
+				"givenName": "Thomas",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Efrom",
+				"givenName": "Joachim",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Feddern",
+				"givenName": "Axel",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}, {
+			"district": "Rethwisch",
+			"party": "Freie Wählergemeinschaft Rethwisch (FWR)",
+			"person": {
+				"familyName": "Feddern",
+				"givenName": "Hartmut",
+				"gender": "MALE",
+				"yearOfBirth": null,
+				"nationality": "de",
+				"address": null,
+				"job": null
+			}
+		}
+	]
+}

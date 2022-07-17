@@ -31,7 +31,7 @@ class LocalElectionResultTest {
 	void testEmpty() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result
-				= new LocalElectionResult(election, emptyMap(), emptyList(), emptySet(), emptySet());
+				= new LocalElectionResult(election, 2, emptyMap(), emptySet(), emptySet(), emptyList());
 
 		assertThat(result.getBallots()).isEmpty();
 		assertThat(result.getEvaluationProgress(1)).isEmpty();

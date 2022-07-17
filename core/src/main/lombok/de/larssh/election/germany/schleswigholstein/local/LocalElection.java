@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -91,26 +90,29 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	}
 
 	/**
-	 * Wahlgebiet
+	 * Name of the election
+	 *
+	 * @return the name of the election
 	 */
+	@JsonProperty(index = 0)
 	@EqualsAndHashCode.Include
-	LocalDistrictRoot district;
+	String name;
 
 	/**
 	 * Date of the election
 	 *
 	 * @return the date of the election
 	 */
+	@JsonProperty(index = 1)
 	@EqualsAndHashCode.Include
 	LocalDate date;
 
 	/**
-	 * Name of the election
-	 *
-	 * @return the name of the election
+	 * Wahlgebiet
 	 */
+	@JsonProperty(index = 2)
 	@EqualsAndHashCode.Include
-	String name;
+	LocalDistrictRoot district;
 
 	/**
 	 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
@@ -133,16 +135,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@ToString.Exclude
 	Set<LocalNomination> nominations = new LinkedHashSet<>();
-
-	/**
-	 * Scale (decimal places) of Sainte Laguë values
-	 *
-	 * <p>
-	 * Usually this is {@code 2}.
-	 *
-	 * @return the scale (decimal places) of Sainte Laguë values
-	 */
-	int sainteLagueScale;
 
 	/**
 	 * Wahlgebiet, Wahlkreise und Wahlbezirke
@@ -184,7 +176,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
 			justification = "passing this to create*For, but made sure, it's filling the object in the correct order")
 	private LocalElection(final ParsableLocalElection parsable) {
-		this(parsable.getDistrict(), parsable.getDate(), parsable.getName(), parsable.getSainteLagueScale());
+		this(parsable.getName(), parsable.getDate(), parsable.getDistrict());
 
 		parsable.addPopulationTo(this);
 		parsable.addNumberOfEligibleVotersTo(this);
@@ -221,13 +213,14 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@JsonProperty("population")
+	@JsonProperty(value = "population", index = 3)
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, OptionalInt> getPopulationForJackson() {
+	private Map<String, Integer> getPopulationForJackson() {
 		return population.entrySet()
 				.stream()
-				.collect(toMap(entry -> entry.getKey().getKey(), Entry::getValue, TreeMap::new));
+				.filter(entry -> entry.getValue().isPresent())
+				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
 	}
 
 	/** {@inheritDoc} */
@@ -267,13 +260,14 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
 	 *         Wahlbezirk
 	 */
-	@JsonProperty("numberOfEligibleVoters")
+	@JsonProperty(value = "numberOfEligibleVoters", index = 4)
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, OptionalInt> getNumberOfEligibleVotersForJackson() {
+	private Map<String, Integer> getNumberOfEligibleVotersForJackson() {
 		return numberOfEligibleVoters.entrySet()
 				.stream()
-				.collect(toMap(entry -> entry.getKey().getKey(), Entry::getValue, TreeMap::new));
+				.filter(entry -> entry.getValue().isPresent())
+				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
 	}
 
 	/** {@inheritDoc} */
@@ -417,6 +411,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * @return Politische Parteien und Wählergruppen
 	 */
+	@JsonProperty(index = 6)
 	public Set<Party> getParties() {
 		return getNominations().stream()
 				.map(LocalNomination::getParty)
@@ -502,16 +497,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		List<ParsableLocalNomination> nominations;
 
 		/**
-		 * Scale (decimal places) of Sainte Laguë values
-		 *
-		 * <p>
-		 * Usually this is {@code 2}.
-		 *
-		 * @return the scale (decimal places) of Sainte Laguë values
-		 */
-		int sainteLagueScale;
-
-		/**
 		 * Politische Parteien und Wählergruppen
 		 *
 		 * @return Politische Parteien und Wählergruppen
@@ -529,7 +514,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten nach Wahlgebiet,
 		 *                               Wahlkreis oder Wahlbezirk
 		 * @param nominations            Bewerberinnen und Bewerber
-		 * @param sainteLagueScale       Scale (decimal places) of Sainte Laguë values
 		 * @param parties                Politische Parteien und Wählergruppen
 		 */
 		@SuppressWarnings("checkstyle:ParameterNumber")
@@ -538,8 +522,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 				@Nullable final String name,
 				@Nullable final Map<String, OptionalInt> population,
 				@Nullable final Map<String, OptionalInt> numberOfEligibleVoters,
-				@Nullable final List<de.larssh.election.germany.schleswigholstein.local.LocalElection.ParsableLocalNomination> nominations,
-				@Nullable final Integer sainteLagueScale,
+				@Nullable final List<ParsableLocalNomination> nominations,
 				@Nullable final Set<Party> parties) {
 			this.district = Nullables.orElseThrow(district,
 					() -> new ElectionException("Missing required parameter \"district\" for election."));
@@ -550,7 +533,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			this.population = Nullables.orElseGet(population, Collections::emptyMap);
 			this.numberOfEligibleVoters = Nullables.orElseGet(numberOfEligibleVoters, Collections::emptyMap);
 			this.nominations = Nullables.orElseGet(nominations, Collections::emptyList);
-			this.sainteLagueScale = Nullables.orElse(sainteLagueScale, 2);
 			this.parties = Nullables.orElseGet(parties, Collections::emptySet);
 		}
 

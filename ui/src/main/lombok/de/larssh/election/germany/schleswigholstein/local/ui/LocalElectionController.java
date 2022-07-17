@@ -32,10 +32,7 @@ public class LocalElectionController extends LocalElectionUiController {
 	public LocalElection getElection() {
 		// Election
 		final LocalDistrictRoot district = new LocalDistrictRoot(getDistrict().getText(), getDistrictType().getValue());
-		final LocalElection election = new LocalElection(district,
-				getDate().getValue(),
-				getName().getText(),
-				getSainteLagueScale().getValue());
+		final LocalElection election = new LocalElection(getName().getText(), getDate().getValue(), district);
 		if (getPopulationIsPresent().isSelected()) {
 			election.setPopulation(district, getPopulation().getValue());
 		}
@@ -114,7 +111,6 @@ public class LocalElectionController extends LocalElectionUiController {
 		getDistrictType().setValue(election.getDistrict().getType());
 		getDate().setValue(election.getDate());
 		getName().setText(election.getName());
-		getSainteLagueScale().getValueFactory().setValue(election.getSainteLagueScale());
 		final OptionalInt population = election.getPopulation(election.getDistrict());
 		getPopulation().getValueFactory().setValue(population.orElse(POPULATION_DEFAULT));
 		getPopulationIsPresent().setSelected(population.isPresent());

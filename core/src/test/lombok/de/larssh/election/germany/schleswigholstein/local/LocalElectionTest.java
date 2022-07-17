@@ -4,26 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
-import de.larssh.election.germany.schleswigholstein.Gender;
 import de.larssh.election.germany.schleswigholstein.Party;
-import de.larssh.election.germany.schleswigholstein.PartyType;
-import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Finals;
 import de.larssh.utils.annotations.PackagePrivate;
+import de.larssh.utils.io.Resources;
 import lombok.NoArgsConstructor;
 
 /**
@@ -51,134 +46,15 @@ public class LocalElectionTest {
 	 * @return Wahl
 	 */
 	public static LocalElection createElection() {
-		final LocalDistrictRoot districtRoot
-				= new LocalDistrictRoot("Gemeinde Rethwisch", LocalDistrictType.KREISANGEHOERIGE_GEMEINDE);
-
-		final LocalElection election = new LocalElection(districtRoot, LocalDate.of(2018, 5, 6), "Gemeindewahl", 2);
-		election.setPopulation(districtRoot, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(districtRoot, OptionalInt.empty());
-
-		// Add districts first, because nominations are based on the districts
-		addDistricts(election);
-		addPartiesAndNominations(election);
-
-		return election;
-	}
-
-	/**
-	 * Adds districts for testing to {@code election}.
-	 *
-	 * @param election Wahl
-	 */
-	private static void addDistricts(final LocalElection election) {
-		final LocalDistrict districtLocal = election.getDistrict().createChild("Rethwisch");
-		election.setPopulation(districtLocal, 1186);
-		election.setNumberOfEligibleVoters(districtLocal, OptionalInt.empty());
-
-		final LocalPollingStation pollingStationKleinBoden
-				= districtLocal.createChild(POLLING_STATION_NAME_KLEIN_BODEN);
-		pollingStationKleinBoden.setBackgroundColor(Color.rgb(7, 98, 188));
-		election.setPopulation(pollingStationKleinBoden, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(pollingStationKleinBoden, 273);
-
-		final LocalPollingStation pollingStationRethwischdorf
-				= districtLocal.createChild(POLLING_STATION_NAME_RETHWISCHDORF);
-		pollingStationRethwischdorf.setBackgroundColor(Color.rgb(237, 28, 36));
-		election.setPopulation(pollingStationRethwischdorf, OptionalInt.empty());
-		election.setNumberOfEligibleVoters(pollingStationRethwischdorf, 717);
-	}
-
-	/**
-	 * Adds parties and nominations for testing to {@code election}.
-	 *
-	 * @param election Wahl
-	 */
-	private static void addPartiesAndNominations(final LocalElection election) {
-		final Party partyCdu = new Party("CDU", //
-				"Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
-				PartyType.POLITICAL_PARTY);
-		partyCdu.setBackgroundColor(Color.rgb(51, 51, 51));
-		final Party partySpd = new Party("SPD", //
-				"Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch",
-				PartyType.POLITICAL_PARTY);
-		partySpd.setBackgroundColor(Color.rgb(237, 28, 36));
-		final Party partyAwg = new Party("AWG", //
-				"Allgemeine Wählergemeinschaft Rethwisch",
-				PartyType.ASSOCIATION_OF_VOTERS);
-		partyAwg.setBackgroundColor(Color.rgb(255, 204, 0));
-		partyAwg.setFontColor(Color.BLACK);
-		final Party partyFwr = new Party("FWR", //
-				"Freie Wählergemeinschaft Rethwisch",
-				PartyType.ASSOCIATION_OF_VOTERS);
-		partyFwr.setBackgroundColor(Color.rgb(7, 98, 188));
-
-		// CDU
-		addNomination(election, partyCdu, "Poppinga", "Jens", Gender.MALE);
-		addNomination(election, partyCdu, "Eggers", "Dirk", Gender.MALE);
-		addNomination(election, partyCdu, "Beck", "Karsten", Gender.MALE);
-		addNomination(election, partyCdu, "Motzkus", "Dietrich", Gender.MALE);
-		addNomination(election, partyCdu, "Behnk", "Sönke", Gender.MALE);
-		addNomination(election, partyCdu, "Weger", "Marcel", Gender.MALE);
-		addNomination(election, partyCdu, "Gräpel", "Carola", Gender.FEMALE);
-		addNomination(election, partyCdu, "Schwarz", "Rupert", Gender.MALE);
-		addNomination(election, partyCdu, "Klein", "Erik", Gender.MALE);
-		addNomination(election, partyCdu, "Dohrendorf", "Martina", Gender.FEMALE);
-		addNomination(election, partyCdu, "Bernhardt", "Christian", Gender.MALE);
-		addNomination(election, partyCdu, "Topel", "Andreas", Gender.MALE);
-
-		// SPD
-		addNomination(election, partySpd, "Kröger", "Dirk", Gender.MALE);
-		addNomination(election, partySpd, "Eick", "Ernst", Gender.MALE);
-		addNomination(election, partySpd, "Jögimar", "Helga", Gender.FEMALE);
-		addNomination(election, partySpd, "Ehlert", "Armin", Gender.MALE);
-		addNomination(election, partySpd, "Ziebarth", "Angelika", Gender.FEMALE);
-		addNomination(election, partySpd, "Sauer", "Joachim", Gender.MALE);
-
-		// AWG
-		addNomination(election, partyAwg, "Gäde", "Jan-Hendrik", Gender.MALE);
-		addNomination(election, partyAwg, "Böttger", "Johannes", Gender.MALE);
-		addNomination(election, partyAwg, "Böttger", "Volker", Gender.MALE);
-		addNomination(election, partyAwg, "Winter", "Martin", Gender.MALE);
-		addNomination(election, partyAwg, "Gäde", "Henning", Gender.MALE);
-		addNomination(election, partyAwg, "Stapelfeldt", "Albert", Gender.MALE);
-
-		// FWR
-		addNomination(election, partyFwr, "Kühn", "Steffen", Gender.MALE);
-		addNomination(election, partyFwr, "Wahl", "Joachim", Gender.MALE);
-		addNomination(election, partyFwr, "Kraus", "Michael", Gender.MALE);
-		addNomination(election, partyFwr, "Breede", "Rolf", Gender.MALE);
-		addNomination(election, partyFwr, "Schöning", "Mathias", Gender.MALE);
-		addNomination(election, partyFwr, "König", "Eva-Maria", Gender.FEMALE);
-		addNomination(election, partyFwr, "Hartz", "Catrin", Gender.FEMALE);
-		addNomination(election, partyFwr, "Dohrendorf", "Thomas", Gender.MALE);
-		addNomination(election, partyFwr, "Efrom", "Joachim", Gender.MALE);
-		addNomination(election, partyFwr, "Feddern", "Axel", Gender.MALE);
-		addNomination(election, partyFwr, "Feddern", "Hartmut", Gender.MALE);
-	}
-
-	/**
-	 * Adds a nomination for testing to {@code election}.
-	 *
-	 * @param election   Wahl
-	 * @param party      the party
-	 * @param familyName the family name
-	 * @param givenName  the given name
-	 * @param gender     the gender
-	 */
-	private static void addNomination(final LocalElection election,
-			final Party party,
-			final String familyName,
-			final String givenName,
-			final Gender gender) {
-		election.createNomination(election.getDistrict().getChildren().iterator().next(),
-				new Person(familyName,
-						givenName,
-						Optional.of(gender),
-						OptionalInt.empty(),
-						Optional.of(Locale.GERMAN),
-						Optional.empty(),
-						Optional.empty()),
-				Optional.of(party));
+		try (Reader reader = Files.newBufferedReader(
+				Resources
+						.getResourceRelativeTo(LocalElectionTest.class,
+								Paths.get(LocalElection.class.getSimpleName() + ".json"))
+						.get())) {
+			return LocalElection.fromJson(reader);
+		} catch (final IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**

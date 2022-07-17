@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.lars-sh.election-results</groupId>
+		<artifactId>election-results-parent</artifactId>
+		<version>0.9.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>election-results-cli</artifactId>
+
+	<name>Election Results CLI</name>
+
+	<properties>
+		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
+		<parent-pom.create-dependabot-yml>false</parent-pom.create-dependabot-yml>
+		<parent-pom.create-github-workflow-yml>false</parent-pom.create-github-workflow-yml>
+		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.lars-sh.election-results</groupId>
+			<artifactId>election-results-core</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.6.3</version>
+		</dependency>
+	</dependencies>
+</project>

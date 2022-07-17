@@ -3,13 +3,22 @@ package de.larssh.election.germany.schleswigholstein.local.file;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Test;
 
+import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionTest;
@@ -35,7 +44,7 @@ class PresentationFilesTest {
 		// given
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result
-				= new LocalElectionResult(election, emptyMap(), emptyList(), emptySet(), emptySet());
+				= new LocalElectionResult(election, 2, emptyMap(), emptySet(), emptySet(), emptyList());
 
 		// when and then
 		assertDoesNotThrow(() -> {
