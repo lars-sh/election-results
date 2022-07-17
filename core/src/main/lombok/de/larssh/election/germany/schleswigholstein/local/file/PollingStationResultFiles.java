@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -170,6 +171,12 @@ public class PollingStationResultFiles {
 		 */
 		Map<String, Pattern> patternCache = new HashMap<>();
 
+		AtomicReference<OptionalInt> numberOfAllBallots = new AtomicReference<>(OptionalInt.empty());
+
+		List<LocalBallot> ballots = new ArrayList<>();
+
+		List<Throwable> exceptions = new ArrayList<>();
+
 		/**
 		 * Reads and parses {@link #reader} ands creates a {@link LocalElectionResult}
 		 * for {@link #election} in {@link #pollingStation}.
@@ -178,34 +185,55 @@ public class PollingStationResultFiles {
 		 * @throws IOException on IO error
 		 */
 		public LocalElectionResult read() throws IOException {
-			try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-				final AtomicReference<OptionalInt> numberOfAllBallots = new AtomicReference<>(OptionalInt.empty());
-				final List<LocalBallot> ballots = new ArrayList<>();
+			try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
+				final AtomicInteger lineNumber = new AtomicInteger(0);
 				bufferedReader.lines()
-						.map(String::trim)
-						.filter(line -> !line.isEmpty() && line.charAt(0) != LINE_COMMENT)
-						.forEachOrdered(line -> {
-							if (line.charAt(0) == LINE_COMMAND) {
-								final String command = line.substring(1).trim();
+						.map(line -> Maps.entry(lineNumber.incrementAndGet(), line.trim()))
+						.filter(entry -> !entry.getValue().isEmpty() && entry.getValue().charAt(0) != LINE_COMMENT)
+						.forEachOrdered(entry -> parseLine(entry.getKey(), entry.getValue()));
 
-								if (Strings.equalsIgnoreCaseAscii(COMMAND_CLEAR, command)) {
-									ballots.clear();
-								} else {
-									Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command)
-											.ifPresent(matcher -> numberOfAllBallots
-													.set(OptionalInt.of(Integer.parseInt(matcher.group(GROUP_VALUE)))));
-								}
-							} else {
-								ballots.addAll(createBallotsFromLine(line));
-							}
-						});
-				return new LocalElectionResult(election,
+				final LocalElectionResult result = new LocalElectionResult(election,
 						2,
 						Maps.<District<?>, OptionalInt>builder().put(pollingStation, numberOfAllBallots.get()).get(),
 						emptySet(),
 						emptySet(),
 						ballots);
+				if (exceptions.isEmpty()) {
+					return result;
+				}
+				throw new PollingStationResultFileParseException(exceptions,
+						result,
+						"Failed parsing the polling station's result file.");
 			}
+		}
+
+		private void parseLine(final int lineNumber, final String line) {
+			// Ballots
+			if (line.charAt(0) != LINE_COMMAND) {
+				try {
+					ballots.addAll(createBallotsFromLine(line));
+				} catch (final Exception e) {
+					exceptions.add(new PollingStationResultFileLineParseException(e, e.getMessage(), lineNumber, line));
+				}
+				return;
+			}
+
+			// Clear Command
+			final String command = line.substring(1).trim();
+			if (Strings.equalsIgnoreCaseAscii(COMMAND_CLEAR, command)) {
+				ballots.clear();
+				return;
+			}
+
+			// Number of all Ballots Command
+			final Optional<Matcher> matcher = Patterns.matches(NUMBER_OF_ALL_BALLOTS_PATTERN, command);
+			if (matcher.isPresent()) {
+				numberOfAllBallots.set(OptionalInt.of(Integer.parseInt(matcher.get().group(GROUP_VALUE))));
+				return;
+			}
+
+			exceptions.add(
+					new PollingStationResultFileLineParseException("Failed parsing command line.", lineNumber, line));
 		}
 
 		/**

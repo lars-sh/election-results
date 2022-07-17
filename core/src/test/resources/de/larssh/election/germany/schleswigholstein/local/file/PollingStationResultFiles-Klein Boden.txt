@@ -3,8 +3,8 @@
 #
 
 * Anzahl Stimmzettel: 166
-* Anzahl Wahlberechtigte: 273
-* Korrekturwert: -25
+# Anzahl Wahlberechtigte: 273
+# Korrekturwert: -25
 
 # Finales Ergebnis
 106 pop 

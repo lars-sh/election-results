@@ -19,12 +19,17 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
+import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileLineParseException;
+import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles;
 import de.larssh.utils.Finals;
+import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
 
 @RequiredArgsConstructor
 public class LocalElectionResultParams {
@@ -45,6 +50,11 @@ public class LocalElectionResultParams {
 			paramLabel = "<Polling Station>=<Path>",
 			description = "Any number of key-value pairs with the polling station as key and a path to the corresponding result file as value.")
 	Map<String, Path> resultPaths = emptyMap();
+
+	@Spec
+	@NonFinal
+	@Nullable
+	CommandSpec commandSpec = null;
 
 	Supplier<LocalElectionResult> result = Finals.lazy(() -> {
 		try {
@@ -70,9 +80,7 @@ public class LocalElectionResultParams {
 								resultPath.getKey()));
 
 				// Read Election Results of Polling Station
-				try (Reader reader = Files.newBufferedReader(resultPath.getValue())) {
-					result = result.add(PollingStationResultFiles.read(election, pollingStation, reader));
-				}
+				result = result.add(readSingleResult(election, pollingStation, resultPath.getValue()));
 			}
 			return result;
 		} catch (final IOException e) {
@@ -93,5 +101,26 @@ public class LocalElectionResultParams {
 		electionPath = null;
 		sainteLagueScale = 2;
 		resultPaths = emptyMap();
+		commandSpec = null;
+	}
+
+	@SuppressWarnings("resource")
+	private LocalElectionResult readSingleResult(final LocalElection election,
+			final LocalPollingStation pollingStation,
+			final Path path) throws IOException {
+		try (Reader reader = Files.newBufferedReader(path)) {
+			return PollingStationResultFiles.read(election, pollingStation, reader);
+		} catch (final PollingStationResultFileParseException e) {
+			for (final PollingStationResultFileLineParseException exception : e.getSuppressedLineParseExceptions()) {
+				Nullables.orElseThrow(commandSpec)
+						.commandLine()
+						.getErr()
+						.println(String.format("Line %d of %s: %s",
+								exception.getLineNumber(),
+								path.getFileName().toString(),
+								exception.getMessage()));
+			}
+			return e.getIncompleteResult();
+		}
 	}
 }

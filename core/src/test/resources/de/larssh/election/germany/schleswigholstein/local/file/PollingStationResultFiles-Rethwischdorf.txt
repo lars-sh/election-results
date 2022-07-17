@@ -3,8 +3,8 @@
 #
 
 * Anzahl Stimmzettel: 435
-* Anzahl Wahlberechtigte: 717
-* Korrekturwert: -1
+# Anzahl Wahlberechtigte: 717
+# Korrekturwert: -1
 
 # Finales Ergebnis
 222 cpop
