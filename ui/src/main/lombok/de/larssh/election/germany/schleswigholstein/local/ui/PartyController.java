@@ -22,7 +22,7 @@ public class PartyController extends PartyUiController {
 	}
 
 	public Party getParty() {
-		final Party party = new Party(getShortName().getText(), getName().getText(), getType().getValue());
+		final Party party = new Party(getType().getValue(), getShortName().getText(), getName().getText());
 		party.setBackgroundColor(colorFromJavaFx(getBackgroundColor().getValue()));
 		party.setFontColor(colorFromJavaFx(getFontColor().getValue()));
 		return party;
