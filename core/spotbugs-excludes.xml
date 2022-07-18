@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FindBugsFilter
-	xmlns="https://github.com/spotbugs/filter/3.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+<FindBugsFilter xmlns="https://github.com/spotbugs/filter/3.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
 	<Match>
 		<Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD" />
 	</Match>
 	<Match>
 		<Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING" />
 	</Match>
-	
-	
+
 	<!-- Methods use template files as String.format input -->
 	<Match>
 		<Bug pattern="FORMAT_STRING_MANIPULATION" />
@@ -18,5 +14,11 @@
 			<Class name="de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles$AwgWebsiteFileWriter" />
 			<Class name="de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles$PresentationFileWriter" />
 		</Or>
+	</Match>
+
+	<!-- Softening is expected here to allow processing incomplete results. -->
+	<Match>
+		<Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+		<Class name="de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles$PollingStationResultFileReader" />
 	</Match>
 </FindBugsFilter>

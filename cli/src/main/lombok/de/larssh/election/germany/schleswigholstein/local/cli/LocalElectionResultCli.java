@@ -30,11 +30,17 @@ import picocli.CommandLine.Parameters;
 		versionProvider = LocalElectionResultCli.class,
 		description = "TODO")
 public class LocalElectionResultCli implements IVersionProvider {
+	/**
+	 * One hundred
+	 */
+	private static final int HUNDRED = 100;
+
 	private static final String WRITE_TO = "File to write to.";
 
 	private static final String FILE_OVERWRITTEN = "\nIn case the file exists already it is overwritten.";
 
-	public static void main(final String... args) throws Exception {
+	@SuppressWarnings("checkstyle:UncommentedMain")
+	public static void main(final String... args) {
 		System.exit(new CommandLine(new LocalElectionResultCli()).execute(args));
 	}
 
@@ -74,8 +80,8 @@ public class LocalElectionResultCli implements IVersionProvider {
 				.stream()
 				.collect(toMap(identity(), result.get()::getNumberOfAllBallots));
 
-		for (int numberOfBallots = result.get().getBallots().size() * start / 100;
-				numberOfBallots <= result.get().getBallots().size() * end / 100 + stepSize - 1;
+		for (int numberOfBallots = result.get().getBallots().size() * start / HUNDRED;
+				numberOfBallots <= result.get().getBallots().size() * end / HUNDRED + stepSize - 1;
 				numberOfBallots += stepSize) {
 			final LocalElectionResult subResult = new LocalElectionResult(result.get().getElection(),
 					result.get().getSainteLagueScale(),

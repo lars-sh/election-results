@@ -214,7 +214,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
 	@JsonProperty(value = "population", index = 3)
-	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.UnusedPrivateMethod" })
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, Integer> getPopulationForJackson() {
 		return population.entrySet()
@@ -261,7 +261,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *         Wahlbezirk
 	 */
 	@JsonProperty(value = "numberOfEligibleVoters", index = 4)
-	@SuppressWarnings("PMD.UnusedPrivateMethod")
+	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.UnusedPrivateMethod" })
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, Integer> getNumberOfEligibleVotersForJackson() {
 		return numberOfEligibleVoters.entrySet()
@@ -412,6 +412,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Politische Parteien und Wählergruppen
 	 */
 	@JsonProperty(index = 6)
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public Set<Party> getParties() {
 		return getNominations().stream()
 				.map(LocalNomination::getParty)

@@ -144,6 +144,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		 * @param children        Wahlkreise des Wahlgebiets
 		 */
 		@PackagePrivate
+		@SuppressWarnings("PMD.LooseCoupling")
 		ParsableLocalDistrictRoot(@Nullable final String name,
 				@Nullable final LocalDistrictType type,
 				@Nullable final Color backgroundColor,
@@ -199,6 +200,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		 * @param children        Wahlbezirke des Wahlkreises
 		 */
 		@PackagePrivate
+		@SuppressWarnings("PMD.LooseCoupling")
 		ParsableLocalDistrict(@Nullable final String name,
 				@Nullable final Color backgroundColor,
 				@Nullable final Color fontColor,

@@ -171,21 +171,30 @@ public class PollingStationResultFiles {
 		 */
 		Map<String, Pattern> patternCache = new HashMap<>();
 
+		/**
+		 * Parsed number of all ballots
+		 */
 		AtomicReference<OptionalInt> numberOfAllBallots = new AtomicReference<>(OptionalInt.empty());
 
+		/**
+		 * Successfully parsed ballots
+		 */
 		List<LocalBallot> ballots = new ArrayList<>();
 
-		List<Throwable> exceptions = new ArrayList<>();
+		/**
+		 * Collected parse errors
+		 */
+		List<PollingStationResultFileLineParseException> exceptions = new ArrayList<>();
 
 		/**
-		 * Reads and parses {@link #reader} ands creates a {@link LocalElectionResult}
+		 * Reads and parses {@link #reader} and creates a {@link LocalElectionResult}
 		 * for {@link #election} in {@link #pollingStation}.
 		 *
 		 * @return the created {@link LocalElectionResult}
 		 * @throws IOException on IO error
 		 */
 		public LocalElectionResult read() throws IOException {
-			try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
+			try (BufferedReader bufferedReader = new BufferedReader(reader)) {
 				final AtomicInteger lineNumber = new AtomicInteger(0);
 				bufferedReader.lines()
 						.map(line -> Maps.entry(lineNumber.incrementAndGet(), line.trim()))
@@ -207,13 +216,20 @@ public class PollingStationResultFiles {
 			}
 		}
 
+		/**
+		 * Tries to parse {@code link}.
+		 *
+		 * @param lineNumber the line number
+		 * @param line       the line content
+		 */
+		@SuppressWarnings({ "checkstyle:XIllegalCatchDefault", "PMD.AvoidCatchingGenericException" })
 		private void parseLine(final int lineNumber, final String line) {
 			// Ballots
 			if (line.charAt(0) != LINE_COMMAND) {
 				try {
 					ballots.addAll(createBallotsFromLine(line));
 				} catch (final Exception e) {
-					exceptions.add(new PollingStationResultFileLineParseException(e, e.getMessage(), lineNumber, line));
+					exceptions.add(new PollingStationResultFileLineParseException(e, lineNumber, line, e.getMessage()));
 				}
 				return;
 			}
@@ -233,7 +249,7 @@ public class PollingStationResultFiles {
 			}
 
 			exceptions.add(
-					new PollingStationResultFileLineParseException("Failed parsing command line.", lineNumber, line));
+					new PollingStationResultFileLineParseException(lineNumber, line, "Failed parsing command line."));
 		}
 
 		/**
@@ -425,7 +441,7 @@ public class PollingStationResultFiles {
 
 			final OptionalInt numberOfEligibleVoters = result.getElection().getNumberOfEligibleVoters();
 			if (numberOfEligibleVoters.isPresent()) {
-				write("%s Anzahl Wahlberechtigte: %d\n", LINE_COMMAND, numberOfEligibleVoters.getAsInt());
+				write("%s Anzahl Wahlberechtigte: %d\n", LINE_COMMENT, numberOfEligibleVoters.getAsInt());
 			}
 
 			final OptionalInt numberOfAllBallots = result.getNumberOfAllBallots(pollingStation);

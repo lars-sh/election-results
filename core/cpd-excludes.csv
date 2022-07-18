@@ -1,6 +1,7 @@
 de.larssh.election.germany.schleswigholstein.District,de.larssh.election.germany.schleswigholstein.Party
 de.larssh.election.germany.schleswigholstein.District,de.larssh.election.germany.schleswigholstein.Party,de.larssh.election.germany.schleswigholstein.local.LocalElection
 de.larssh.election.germany.schleswigholstein.District,de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot
+de.larssh.election.germany.schleswigholstein.District,de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot,de.larssh.election.germany.schleswigholstein.Party.java
 de.larssh.election.germany.schleswigholstein.District,de.larssh.election.germany.schleswigholstein.local.LocalElection
 de.larssh.election.germany.schleswigholstein.local.LocalBallot,de.larssh.election.germany.schleswigholstein.local.LocalElectionResult
 de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot

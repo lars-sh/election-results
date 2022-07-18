@@ -104,7 +104,7 @@ public class LocalElectionResultParams {
 		commandSpec = null;
 	}
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	private LocalElectionResult readSingleResult(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final Path path) throws IOException {
