@@ -35,9 +35,9 @@ public class LocalElectionResultCli implements IVersionProvider {
 	 */
 	private static final int HUNDRED = 100;
 
-	private static final String WRITE_TO = "File to write to.";
+	private static final String DESCRIPTION_FILE_WRITE = "File to write to.";
 
-	private static final String FILE_OVERWRITTEN = "\nIn case the file exists already it is overwritten.";
+	private static final String DESCRIPTION_OVERWRITE_FILE = "\nIn case the file exists already it is overwritten.";
 
 	@SuppressWarnings("checkstyle:UncommentedMain")
 	public static void main(final String... args) {
@@ -46,7 +46,8 @@ public class LocalElectionResultCli implements IVersionProvider {
 
 	@Command(name = "awg-website", description = "Creates a PHP file to be used for the AWG website.")
 	public void awgWebsite(@Mixin final LocalElectionResultParams result,
-			@Parameters(paramLabel = "FILE", description = WRITE_TO + FILE_OVERWRITTEN) final Path output)
+			@Parameters(paramLabel = "FILE",
+					description = DESCRIPTION_FILE_WRITE + DESCRIPTION_OVERWRITE_FILE) final Path output)
 			throws IOException {
 		try (Writer writer = Files.newBufferedWriter(output)) {
 			AwgWebsiteFiles.write(result.get(), writer);
@@ -56,9 +57,9 @@ public class LocalElectionResultCli implements IVersionProvider {
 	@Command(description = "Creates a HTML presentation format for the election result.")
 	public void presentation(@Mixin final LocalElectionResultParams result,
 			@Parameters(paramLabel = "FILE",
-					description = WRITE_TO
+					description = DESCRIPTION_FILE_WRITE
 							+ "\nWriting is done atomic to avoid blank browser screens."
-							+ FILE_OVERWRITTEN) final Path output)
+							+ DESCRIPTION_OVERWRITE_FILE) final Path output)
 			throws IOException {
 		writePresentationFile(result.get(), output);
 	}
@@ -66,9 +67,9 @@ public class LocalElectionResultCli implements IVersionProvider {
 	@Command(name = "time-travel", description = "TODO")
 	public void timeTravel(@Mixin final LocalElectionResultParams result,
 			@Parameters(paramLabel = "FILE",
-					description = WRITE_TO
+					description = DESCRIPTION_FILE_WRITE
 							+ "\nWriting is done atomic to avoid blank browser screens."
-							+ FILE_OVERWRITTEN) final Path output,
+							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
 			@Option(names = "--sleep", defaultValue = "1000", description = "TODO") final int sleep,
 			@Option(names = "--step-size", defaultValue = "1", description = "TODO") final int stepSize,
 			@Option(names = "--start", defaultValue = "0", description = "TODO") final int start,
