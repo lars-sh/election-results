@@ -23,7 +23,7 @@
 		<!-- Versions -->
 		<javafx-base.version>18.0.1</javafx-base.version>
 		<javafx-controls.version>18.0.2</javafx-controls.version>
-		<javafx-fxml.version>18.0.1</javafx-fxml.version>
+		<javafx-fxml.version>18.0.2</javafx-fxml.version>
 		<javafx-graphics.version>18.0.2</javafx-graphics.version>
 	</properties>
 
