@@ -395,8 +395,9 @@ public class PresentationFiles {
 							party.getShortName()))
 					.ifPresent(builder::append);
 			result.getSainteLagueValue()
-					.map(sainteLagueValue -> String
-							.format(Locale.GERMAN, "\nSainte-Laguë-Höchstzahl: %.2f", sainteLagueValue))
+					.map(sainteLagueValue -> String.format(Locale.GERMAN,
+							"\nSainte-Laguë-Höchstzahl: %." + sainteLagueValue.scale() + "f",
+							sainteLagueValue))
 					.ifPresent(builder::append);
 
 			for (final LocalPollingStation pollingStation : result.getNomination().getDistrict().getChildren()) {
