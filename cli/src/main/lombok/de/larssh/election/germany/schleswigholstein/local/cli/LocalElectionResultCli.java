@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -77,15 +76,12 @@ public class LocalElectionResultCli implements IVersionProvider {
 					description = DESCRIPTION_FILE_WRITE
 							+ "\nWriting is done atomic to avoid blank browser screens."
 							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
-			@Option(names = "--loop", defaultValue = "-1", description = "TODO") final long loop)
+			@Option(names = "--loop", defaultValue = "false", description = "TODO") final boolean loop)
 			throws IOException, InterruptedException {
-		do {
-			writePresentationFile(result.read(), output);
-			if (loop > -1) {
-				getStandardOutputWriter().println(String.format("Updated at %2$tT %2$tZ", LocalDateTime.now()));
-				Thread.sleep(loop);
-			}
-		} while (loop > -1);
+		result.handle(loop, readResult -> {
+			writePresentationFile(readResult, output);
+			getStandardOutputWriter().println(String.format("Updated at %1$tT %1$tZ", ZonedDateTime.now()));
+		});
 	}
 
 	@SuppressWarnings("resource")
@@ -121,7 +117,6 @@ public class LocalElectionResultCli implements IVersionProvider {
 							.collect(toList()));
 
 			writePresentationFile(subResult, output);
-
 			getStandardOutputWriter().println(String.format("Travelled to %5.1f%% at %2$tT %2$tZ",
 					Math.min(100, (double) numberOfBallots * HUNDRED / result.getBallots().size()),
 					ZonedDateTime.now()));

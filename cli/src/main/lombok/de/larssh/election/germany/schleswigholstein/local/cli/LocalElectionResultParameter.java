@@ -1,11 +1,12 @@
 package de.larssh.election.germany.schleswigholstein.local.cli;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,11 +19,14 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
+import de.larssh.election.germany.schleswigholstein.local.cli.FileWatchService.FileWatchResult;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileLineParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import picocli.CommandLine.Model.CommandSpec;
@@ -50,6 +54,7 @@ public class LocalElectionResultParameter {
 	 * Scale (decimal places) of Sainte Laguë values
 	 */
 	@NonFinal
+	@Getter(AccessLevel.PRIVATE)
 	@Option(names = { "-s", "--sainte-lague-scale" }, description = "Scale (decimal places) of Sainte Laguë values")
 	int sainteLagueScale = 2;
 
@@ -71,8 +76,39 @@ public class LocalElectionResultParameter {
 	@Nullable
 	CommandSpec commandSpec = null;
 
-	private PrintWriter getStandardErrorWriter() {
-		return Nullables.orElseThrow(commandSpec).commandLine().getErr();
+	private CommandSpec getCommandSpec() {
+		return Nullables.orElseThrow(commandSpec);
+	}
+
+	private Path getElectionPath() {
+		return Nullables.orElseThrow(electionPath);
+	}
+
+	public Map<String, Path> getResultPaths() {
+		return resultPaths;
+	}
+
+	public void handle(final boolean loop, final LocalElectionResultHandler resultHandler)
+			throws InterruptedException, IOException {
+		resultHandler.accept(read());
+		if (!loop) {
+			return;
+		}
+
+		try (final FileWatchService fileWatchService = new FileWatchService()) {
+			// Register files to watch
+			fileWatchService.register(getElectionPath(), ENTRY_CREATE, ENTRY_MODIFY);
+			for (final Path path : getResultPaths().values()) {
+				fileWatchService.register(path, ENTRY_CREATE, ENTRY_MODIFY);
+			}
+
+			// Loop endlessly
+			while (true) {
+				try (final FileWatchResult fileWatchResult = fileWatchService.watch()) {
+					resultHandler.accept(read());
+				}
+			}
+		}
 	}
 
 	/**
@@ -96,14 +132,18 @@ public class LocalElectionResultParameter {
 	public LocalElectionResult read() throws IOException {
 		// Read Election
 		final LocalElection election;
-		try (Reader reader = Files.newBufferedReader(this.electionPath)) {
+		try (Reader reader = Files.newBufferedReader(getElectionPath())) {
 			election = LocalElection.fromJson(reader);
 		}
 
 		// Read all Election Results
-		LocalElectionResult result
-				= new LocalElectionResult(election, 2, emptyMap(), emptySet(), emptySet(), emptyList());
-		for (final Entry<String, Path> resultPath : resultPaths.entrySet()) {
+		LocalElectionResult result = new LocalElectionResult(election,
+				getSainteLagueScale(),
+				emptyMap(),
+				emptySet(),
+				emptySet(),
+				emptyList());
+		for (final Entry<String, Path> resultPath : getResultPaths().entrySet()) {
 			// Find Polling Station
 			final LocalPollingStation pollingStation = election.getDistrict()
 					.getChildren()
@@ -139,18 +179,25 @@ public class LocalElectionResultParameter {
 		} catch (final PollingStationResultFileParseException e) {
 			for (final PollingStationResultFileLineParseException lineException : e
 					.getSuppressedLineParseExceptions()) {
-				getStandardErrorWriter().println(String.format("Line %d of \"%s\": %-70s | %s",
-						lineException.getLineNumber(),
-						path.getFileName().toString(),
-						lineException.getMessage(),
-						lineException.getLineContent()));
+				getCommandSpec().commandLine()
+						.getErr()
+						.println(String.format("Line %d of \"%s\": %-70s | %s",
+								lineException.getLineNumber(),
+								path.getFileName().toString(),
+								lineException.getMessage(),
+								lineException.getLineContent()));
 
 				final Throwable cause = lineException.getCause();
 				if (cause != null && !(cause instanceof ElectionException)) {
-					cause.printStackTrace(getStandardErrorWriter());
+					cause.printStackTrace(getCommandSpec().commandLine().getErr());
 				}
 			}
 			return e.getIncompleteResult();
 		}
+	}
+
+	@FunctionalInterface
+	public interface LocalElectionResultHandler {
+		void accept(LocalElectionResult result) throws IOException;
 	}
 }
