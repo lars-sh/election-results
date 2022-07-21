@@ -1,6 +1,5 @@
 package de.larssh.election.germany.schleswigholstein.local.file;
 
-import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.utils.text.Strings;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.Getter;
  * Thrown to indicate an errors while parsing {@link PollingStationResultFiles};
  * includes line information.
  */
-public class PollingStationResultFileLineParseException extends ElectionException {
+public class PollingStationResultFileLineParseException extends RuntimeException {
 	/**
 	 * The error's line number
 	 *

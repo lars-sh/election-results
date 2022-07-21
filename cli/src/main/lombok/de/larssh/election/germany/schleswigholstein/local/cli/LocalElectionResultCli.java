@@ -5,10 +5,13 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.jar.Attributes.Name;
@@ -17,13 +20,18 @@ import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles;
 import de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles;
+import de.larssh.utils.Nullables;
 import de.larssh.utils.io.Resources;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import lombok.experimental.NonFinal;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.Spec;
 
 @Command(name = "election-results",
 		mixinStandardHelpOptions = true,
@@ -44,53 +52,69 @@ public class LocalElectionResultCli implements IVersionProvider {
 		System.exit(new CommandLine(new LocalElectionResultCli()).execute(args));
 	}
 
+	/**
+	 * Current {@link CommandSpec} instance
+	 */
+	@Spec
+	@NonFinal
+	@Nullable
+	CommandSpec commandSpec = null;
+
 	@Command(name = "awg-website", description = "Creates a PHP file to be used for the AWG website.")
-	public void awgWebsite(@Mixin final LocalElectionResultParams result,
+	public void awgWebsite(@Mixin final LocalElectionResultParameter result,
 			@Parameters(paramLabel = "FILE",
 					description = DESCRIPTION_FILE_WRITE + DESCRIPTION_OVERWRITE_FILE) final Path output)
 			throws IOException {
 		try (Writer writer = Files.newBufferedWriter(output)) {
-			AwgWebsiteFiles.write(result.get(), writer);
+			AwgWebsiteFiles.write(result.read(), writer);
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Command(description = "Creates a HTML presentation format for the election result.")
-	public void presentation(@Mixin final LocalElectionResultParams result,
-			@Parameters(paramLabel = "FILE",
-					description = DESCRIPTION_FILE_WRITE
-							+ "\nWriting is done atomic to avoid blank browser screens."
-							+ DESCRIPTION_OVERWRITE_FILE) final Path output)
-			throws IOException {
-		writePresentationFile(result.get(), output);
-	}
-
-	@Command(name = "time-travel", description = "TODO")
-	public void timeTravel(@Mixin final LocalElectionResultParams result,
+	public void presentation(@Mixin final LocalElectionResultParameter result,
 			@Parameters(paramLabel = "FILE",
 					description = DESCRIPTION_FILE_WRITE
 							+ "\nWriting is done atomic to avoid blank browser screens."
 							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
-			@Option(names = "--sleep", defaultValue = "1000", description = "TODO") final int sleep,
+			@Option(names = "--loop", defaultValue = "-1", description = "TODO") final long loop)
+			throws IOException, InterruptedException {
+		do {
+			writePresentationFile(result.read(), output);
+			if (loop > -1) {
+				getStandardOutputWriter().println(String.format("Updated at %2$tT %2$tZ", LocalDateTime.now()));
+				Thread.sleep(loop);
+			}
+		} while (loop > -1);
+	}
+
+	@SuppressWarnings("resource")
+	@Command(name = "time-travel", description = "TODO")
+	public void timeTravel(@Mixin final LocalElectionResultParameter resultParameter,
+			@Parameters(paramLabel = "FILE",
+					description = DESCRIPTION_FILE_WRITE
+							+ "\nWriting is done atomic to avoid blank browser screens."
+							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
+			@Option(names = "--sleep", defaultValue = "1000", description = "TODO") final long sleep,
 			@Option(names = "--step-size", defaultValue = "1", description = "TODO") final int stepSize,
 			@Option(names = "--start", defaultValue = "0", description = "TODO") final int start,
 			@Option(names = "--end", defaultValue = "100", description = "TODO") final int end)
 			throws InterruptedException, IOException {
-		final Map<District<?>, OptionalInt> numberOfAllBallots = result.get()
-				.getElection()
+		final LocalElectionResult result = resultParameter.read();
+		final Map<District<?>, OptionalInt> numberOfAllBallots = result.getElection()
 				.getDistricts()
 				.stream()
-				.collect(toMap(identity(), result.get()::getNumberOfAllBallots));
+				.collect(toMap(identity(), result::getNumberOfAllBallots));
 
-		for (int numberOfBallots = result.get().getBallots().size() * start / HUNDRED;
-				numberOfBallots <= result.get().getBallots().size() * end / HUNDRED + stepSize - 1;
+		for (int numberOfBallots = result.getBallots().size() * start / HUNDRED;
+				numberOfBallots <= result.getBallots().size() * end / HUNDRED + stepSize - 1;
 				numberOfBallots += stepSize) {
-			final LocalElectionResult subResult = new LocalElectionResult(result.get().getElection(),
-					result.get().getSainteLagueScale(),
+			final LocalElectionResult subResult = new LocalElectionResult(result.getElection(),
+					result.getSainteLagueScale(),
 					numberOfAllBallots,
-					result.get().getDirectDrawResults(),
-					result.get().getListDrawResults(),
-					result.get()
-							.getBallots()
+					result.getDirectDrawResults(),
+					result.getListDrawResults(),
+					result.getBallots()
 							.stream()
 							.sorted((a, b) -> b.getPollingStation().compareTo(a.getPollingStation()))
 							.limit(numberOfBallots)
@@ -98,8 +122,32 @@ public class LocalElectionResultCli implements IVersionProvider {
 
 			writePresentationFile(subResult, output);
 
+			getStandardOutputWriter().println(String.format("Travelled to %5.1f%% at %2$tT %2$tZ",
+					Math.min(100, (double) numberOfBallots * HUNDRED / result.getBallots().size()),
+					ZonedDateTime.now()));
 			Thread.sleep(sleep);
 		}
+	}
+
+	private PrintWriter getStandardOutputWriter() {
+		return Nullables.orElseThrow(commandSpec).commandLine().getOut();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String[] getVersion() throws IOException {
+		return new String[] {
+				Resources.readManifest(getClass())
+						.map(manifest -> manifest.getMainAttributes().get(Name.IMPLEMENTATION_VERSION).toString())
+						.orElse("unknown") };
+	}
+
+	/**
+	 * Dummy to avoid the IDE to mark some fields as {@code final}.
+	 */
+	@SuppressWarnings("unused")
+	private void nonFinalDummy() {
+		commandSpec = null;
 	}
 
 	private void writePresentationFile(final LocalElectionResult result, final Path output) throws IOException {
@@ -111,13 +159,5 @@ public class LocalElectionResultCli implements IVersionProvider {
 			PresentationFiles.write(result, writer);
 		}
 		Files.move(tempFile, output, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-	}
-
-	@Override
-	public String[] getVersion() throws IOException {
-		return new String[] {
-				Resources.readManifest(getClass())
-						.map(manifest -> manifest.getMainAttributes().get(Name.IMPLEMENTATION_VERSION).toString())
-						.orElse("unknown") };
 	}
 }

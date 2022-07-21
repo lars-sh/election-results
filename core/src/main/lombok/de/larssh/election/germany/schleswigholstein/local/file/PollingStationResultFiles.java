@@ -255,7 +255,7 @@ public class PollingStationResultFiles {
 		/**
 		 * Parses a single {@code line} and creates ballots out of it.
 		 *
-		 * @param line the line to create a set of {qlink LocalBllot
+		 * @param line the line to create a set of {@link LocalBllot
 		 * @return Stimmzettel
 		 */
 		private Collection<LocalBallot> createBallotsFromLine(final String line) {

@@ -5,14 +5,13 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
@@ -22,7 +21,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileLineParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles;
-import de.larssh.utils.Finals;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +31,10 @@ import picocli.CommandLine.Spec;
 
 /**
  * A picocli compatible parameter set to load election results via command line
- * arguments.
+ * options.
  */
 @RequiredArgsConstructor
-public class LocalElectionResultParams {
+public class LocalElectionResultParameter {
 	/**
 	 * Path to the election data
 	 */
@@ -73,35 +71,8 @@ public class LocalElectionResultParams {
 	@Nullable
 	CommandSpec commandSpec = null;
 
-	/**
-	 * Lazily loaded election result
-	 *
-	 * <p>
-	 * {@link IOException}s thrown while loading a result are converted to
-	 * {@link UncheckedIOException} for lambda processing and should be converted
-	 * back afterwards.
-	 */
-	Supplier<LocalElectionResult> result = Finals.lazy(() -> {
-		try {
-			return readResults();
-		} catch (final IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	});
-
-	/**
-	 * Returns the election result as specified by the user's command line
-	 * arguments.
-	 *
-	 * @return the loaded election result
-	 * @throws IOException on IO error
-	 */
-	public LocalElectionResult get() throws IOException {
-		try {
-			return result.get();
-		} catch (final UncheckedIOException e) {
-			throw e.getCause();
-		}
+	private PrintWriter getStandardErrorWriter() {
+		return Nullables.orElseThrow(commandSpec).commandLine().getErr();
 	}
 
 	/**
@@ -116,42 +87,13 @@ public class LocalElectionResultParams {
 	}
 
 	/**
-	 * Reads an election result by {@code path}.
-	 *
-	 * @param election       the election
-	 * @param pollingStation the polling station to read results for
-	 * @param path           the path to the polling station results file to load
-	 * @return the loaded result
-	 * @throws IOException on IO error
-	 */
-	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
-	private LocalElectionResult readResult(final LocalElection election,
-			final LocalPollingStation pollingStation,
-			final Path path) throws IOException {
-		try (Reader reader = Files.newBufferedReader(path)) {
-			return PollingStationResultFiles.read(election, pollingStation, reader);
-		} catch (final PollingStationResultFileParseException e) {
-			for (final PollingStationResultFileLineParseException exception : e.getSuppressedLineParseExceptions()) {
-				Nullables.orElseThrow(commandSpec)
-						.commandLine()
-						.getErr()
-						.println(String.format("Line %d of %s: %s",
-								exception.getLineNumber(),
-								path.getFileName().toString(),
-								exception.getMessage()));
-			}
-			return e.getIncompleteResult();
-		}
-	}
-
-	/**
 	 * Reads all results specified by {@link #resultPaths} and merges them all
 	 * together.
 	 *
 	 * @return one result containing multiple results
 	 * @throws IOException on IO error
 	 */
-	private LocalElectionResult readResults() throws IOException {
+	public LocalElectionResult read() throws IOException {
 		// Read Election
 		final LocalElection election;
 		try (Reader reader = Files.newBufferedReader(this.electionPath)) {
@@ -174,8 +116,41 @@ public class LocalElectionResultParams {
 							resultPath.getKey()));
 
 			// Read Election Results of Polling Station
-			result = result.add(readResult(election, pollingStation, resultPath.getValue()));
+			result = result.add(readSingleResult(election, pollingStation, resultPath.getValue()));
 		}
 		return result;
+	}
+
+	/**
+	 * Reads a single election result by {@code path}.
+	 *
+	 * @param election       the election
+	 * @param pollingStation the polling station to read results for
+	 * @param path           the path to the polling station results file to load
+	 * @return the loaded result
+	 * @throws IOException on IO error
+	 */
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
+	private LocalElectionResult readSingleResult(final LocalElection election,
+			final LocalPollingStation pollingStation,
+			final Path path) throws IOException {
+		try (Reader reader = Files.newBufferedReader(path)) {
+			return PollingStationResultFiles.read(election, pollingStation, reader);
+		} catch (final PollingStationResultFileParseException e) {
+			for (final PollingStationResultFileLineParseException lineException : e
+					.getSuppressedLineParseExceptions()) {
+				getStandardErrorWriter().println(String.format("Line %d of \"%s\": %-70s | %s",
+						lineException.getLineNumber(),
+						path.getFileName().toString(),
+						lineException.getMessage(),
+						lineException.getLineContent()));
+
+				final Throwable cause = lineException.getCause();
+				if (cause != null && !(cause instanceof ElectionException)) {
+					cause.printStackTrace(getStandardErrorWriter());
+				}
+			}
+			return e.getIncompleteResult();
+		}
 	}
 }
