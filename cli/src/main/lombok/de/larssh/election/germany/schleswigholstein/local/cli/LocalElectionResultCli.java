@@ -69,7 +69,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 		}
 	}
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	@Command(description = "Creates a HTML presentation format for the election result.")
 	public void presentation(@Mixin final LocalElectionResultParameter result,
 			@Parameters(paramLabel = "FILE",
@@ -84,7 +84,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 		});
 	}
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	@Command(name = "time-travel", description = "TODO")
 	public void timeTravel(@Mixin final LocalElectionResultParameter resultParameter,
 			@Parameters(paramLabel = "FILE",
@@ -118,7 +118,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 
 			writePresentationFile(subResult, output);
 			getStandardOutputWriter().println(String.format("Travelled to %5.1f%% at %2$tT %2$tZ",
-					Math.min(100, (double) numberOfBallots * HUNDRED / result.getBallots().size()),
+					Math.min(HUNDRED, (double) numberOfBallots * HUNDRED / result.getBallots().size()),
 					ZonedDateTime.now()));
 			Thread.sleep(sleep);
 		}

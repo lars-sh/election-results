@@ -16,16 +16,32 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-// The Java WatchService is used to be notified upon file changes
+/**
+ * This class wraps {@link WatchService} to watch files instead of directories.
+ * It is thread-safe.
+ *
+ * <p>
+ * For now only files of the same {@link java.nio.file.FileSystem} can be
+ * watched.
+ */
 @PackagePrivate
-class FileWatchService implements Closeable {
+class FilesWatchService implements Closeable {
+	/**
+	 * A set of all files to watch.
+	 */
 	Set<Path> filesToWatch = synchronizedSet(new HashSet<>());
 
+	/**
+	 * The wrapped {@link WatchService}, which is created lazily to choose the
+	 * correct {@link java.nio.file.FileSystem}.
+	 */
 	AtomicReference<WatchService> watchService = new AtomicReference<>();
 
+	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 		final WatchService watchService = this.watchService.get();
@@ -34,7 +50,16 @@ class FileWatchService implements Closeable {
 		}
 	}
 
-	@SuppressWarnings("resource")
+	/**
+	 * Retrieves the wrapped {@link WatchService}. If not present, it is created
+	 * based on {@code path.getFileSystem()}.
+	 *
+	 * @param path the path to determine the correct
+	 *             {@link java.nio.file.FileSystem} of
+	 * @return the wrapped {@link WatchService}
+	 * @throws IOException on IO error
+	 */
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	private WatchService getWatchService(final Path path) throws IOException {
 		final WatchService watchService = this.watchService.get();
 		if (watchService != null) {
@@ -49,7 +74,15 @@ class FileWatchService implements Closeable {
 		}
 	}
 
-	@SuppressWarnings("resource")
+	/**
+	 * Registers {@code file} to be watched for the given set of {@code kinds}.
+	 *
+	 * @param file  the file to watch
+	 * @param kinds the kinds to watch
+	 * @return the created {@link WatchKey}
+	 * @throws IOException on IO error
+	 */
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	public WatchKey register(final Path file, final WatchEvent.Kind<?>... kinds) throws IOException {
 		// It's not possible to watch single files.
 		// Therefore we watch the parent directory of all input files.
@@ -60,10 +93,23 @@ class FileWatchService implements Closeable {
 		return key;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Waits for the next watch event and returns it. The returned
+	 * {@link FileWatchResult} needs to be closed to release the inner
+	 * {@link WatchKey} and allow it to be watched again.
+	 *
+	 * <p>
+	 * This method works similar to {@link WatchService#take()}.
+	 *
+	 * @return the next watch event
+	 * @throws InterruptedException if interrupted while waiting
+	 */
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "unchecked" })
 	public FileWatchResult watch() throws InterruptedException {
+		// Wait for the next watch key
 		@SuppressWarnings("resource")
 		final WatchKey key = watchService.get().take();
+
 		final Path watchable = (Path) key.watchable();
 		final Map<Path, WatchEvent<Path>> events = key.pollEvents()
 				.stream()
@@ -80,11 +126,25 @@ class FileWatchService implements Closeable {
 		return watch();
 	}
 
+	/**
+	 * This class contains a set of watch events and the watched files absolute
+	 * paths.
+	 */
 	@Getter
-	@RequiredArgsConstructor
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class FileWatchResult implements AutoCloseable {
+		/**
+		 * The current watch key
+		 *
+		 * @return the current watch key
+		 */
 		WatchKey key;
 
+		/**
+		 * The current watch events by the watched files absolute paths
+		 *
+		 * @return the current watch events by the watched files absolute paths
+		 */
 		Map<Path, WatchEvent<Path>> events;
 
 		/** {@inheritDoc} */

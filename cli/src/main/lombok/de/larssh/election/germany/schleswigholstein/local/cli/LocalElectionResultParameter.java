@@ -19,7 +19,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
-import de.larssh.election.germany.schleswigholstein.local.cli.FileWatchService.FileWatchResult;
+import de.larssh.election.germany.schleswigholstein.local.cli.FilesWatchService.FileWatchResult;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileLineParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileParseException;
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles;
@@ -95,7 +95,7 @@ public class LocalElectionResultParameter {
 			return;
 		}
 
-		try (final FileWatchService fileWatchService = new FileWatchService()) {
+		try (FilesWatchService fileWatchService = new FilesWatchService()) {
 			// Register files to watch
 			fileWatchService.register(getElectionPath(), ENTRY_CREATE, ENTRY_MODIFY);
 			for (final Path path : getResultPaths().values()) {
@@ -104,7 +104,7 @@ public class LocalElectionResultParameter {
 
 			// Loop endlessly
 			while (true) {
-				try (final FileWatchResult fileWatchResult = fileWatchService.watch()) {
+				try (FileWatchResult fileWatchResult = fileWatchService.watch()) {
 					resultHandler.accept(read());
 				}
 			}
