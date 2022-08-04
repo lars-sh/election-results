@@ -20,6 +20,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles;
 import de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles;
 import de.larssh.utils.Nullables;
+import de.larssh.utils.function.ThrowingConsumer;
 import de.larssh.utils.io.Resources;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.experimental.NonFinal;
@@ -77,11 +78,17 @@ public class LocalElectionResultCli implements IVersionProvider {
 							+ "\nWriting is done atomic to avoid blank browser screens."
 							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
 			@Option(names = "--loop", defaultValue = "false", description = "TODO") final boolean loop)
-			throws IOException, InterruptedException {
-		result.handle(loop, readResult -> {
-			writePresentationFile(readResult, output);
+			throws InterruptedException, IOException {
+		final ThrowingConsumer<LocalElectionResult> handler = readResult -> {
+			writePresentationFile(Nullables.orElseThrow(readResult), output);
 			getStandardOutputWriter().println(String.format("Updated at %1$tT %1$tZ", ZonedDateTime.now()));
-		});
+		};
+
+		// Execute
+		handler.accept(result.read());
+		if (loop) {
+			result.watch(handler);
+		}
 	}
 
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })

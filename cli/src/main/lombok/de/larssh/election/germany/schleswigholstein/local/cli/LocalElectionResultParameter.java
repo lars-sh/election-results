@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
@@ -76,27 +77,50 @@ public class LocalElectionResultParameter {
 	@Nullable
 	CommandSpec commandSpec = null;
 
+	/**
+	 * Current {@link CommandSpec} instance
+	 *
+	 * @return the current {@link CommandSpec} instance
+	 */
 	private CommandSpec getCommandSpec() {
 		return Nullables.orElseThrow(commandSpec);
 	}
 
+	/**
+	 * Path to the election data
+	 *
+	 * @return the path to the election data
+	 */
 	private Path getElectionPath() {
 		return Nullables.orElseThrow(electionPath);
 	}
 
+	/**
+	 * Any number of key-value pairs with the polling station as key and a path to
+	 * the corresponding result file as value
+	 *
+	 * @return the result paths per polling station
+	 */
 	public Map<String, Path> getResultPaths() {
 		return resultPaths;
 	}
 
-	public void handle(final boolean loop, final LocalElectionResultHandler resultHandler)
-			throws InterruptedException, IOException {
-		resultHandler.accept(read());
-		if (!loop) {
-			return;
-		}
-
+	/**
+	 * Watches the election and results files for changes and executes
+	 * {@code handler} passing updated {@link LocalElectionResult}. This method
+	 * loops endlessly and does not return control except an exception is thrown.
+	 *
+	 * <p>
+	 * Results are read using {@link #read()}. Therefore some specific parsing
+	 * errors might be written to standard out while processing continues with a
+	 * probably incomplete result.
+	 *
+	 * @param handler the consumer handling the latest {@link LocalElectionResult}
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void watch(final Consumer<LocalElectionResult> handler) throws InterruptedException, IOException {
 		try (FilesWatchService fileWatchService = new FilesWatchService()) {
-			// Register files to watch
 			fileWatchService.register(getElectionPath(), ENTRY_CREATE, ENTRY_MODIFY);
 			for (final Path path : getResultPaths().values()) {
 				fileWatchService.register(path, ENTRY_CREATE, ENTRY_MODIFY);
@@ -105,7 +129,7 @@ public class LocalElectionResultParameter {
 			// Loop endlessly
 			while (true) {
 				try (FileWatchResult fileWatchResult = fileWatchService.watch()) {
-					resultHandler.accept(read());
+					handler.accept(read());
 				}
 			}
 		}
@@ -194,10 +218,5 @@ public class LocalElectionResultParameter {
 			}
 			return e.getIncompleteResult();
 		}
-	}
-
-	@FunctionalInterface
-	public interface LocalElectionResultHandler {
-		void accept(LocalElectionResult result) throws IOException;
 	}
 }
