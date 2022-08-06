@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -20,6 +21,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles;
 import de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles;
 import de.larssh.utils.Nullables;
+import de.larssh.utils.function.IntToIntFunction;
 import de.larssh.utils.function.ThrowingConsumer;
 import de.larssh.utils.io.Resources;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -33,20 +35,36 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
+/**
+ * The CLI interface for {@link LocalElectionResult}.
+ */
 @Command(name = "election-results",
 		mixinStandardHelpOptions = true,
 		versionProvider = LocalElectionResultCli.class,
-		description = "TODO")
+		description = "These commands can be used to convert on eor more polling station results to e.g. human-readable file types.")
 public class LocalElectionResultCli implements IVersionProvider {
 	/**
 	 * One hundred
 	 */
 	private static final int HUNDRED = 100;
 
-	private static final String DESCRIPTION_FILE_WRITE = "File to write to.";
+	/**
+	 * CLI description for {@code FILE} parameters
+	 */
+	private static final String DESCRIPTION_FILE
+			= "File to write to.\nIn case the file exists already it is overwritten.";
 
-	private static final String DESCRIPTION_OVERWRITE_FILE = "\nIn case the file exists already it is overwritten.";
+	/**
+	 * CLI description for {@code FILE} parameters, whose files are written atomic
+	 */
+	private static final String DESCRIPTION_FILE_ATOMIC
+			= DESCRIPTION_FILE + "\nWriting is done atomic to avoid blank browser screens.";
 
+	/**
+	 * The CLI interface for {@link LocalElectionResult}.
+	 *
+	 * @param args CLI arguments
+	 */
 	@SuppressWarnings("checkstyle:UncommentedMain")
 	public static void main(final String... args) {
 		System.exit(new CommandLine(new LocalElectionResultCli()).execute(args));
@@ -60,24 +78,38 @@ public class LocalElectionResultCli implements IVersionProvider {
 	@Nullable
 	CommandSpec commandSpec = null;
 
-	@Command(name = "awg-website", description = "Creates a PHP file to be used for the AWG website.")
+	/**
+	 * Creates a PHP file to be used for the AWG web site.
+	 *
+	 * @param result the result
+	 * @param output the path to write to
+	 * @throws IOException on IO error
+	 */
+	@Command(name = "awg-website", description = "Creates a PHP file to be used for the AWG web site.")
 	public void awgWebsite(@Mixin final LocalElectionResultParameter result,
-			@Parameters(paramLabel = "FILE",
-					description = DESCRIPTION_FILE_WRITE + DESCRIPTION_OVERWRITE_FILE) final Path output)
-			throws IOException {
+			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE) final Path output) throws IOException {
 		try (Writer writer = Files.newBufferedWriter(output)) {
 			AwgWebsiteFiles.write(result.read(), writer);
 		}
 	}
 
+	/**
+	 * Creates a HTML presentation format for the election result.
+	 *
+	 * @param result the result
+	 * @param output the path to write to
+	 * @param watch  if {@code true} the input files are watched for updates and the
+	 *               application does not return its handle
+	 * @throws InterruptedException if interrupted while watching for file changes
+	 * @throws IOException          on IO error
+	 */
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	@Command(description = "Creates a HTML presentation format for the election result.")
 	public void presentation(@Mixin final LocalElectionResultParameter result,
-			@Parameters(paramLabel = "FILE",
-					description = DESCRIPTION_FILE_WRITE
-							+ "\nWriting is done atomic to avoid blank browser screens."
-							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
-			@Option(names = "--loop", defaultValue = "false", description = "TODO") final boolean loop)
+			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE_ATOMIC) final Path output,
+			@Option(names = "--watch",
+					defaultValue = "false",
+					description = "Watches the input files for updates and does not return the application's handle") final boolean watch)
 			throws InterruptedException, IOException {
 		final ThrowingConsumer<LocalElectionResult> handler = readResult -> {
 			writePresentationFile(Nullables.orElseThrow(readResult), output);
@@ -86,7 +118,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 
 		// Execute
 		handler.accept(result.read());
-		if (loop) {
+		if (watch) {
 			result.watch(handler);
 		}
 	}
@@ -94,14 +126,20 @@ public class LocalElectionResultCli implements IVersionProvider {
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	@Command(name = "time-travel", description = "TODO")
 	public void timeTravel(@Mixin final LocalElectionResultParameter resultParameter,
-			@Parameters(paramLabel = "FILE",
-					description = DESCRIPTION_FILE_WRITE
-							+ "\nWriting is done atomic to avoid blank browser screens."
-							+ DESCRIPTION_OVERWRITE_FILE) final Path output,
-			@Option(names = "--sleep", defaultValue = "1000", description = "TODO") final long sleep,
-			@Option(names = "--step-size", defaultValue = "1", description = "TODO") final int stepSize,
-			@Option(names = "--start", defaultValue = "0", description = "TODO") final int start,
-			@Option(names = "--end", defaultValue = "100", description = "TODO") final int end)
+			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE_ATOMIC) final Path output,
+			@Option(names = "--sleep", defaultValue = "PT1S", description = "TODO") final Duration sleepDuration,
+			@Option(names = "--step-size",
+					defaultValue = "1",
+					converter = EitherAbsoluteOrPercentageTypeConverter.class,
+					description = "TODO") final IntToIntFunction stepSizeParameter,
+			@Option(names = "--start",
+					defaultValue = "0",
+					converter = EitherAbsoluteOrPercentageTypeConverter.class,
+					description = "TODO") final IntToIntFunction start,
+			@Option(names = "--end",
+					defaultValue = "100",
+					converter = EitherAbsoluteOrPercentageTypeConverter.class,
+					description = "TODO") final IntToIntFunction endParameter)
 			throws InterruptedException, IOException {
 		final LocalElectionResult result = resultParameter.read();
 		final Map<District<?>, OptionalInt> numberOfAllBallots = result.getElection()
@@ -109,9 +147,10 @@ public class LocalElectionResultCli implements IVersionProvider {
 				.stream()
 				.collect(toMap(identity(), result::getNumberOfAllBallots));
 
-		for (int numberOfBallots = result.getBallots().size() * start / HUNDRED;
-				numberOfBallots <= result.getBallots().size() * end / HUNDRED + stepSize - 1;
-				numberOfBallots += stepSize) {
+		final int numberOfResultBallots = result.getBallots().size();
+		final int stepSize = stepSizeParameter.applyAsInt(numberOfResultBallots);
+		final int end = endParameter.applyAsInt(numberOfResultBallots) + stepSize;
+		for (int limit = start.applyAsInt(numberOfResultBallots); limit < end; limit += stepSize) {
 			final LocalElectionResult subResult = new LocalElectionResult(result.getElection(),
 					result.getSainteLagueScale(),
 					numberOfAllBallots,
@@ -120,17 +159,22 @@ public class LocalElectionResultCli implements IVersionProvider {
 					result.getBallots()
 							.stream()
 							.sorted((a, b) -> b.getPollingStation().compareTo(a.getPollingStation()))
-							.limit(numberOfBallots)
+							.limit(limit)
 							.collect(toList()));
 
 			writePresentationFile(subResult, output);
 			getStandardOutputWriter().println(String.format("Travelled to %5.1f%% at %2$tT %2$tZ",
-					Math.min(HUNDRED, (double) numberOfBallots * HUNDRED / result.getBallots().size()),
+					Math.min(HUNDRED, (double) limit * HUNDRED / numberOfResultBallots),
 					ZonedDateTime.now()));
-			Thread.sleep(sleep);
+			Thread.sleep(sleepDuration.toMillis());
 		}
 	}
 
+	/**
+	 * Returns the standard output writer based on the current {@link CommandSpec}.
+	 *
+	 * @return the standard output writer
+	 */
 	private PrintWriter getStandardOutputWriter() {
 		return Nullables.orElseThrow(commandSpec).commandLine().getOut();
 	}
@@ -152,6 +196,16 @@ public class LocalElectionResultCli implements IVersionProvider {
 		commandSpec = null;
 	}
 
+	/**
+	 * Writes {@code result} as presentation file to {@code output}. To avoid blank
+	 * browser screens writing is done to a temporary file beneath {@code output}
+	 * first. Either creating or overwriting {@code output} is done atomic
+	 * afterwards.
+	 *
+	 * @param result the result
+	 * @param output the path to write to
+	 * @throws IOException on IO error
+	 */
 	private void writePresentationFile(final LocalElectionResult result, final Path output) throws IOException {
 		final Path tempFile
 				= Files.createTempFile(output.toAbsolutePath().getParent(), output.getFileName().toString(), ".tmp");

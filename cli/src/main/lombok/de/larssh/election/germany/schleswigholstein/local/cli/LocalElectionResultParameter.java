@@ -56,7 +56,8 @@ public class LocalElectionResultParameter {
 	 */
 	@NonFinal
 	@Getter(AccessLevel.PRIVATE)
-	@Option(names = { "-s", "--sainte-lague-scale" }, description = "Scale (decimal places) of Sainte Laguë values")
+	@Option(names = { "-s", "--sainte-lague-scale" }, //
+			description = "Scale (decimal places) of Sainte Laguë values")
 	int sainteLagueScale = 2;
 
 	/**
@@ -116,8 +117,8 @@ public class LocalElectionResultParameter {
 	 * probably incomplete result.
 	 *
 	 * @param handler the consumer handling the latest {@link LocalElectionResult}
-	 * @throws InterruptedException
-	 * @throws IOException
+	 * @throws InterruptedException if interrupted while watching for file changes
+	 * @throws IOException          on IO error
 	 */
 	public void watch(final Consumer<LocalElectionResult> handler) throws InterruptedException, IOException {
 		try (FilesWatchService fileWatchService = new FilesWatchService()) {
