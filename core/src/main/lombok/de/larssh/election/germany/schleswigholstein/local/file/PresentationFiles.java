@@ -12,11 +12,13 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -50,12 +52,15 @@ public class PresentationFiles {
 	/**
 	 * Formats and writes {@code result} to {@code writer}.
 	 *
-	 * @param result the election result to to write
-	 * @param writer the live presentation file writer
+	 * @param result      the election result to to write
+	 * @param refreshRate the refresh rate of the HTML file or empty
+	 * @param writer      the live presentation file writer
 	 * @throws IOException on IO error
 	 */
-	public static void write(final LocalElectionResult result, final Writer writer) throws IOException {
-		new PresentationFileWriter(result, writer).write();
+	public static void write(final LocalElectionResult result,
+			final Optional<Duration> refreshRate,
+			final Writer writer) throws IOException {
+		new PresentationFileWriter(result, refreshRate, writer).write();
 	}
 
 	/**
@@ -152,6 +157,14 @@ public class PresentationFiles {
 		LocalElectionResult result;
 
 		/**
+		 * Refresh rate of the HTML file or empty if the page shall not refresh
+		 * automatically
+		 *
+		 * @return the refresh rate of the HTML file or empty
+		 */
+		Optional<Duration> refreshRate;
+
+		/**
 		 * Live presentation file writer
 		 *
 		 * @return the live presentation file writer
@@ -166,6 +179,10 @@ public class PresentationFiles {
 		@PackagePrivate
 		void write() throws IOException {
 			writer.write(String.format(TEMPLATE.get(),
+					refreshRate.filter(duration -> !duration.isNegative() && !duration.isZero())
+							.map(Duration::getSeconds)
+							.map(seconds -> seconds == 0 ? "1" : Long.toString(seconds))
+							.orElse(""),
 					result.getElection().getDate(),
 					LocalDateTime.now(ZoneId.of("Europe/Berlin")),
 					formatPollingStations(),

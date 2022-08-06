@@ -5,6 +5,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableMap;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,6 +27,7 @@ import de.larssh.election.germany.schleswigholstein.local.file.PollingStationRes
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles;
 import de.larssh.utils.Nullables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +58,8 @@ public class LocalElectionResultParameter {
 	 */
 	@NonFinal
 	@Getter(AccessLevel.PRIVATE)
-	@Option(names = { "-s", "--sainte-lague-scale" }, //
+	@Option(names = { "-s", "--sainte-lague-scale" },
+			paramLabel = "<Number>",
 			description = "Scale (decimal places) of Sainte Laguë values")
 	int sainteLagueScale = 2;
 
@@ -103,7 +106,7 @@ public class LocalElectionResultParameter {
 	 * @return the result paths per polling station
 	 */
 	public Map<String, Path> getResultPaths() {
-		return resultPaths;
+		return unmodifiableMap(resultPaths);
 	}
 
 	/**
@@ -139,7 +142,8 @@ public class LocalElectionResultParameter {
 	/**
 	 * Dummy to avoid the IDE to mark some fields as {@code final}.
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "PMD.NullAssignment", "PMD.UnusedPrivateMethod" })
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "dummy method")
 	private void nonFinalDummy() {
 		electionPath = null;
 		sainteLagueScale = 2;
@@ -154,6 +158,7 @@ public class LocalElectionResultParameter {
 	 * @return one result containing multiple results
 	 * @throws IOException on IO error
 	 */
+	@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 	public LocalElectionResult read() throws IOException {
 		// Read Election
 		final LocalElection election;
@@ -196,6 +201,8 @@ public class LocalElectionResultParameter {
 	 * @throws IOException on IO error
 	 */
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
+	@SuppressFBWarnings(value = "INFORMATION_EXPOSURE_THROUGH_AN_ERROR_MESSAGE",
+			justification = "There should be no risk by the exposure of internal information to the user here.")
 	private LocalElectionResult readSingleResult(final LocalElection election,
 			final LocalPollingStation pollingStation,
 			final Path path) throws IOException {
@@ -208,7 +215,7 @@ public class LocalElectionResultParameter {
 						.getErr()
 						.println(String.format("Line %d of \"%s\": %-70s | %s",
 								lineException.getLineNumber(),
-								path.getFileName().toString(),
+								path.getFileName(),
 								lineException.getMessage(),
 								lineException.getLineContent()));
 

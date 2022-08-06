@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.collection.Maps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,17 @@ import lombok.RequiredArgsConstructor;
  * watched.
  */
 @PackagePrivate
+@RequiredArgsConstructor
 class FilesWatchService implements Closeable {
 	/**
 	 * A set of all files to watch.
 	 */
 	Set<Path> filesToWatch = synchronizedSet(new HashSet<>());
+
+	/**
+	 * Object used for locking
+	 */
+	Object lock = new Object();
 
 	/**
 	 * The wrapped {@link WatchService}, which is created lazily to choose the
@@ -43,6 +50,7 @@ class FilesWatchService implements Closeable {
 
 	/** {@inheritDoc} */
 	@Override
+	@SuppressWarnings("PMD.CloseResource")
 	public void close() throws IOException {
 		final WatchService watchService = this.watchService.get();
 		if (watchService != null) {
@@ -66,7 +74,7 @@ class FilesWatchService implements Closeable {
 			return watchService;
 		}
 
-		synchronized (this.watchService) {
+		synchronized (lock) {
 			if (this.watchService.get() == null) {
 				this.watchService.set(path.getFileSystem().newWatchService());
 			}
@@ -84,9 +92,15 @@ class FilesWatchService implements Closeable {
 	 */
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 	public WatchKey register(final Path file, final WatchEvent.Kind<?>... kinds) throws IOException {
+		final Path parentFolder = file.toAbsolutePath().getParent();
+		if (parentFolder == null) {
+			throw new IllegalArgumentException(
+					String.format("Path \"%s\" seems to be no file, as there is no parent folder.", file));
+		}
+
 		// It's not possible to watch single files.
 		// Therefore we watch the parent directory of all input files.
-		final WatchKey key = file.getParent().register(getWatchService(file), kinds);
+		final WatchKey key = parentFolder.register(getWatchService(file), kinds);
 
 		// Registering might fail, therefore add to the set after registration
 		filesToWatch.add(file.toAbsolutePath().normalize());
@@ -105,6 +119,8 @@ class FilesWatchService implements Closeable {
 	 * @throws InterruptedException if interrupted while waiting
 	 */
 	@SuppressWarnings({ "checkstyle:SuppressWarnings", "unchecked" })
+	@SuppressFBWarnings(value = "FII_USE_FUNCTION_IDENTITY",
+			justification = "WatchEvent.class::cast cannot be used here, as it does not support generics")
 	public FileWatchResult watch() throws InterruptedException {
 		// Wait for the next watch key
 		@SuppressWarnings("resource")
@@ -131,7 +147,7 @@ class FilesWatchService implements Closeable {
 	 * paths.
 	 */
 	@Getter
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 	public static class FileWatchResult implements AutoCloseable {
 		/**
 		 * The current watch key

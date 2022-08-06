@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.larssh.utils.Nullables;
-import de.larssh.utils.function.IntToIntFunction;
+import de.larssh.utils.function.DoubleToDoubleFunction;
 import de.larssh.utils.text.Patterns;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -16,32 +16,32 @@ import picocli.CommandLine.TypeConversionException;
  * values.
  *
  * <p>
- * The created {@link IntToIntFunction} takes the total and calculates (in case
- * of a percentage value) the corresponding absolute value.
+ * The created {@link DoubleToDoubleFunction} takes the total and calculates (in
+ * case of a percentage value) the corresponding absolute value.
  */
 @RequiredArgsConstructor
-public class EitherAbsoluteOrPercentageTypeConverter implements ITypeConverter<IntToIntFunction> {
+public class EitherAbsoluteOrPercentageTypeConverter implements ITypeConverter<DoubleToDoubleFunction> {
 	/**
 	 * One hundred
 	 */
 	private static final int HUNDRED = 100;
 
 	/**
-	 * Pattern to match either an absolute integer value or a percentage value.
+	 * Pattern to match either an absolute double value or a percentage value.
 	 * Values need to be zero or positive.
 	 */
-	private static final Pattern PATTERN = Pattern.compile("^\\s*(?<value>\\d+)(?<percentage>\\s*%)?\\s*$");
+	private static final Pattern PATTERN = Pattern.compile("^\\s*(?<value>\\d+(\\.\\d*)?)(?<percentage>\\s*%)?\\s*$");
 
 	/** {@inheritDoc} */
 	@Override
-	public IntToIntFunction convert(@Nullable final String value) {
-		final Matcher matcher = Patterns.matches(PATTERN, Nullables.orElseThrow(value)) //
+	public DoubleToDoubleFunction convert(@Nullable final String value) {
+		final Matcher matcher = Patterns.matches(PATTERN, Nullables.orElseThrow(value))
 				.orElseThrow(() -> new TypeConversionException(String.format(
-						"Invalid format. Expecting either a positive integer or a percentage value, but was '%s'.",
+						"Invalid format. Expecting either a positive double or a percentage value, but was \"%s\".",
 						value)));
-		final int parsedValue = Integer.parseInt(matcher.group("value"));
+		final double parsedValue = Double.parseDouble(matcher.group("value"));
 		return matcher.group("percentage") == null //
 				? total -> parsedValue
-				: total -> (int) ((long) total * HUNDRED / parsedValue); // Use long to avoid integer overflows
+				: total -> parsedValue * total / HUNDRED;
 	}
 }

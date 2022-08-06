@@ -6,6 +6,8 @@ import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.StringWriter;
+import java.time.Duration;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +40,7 @@ class PresentationFilesTest {
 
 		// when and then
 		assertDoesNotThrow(() -> {
-			PresentationFiles.write(result, new StringWriter());
+			PresentationFiles.write(result, Optional.empty(), new StringWriter());
 		});
 	}
 
@@ -57,7 +59,7 @@ class PresentationFilesTest {
 
 		// when and then
 		assertDoesNotThrow(() -> {
-			PresentationFiles.write(result, new StringWriter());
+			PresentationFiles.write(result, Optional.of(Duration.ofSeconds(1)), new StringWriter());
 		});
 	}
 }
