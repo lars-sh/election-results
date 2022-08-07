@@ -259,12 +259,13 @@ ol {
 	}
 }
 		/*]]>*/</style>
-		<script><![CDATA[
+		<script>//<![CDATA[
 const REFRESH_RATIO_MS = %d;
 
 if (REFRESH_RATIO_MS > 0 && window === window.parent) {
 	let currentFrame = null;
-	const refreshContent = (initialize) => {
+	let initialized = false;
+	const refreshContent = () => {
 		// Remove all elements except the current frame
 		for (let index = document.body.childNodes.length - 1; index >= 0; index -= 1) {
 			const child = document.body.childNodes.item(index);
@@ -277,7 +278,7 @@ if (REFRESH_RATIO_MS > 0 && window === window.parent) {
 		// Iframes are used for compatibility with files from the file system (in addition to HTTP)
 		const iframe = document.createElement('iframe');
 		iframe.src = location.href;
-		if (REFRESH_RATIO_MS >= 500 && !initialize) {
+		if (REFRESH_RATIO_MS >= 500 && initialized) {
 			iframe.style.opacity = '0';
 		}
 		currentFrame = iframe;
@@ -286,14 +287,16 @@ if (REFRESH_RATIO_MS > 0 && window === window.parent) {
 		// Force the browser to apply the opacity transition by executing asynchronously
 		setTimeout(() => {
 			iframe.style.opacity = '';
+
+			initialized = true;
 			setTimeout(refreshContent, REFRESH_RATIO_MS);
 		}, 0);
 	};
 	window.addEventListener('load', (event) => {
-		refreshContent(true);
+		refreshContent();
 	});
 }
-		]]></script>
+		//]]></script>
 		<title>Kommunalwahl %tY</title>
 	</head>
 	<body>
