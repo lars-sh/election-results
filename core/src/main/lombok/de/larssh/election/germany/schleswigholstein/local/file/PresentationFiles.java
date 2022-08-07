@@ -101,6 +101,11 @@ public class PresentationFiles {
 				= Finals.lazy(() -> loadResourceRelativeToClass("template-pollingStation.html"));
 
 		/**
+		 * Time zone for time stamps in presentation files
+		 */
+		private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
+
+		/**
 		 * Loads a resource from a folder next to this class. The file name is build by
 		 * concatenating the class name, a dash and {@code fileNameSuffix}.
 		 *
@@ -177,6 +182,8 @@ public class PresentationFiles {
 		 * @throws IOException on IO error
 		 */
 		@PackagePrivate
+		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_USES_IMMEDIATE_EXECUTION",
+				justification = "The value 0L is nothing that needs to be executed.")
 		void write() throws IOException {
 			writer.write(String.format(TEMPLATE.get(),
 					refreshRate.map(Duration::toMillis).orElse(0L),
@@ -184,7 +191,7 @@ public class PresentationFiles {
 					formatPollingStations(),
 					formatNominationResults(),
 					formatPartyResults(),
-					LocalDateTime.now(ZoneId.of("Europe/Berlin"))));
+					LocalDateTime.now(TIME_ZONE)));
 		}
 
 		/**
