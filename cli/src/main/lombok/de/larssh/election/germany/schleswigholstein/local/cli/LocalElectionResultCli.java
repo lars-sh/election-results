@@ -160,8 +160,6 @@ public class LocalElectionResultCli implements IVersionProvider {
 	 * @param stepSize      size per step of the time-travel
 	 * @param start         start of the time-travel
 	 * @param end           end of the time-travel
-	 * @param refreshEnd    do not stop automatic browser refreshing when reaching
-	 *                      the end
 	 * @param noRefresh     disables automatic browser refreshing
 	 * @throws InterruptedException if interrupted while watching for file changes
 	 * @throws IOException          on IO error
@@ -198,9 +196,6 @@ public class LocalElectionResultCli implements IVersionProvider {
 					paramLabel = PARAM_LABEL_ABSOLUTE_BALLOTS_OR_PERCENTAGE,
 					converter = EitherAbsoluteOrPercentageTypeConverter.class,
 					description = "End of the time-travel") final DoubleToDoubleFunction end,
-			@Option(names = "--refresh-end",
-					defaultValue = "false",
-					description = "Do not stop automatic browser refreshing when reaching the end") final boolean refreshEnd,
 			@Option(names = "--no-refresh",
 					defaultValue = "false",
 					description = "Disables automatic browser refreshing") final boolean noRefresh)
@@ -225,9 +220,9 @@ public class LocalElectionResultCli implements IVersionProvider {
 			final int numberOfBallots = Math.min((int) loopPosition, (int) loopEnd);
 
 			// Stop refreshing the page when reached the end
-			final Optional<Duration> refreshRate = !noRefresh && (numberOfBallots < numberOfAllBallots || refreshEnd)
-					? Optional.of(sleepDuration)
-					: Optional.empty();
+			final Optional<Duration> refreshRate = noRefresh || numberOfBallots >= numberOfAllBallots
+					? Optional.empty()
+					: Optional.of(sleepDuration);
 
 			// Create partial result and write the presentation file
 			final LocalElectionResult partialResult = new LocalElectionResult(fullResult.getElection(),

@@ -3,7 +3,6 @@
 <html lang="de" xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
 	<head>
 		<meta charset="UTF-8" />
-		<meta http-equiv="refresh" content="%1$s" />
 		<style>/*<![CDATA[*/
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap');
 
@@ -20,6 +19,15 @@ body {
 	padding: 1em;
 	row-gap: 1em;
 	white-space: nowrap;
+}
+body > iframe {
+	border: 0;
+	height: 100%%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	transition: opacity 0.5s 0.2s;
+	width: 100%%;
 }
 html {
 	height: 100%%;
@@ -251,13 +259,48 @@ ol {
 	}
 }
 		/*]]>*/</style>
-		<title>Kommunalwahl %2$tY - Stand: %3$te. %3$tB %3$tY %3$tT Uhr</title>
+		<script><![CDATA[
+const REFRESH_RATIO_MS = %d;
+
+if (REFRESH_RATIO_MS > 0 && window === window.parent) {
+	let currentFrame = null;
+	const refreshContent = (initialize) => {
+		// Remove all elements except the current frame
+		for (let index = document.body.childNodes.length - 1; index >= 0; index -= 1) {
+			const child = document.body.childNodes.item(index);
+			if (child !== currentFrame) {
+				document.body.removeChild(child);
+			}
+		}
+
+		// Create an iframe to display the next update
+		// Iframes are used for compatibility with files from the file system (in addition to HTTP)
+		const iframe = document.createElement('iframe');
+		iframe.src = location.href;
+		if (REFRESH_RATIO_MS >= 500 && !initialize) {
+			iframe.style.opacity = '0';
+		}
+		currentFrame = iframe;
+		document.body.appendChild(iframe);
+
+		// Force the browser to apply the opacity transition by executing asynchronously
+		setTimeout(() => {
+			iframe.style.opacity = '';
+			setTimeout(refreshContent, REFRESH_RATIO_MS);
+		}, 0);
+	};
+	window.addEventListener('load', (event) => {
+		refreshContent(true);
+	});
+}
+		]]></script>
+		<title>Kommunalwahl %tY</title>
 	</head>
 	<body>
-		<ol class="polling-stations">%4$s</ol>
-		<ol class="nomination-results">%5$s
+		<ol class="polling-stations">%s</ol>
+		<ol class="nomination-results">%s
 		</ol>
-		<ol class="party-results">%6$s
+		<ol class="party-results">%s
 		</ol>
 		<div class="footer">
 			<ol class="legend">
@@ -269,7 +312,7 @@ ol {
 				<li class="certain">sicher gewählt</li>
 				<li class="certain-not_elected">nicht gewählt</li>
 			</ol>
-			<div class="timestamp">%3$tT</div>
+			<div class="timestamp">%tT</div>
 		</div>
 	</body>
 </html>

@@ -179,15 +179,12 @@ public class PresentationFiles {
 		@PackagePrivate
 		void write() throws IOException {
 			writer.write(String.format(TEMPLATE.get(),
-					refreshRate.filter(duration -> !duration.isNegative() && !duration.isZero())
-							.map(Duration::getSeconds)
-							.map(seconds -> seconds == 0 ? "1" : Long.toString(seconds))
-							.orElse(""),
+					refreshRate.map(Duration::toMillis).orElse(0L),
 					result.getElection().getDate(),
-					LocalDateTime.now(ZoneId.of("Europe/Berlin")),
 					formatPollingStations(),
 					formatNominationResults(),
-					formatPartyResults()));
+					formatPartyResults(),
+					LocalDateTime.now(ZoneId.of("Europe/Berlin"))));
 		}
 
 		/**
