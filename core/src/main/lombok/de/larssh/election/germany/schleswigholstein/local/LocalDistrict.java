@@ -35,13 +35,13 @@ public class LocalDistrict extends District<LocalPollingStation> {
 	@Override
 	@JsonIgnore
 	public Optional<LocalDistrictRoot> getParent() {
-		return Optional.of(getRoot());
+		return super.getParent().map(LocalDistrictRoot.class::cast);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	@JsonIgnore
 	public LocalDistrictRoot getRoot() {
-		return (LocalDistrictRoot) super.getRoot();
+		return getParent().get();
 	}
 }
