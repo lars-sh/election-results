@@ -76,6 +76,7 @@ public class LocalNominationResult
 	 * Stimmzettel der Bewerberin oder des Bewerbers
 	 */
 	@ToString.Exclude
+	@Getter(AccessLevel.NONE)
 	Supplier<List<LocalBallot>> ballots = lazy(() -> unmodifiableList(getElectionResult().getBallots()
 			.stream()
 			.filter(Ballot::isValid)
@@ -131,6 +132,12 @@ public class LocalNominationResult
 	 */
 	@ToString.Exclude
 	Supplier<Optional<LocalNominationResultType>> certainResultType = lazy(() -> {
+		// The number of all ballots is required to calculate certainty
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return Optional.empty();
+		}
+
 		if (isCertainDirectResult()) {
 			return Optional.of(LocalNominationResultType.DIRECT);
 		}

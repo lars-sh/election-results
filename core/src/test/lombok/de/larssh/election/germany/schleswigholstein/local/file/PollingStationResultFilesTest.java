@@ -57,7 +57,8 @@ public class PollingStationResultFilesTest {
 			final Path classRelativePath) {
 		final LocalPollingStation pollingStation = LocalElectionTest.findPollingStation(election, pollingStationName);
 		final Path path = Resources.getResourceRelativeTo(PollingStationResultFilesTest.class, classRelativePath)
-				.orElseThrow(() -> new ElectionException("Cannot find test file for polling station \"%s\".",
+				.orElseThrow(() -> new ElectionException("Cannot find test file \"%s\" for polling station \"%s\".",
+						classRelativePath.toString(),
 						pollingStation.getKey()));
 		try (Reader reader = Files.newBufferedReader(path)) {
 			return PollingStationResultFiles.read(election, pollingStation, reader);
