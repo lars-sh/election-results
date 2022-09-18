@@ -343,8 +343,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	public List<LocalBallot> getBallots(final District<?> district) {
 		return ballots.stream()
 				.filter(ballot -> ballot.getPollingStation().equals(district)
-						|| ballot.getPollingStation().getParent().get().equals(district)
-						|| ballot.getPollingStation().getParent().get().getParent().get().equals(district))
+						|| ballot.getPollingStation().getDistrict().equals(district)
+						|| ballot.getPollingStation().getRoot().equals(district))
 				.collect(toList());
 	}
 

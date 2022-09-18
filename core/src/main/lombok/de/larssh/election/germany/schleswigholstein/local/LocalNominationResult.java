@@ -118,7 +118,7 @@ public class LocalNominationResult
 		// required to calculate the number of remaining ballots in that district.
 		final long numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots()
 				.stream()
-				.filter(ballot -> ballot.getPollingStation().getParent().get().equals(district))
+				.filter(ballot -> ballot.getPollingStation().getDistrict().equals(district))
 				.count();
 		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
 				+ numberOfAllBallotsOfDistrict.getAsInt()

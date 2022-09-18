@@ -49,13 +49,12 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 		setFontColor(parseable.getFontColor());
 
 		for (final ParsableLocalDistrict parsableLocalDistrict : parseable.getChildren()) {
-			final LocalDistrict localDistrict = createChild(parsableLocalDistrict.getName());
-			localDistrict.setBackgroundColor(parsableLocalDistrict.getBackgroundColor());
-			localDistrict.setFontColor(parsableLocalDistrict.getFontColor());
+			final LocalDistrict district = createChild(parsableLocalDistrict.getName());
+			district.setBackgroundColor(parsableLocalDistrict.getBackgroundColor());
+			district.setFontColor(parsableLocalDistrict.getFontColor());
 
 			for (final ParsableLocalPollingStation parsableLocalPollingStation : parsableLocalDistrict.getChildren()) {
-				final LocalPollingStation pollingStation
-						= localDistrict.createChild(parsableLocalPollingStation.getName());
+				final LocalPollingStation pollingStation = district.createChild(parsableLocalPollingStation.getName());
 				pollingStation.setBackgroundColor(parsableLocalPollingStation.getBackgroundColor());
 				pollingStation.setFontColor(parsableLocalPollingStation.getFontColor());
 			}
@@ -91,7 +90,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	@Override
 	@JsonIgnore
 	public LocalDistrictRoot getRoot() {
-		return (LocalDistrictRoot) super.getRoot();
+		return this;
 	}
 
 	/**

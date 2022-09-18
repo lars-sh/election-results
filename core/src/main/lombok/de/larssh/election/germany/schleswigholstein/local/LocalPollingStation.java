@@ -33,6 +33,16 @@ public class LocalPollingStation extends District<District<?>> {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * {@link LocalDistrict} of this {@link LocalPollingStation}
+	 *
+	 * @return the {@link LocalDistrict} of this {@link LocalPollingStation}
+	 */
+	@JsonIgnore
+	public LocalDistrict getDistrict() {
+		return getParent().get();
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	@JsonIgnore

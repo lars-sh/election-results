@@ -287,7 +287,7 @@ public class PollingStationResultFiles {
 		 * @return Bewerberin oder Bewerber
 		 */
 		private LocalNomination findNomination(final String person) {
-			final LocalDistrict district = pollingStation.getParent().get();
+			final LocalDistrict district = pollingStation.getDistrict();
 			if (person.isEmpty()) {
 				throw new ElectionException("Cannot find a nomination for an empty string in district \"%s\".",
 						district.getName());
@@ -383,7 +383,7 @@ public class PollingStationResultFiles {
 		 * @return the formatted direct nominations
 		 */
 		private String formatDirectNominations(final Party party) {
-			final LocalDistrict district = pollingStation.getParent().get();
+			final LocalDistrict district = pollingStation.getDistrict();
 
 			return formatNominations(result.getElection()
 					.getNominations(party)
