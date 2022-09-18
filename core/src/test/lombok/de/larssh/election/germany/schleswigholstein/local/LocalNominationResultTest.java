@@ -35,7 +35,8 @@ class LocalNominationResultTest {
 	 * Executes {@link LocalElectionResult#getNominationResults()} and asserts the
 	 * result for the expected number of results.
 	 *
-	 * @param result the {@link LocalElectionResult}
+	 * @param softAssertions the {@link SoftAssertions} object to add assertions to
+	 * @param result         the {@link LocalElectionResult}
 	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
 	 */
 	private static Map<LocalNomination, LocalNominationResult> getAndAssertNominationResults(
@@ -55,6 +56,8 @@ class LocalNominationResultTest {
 	 * nominations are not elected, which is the case as long as no balance seat is
 	 * involved.
 	 *
+	 * @param softAssertions                    the {@link SoftAssertions} object to
+	 *                                          add assertions to
 	 * @param result                            the {@link LocalElectionResult}
 	 * @param assertListNominationsAsNotElected {@code true} if list nominations
 	 *                                          shall be asserted as not elected,

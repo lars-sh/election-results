@@ -31,28 +31,28 @@ class LocalPartyResultTest {
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
-		final Party CDU = LocalElectionTest.findParty(election, "CDU");
-		final Party SPD = LocalElectionTest.findParty(election, "SPD");
-		final Party AWG = LocalElectionTest.findParty(election, "AWG");
-		final Party FWR = LocalElectionTest.findParty(election, "FWR");
+		final Party cdu = LocalElectionTest.findParty(election, "CDU");
+		final Party spd = LocalElectionTest.findParty(election, "SPD");
+		final Party awg = LocalElectionTest.findParty(election, "AWG");
+		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
 		// Votes
-		assertThat(partyResults.get(CDU).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(SPD).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(AWG).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(FWR).getNumberOfVotes()).isEqualTo(6);
+		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(6);
+		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(6);
+		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(6);
+		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(6);
 
 		// Block Votings
-		assertThat(partyResults.get(CDU).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
 
 		// Certain Seats
-		assertThat(partyResults.get(CDU).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
 	}
 
 	/**
@@ -67,28 +67,28 @@ class LocalPartyResultTest {
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
-		final Party CDU = LocalElectionTest.findParty(election, "CDU");
-		final Party SPD = LocalElectionTest.findParty(election, "SPD");
-		final Party AWG = LocalElectionTest.findParty(election, "AWG");
-		final Party FWR = LocalElectionTest.findParty(election, "FWR");
+		final Party cdu = LocalElectionTest.findParty(election, "CDU");
+		final Party spd = LocalElectionTest.findParty(election, "SPD");
+		final Party awg = LocalElectionTest.findParty(election, "AWG");
+		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
 		// Votes
-		assertThat(partyResults.get(CDU).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfVotes()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfVotes()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfVotes()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfVotes()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfVotes()).isZero();
 
 		// Block Votings
-		assertThat(partyResults.get(CDU).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
 
 		// Certain Seats
-		assertThat(partyResults.get(CDU).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
 	}
 
 	/**
@@ -104,30 +104,30 @@ class LocalPartyResultTest {
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
-		final Party CDU = LocalElectionTest.findParty(election, "CDU");
-		final Party SPD = LocalElectionTest.findParty(election, "SPD");
-		final Party AWG = LocalElectionTest.findParty(election, "AWG");
-		final Party FWR = LocalElectionTest.findParty(election, "FWR");
+		final Party cdu = LocalElectionTest.findParty(election, "CDU");
+		final Party spd = LocalElectionTest.findParty(election, "SPD");
+		final Party awg = LocalElectionTest.findParty(election, "AWG");
+		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
 		// Votes
-		assertThat(partyResults.get(CDU).getNumberOfVotes()).isEqualTo(417);
-		assertThat(partyResults.get(SPD).getNumberOfVotes()).isEqualTo(110);
-		assertThat(partyResults.get(AWG).getNumberOfVotes()).isEqualTo(108);
-		assertThat(partyResults.get(FWR).getNumberOfVotes()).isEqualTo(249);
+		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(417);
+		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(110);
+		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(108);
+		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(249);
 
 		// Block Votings
-		assertThat(partyResults.get(CDU).getNumberOfBlockVotings()).isEqualTo(41);
-		assertThat(partyResults.get(SPD).getNumberOfBlockVotings()).isEqualTo(6);
-		assertThat(partyResults.get(AWG).getNumberOfBlockVotings()).isEqualTo(4);
-		assertThat(partyResults.get(FWR).getNumberOfBlockVotings()).isEqualTo(20);
+		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(41);
+		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(6);
+		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(4);
+		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(20);
 
 		// Certain Seats
 		// TODO: We should probably use the max eligible voters to calculate the certain
 		// seats here
-		assertThat(partyResults.get(CDU).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
 	}
 
 	/**
@@ -141,28 +141,28 @@ class LocalPartyResultTest {
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
-		final Party CDU = LocalElectionTest.findParty(election, "CDU");
-		final Party SPD = LocalElectionTest.findParty(election, "SPD");
-		final Party AWG = LocalElectionTest.findParty(election, "AWG");
-		final Party FWR = LocalElectionTest.findParty(election, "FWR");
+		final Party cdu = LocalElectionTest.findParty(election, "CDU");
+		final Party spd = LocalElectionTest.findParty(election, "SPD");
+		final Party awg = LocalElectionTest.findParty(election, "AWG");
+		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
 		// Votes
-		assertThat(partyResults.get(CDU).getNumberOfVotes()).isEqualTo(1322);
-		assertThat(partyResults.get(SPD).getNumberOfVotes()).isEqualTo(400);
-		assertThat(partyResults.get(AWG).getNumberOfVotes()).isEqualTo(787);
-		assertThat(partyResults.get(FWR).getNumberOfVotes()).isEqualTo(717);
+		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(1322);
+		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(400);
+		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(787);
+		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(717);
 
 		// Block Votings
-		assertThat(partyResults.get(CDU).getNumberOfBlockVotings()).isEqualTo(106);
-		assertThat(partyResults.get(SPD).getNumberOfBlockVotings()).isEqualTo(19);
-		assertThat(partyResults.get(AWG).getNumberOfBlockVotings()).isEqualTo(45);
-		assertThat(partyResults.get(FWR).getNumberOfBlockVotings()).isEqualTo(51);
+		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(106);
+		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(19);
+		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(45);
+		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(51);
 
 		// Certain Seats
-		assertThat(partyResults.get(CDU).getNumberOfCertainSeats()).isEqualTo(5);
-		assertThat(partyResults.get(SPD).getNumberOfCertainSeats()).isEqualTo(1);
-		assertThat(partyResults.get(AWG).getNumberOfCertainSeats()).isEqualTo(3);
-		assertThat(partyResults.get(FWR).getNumberOfCertainSeats()).isEqualTo(2);
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(5);
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(3);
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(2);
 	}
 
 	/**
@@ -178,27 +178,27 @@ class LocalPartyResultTest {
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
-		final Party CDU = LocalElectionTest.findParty(election, "CDU");
-		final Party SPD = LocalElectionTest.findParty(election, "SPD");
-		final Party AWG = LocalElectionTest.findParty(election, "AWG");
-		final Party FWR = LocalElectionTest.findParty(election, "FWR");
+		final Party cdu = LocalElectionTest.findParty(election, "CDU");
+		final Party spd = LocalElectionTest.findParty(election, "SPD");
+		final Party awg = LocalElectionTest.findParty(election, "AWG");
+		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
 		// Votes
-		assertThat(partyResults.get(CDU).getNumberOfVotes()).isEqualTo(905);
-		assertThat(partyResults.get(SPD).getNumberOfVotes()).isEqualTo(290);
-		assertThat(partyResults.get(AWG).getNumberOfVotes()).isEqualTo(679);
-		assertThat(partyResults.get(FWR).getNumberOfVotes()).isEqualTo(468);
+		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(905);
+		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(290);
+		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(679);
+		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(468);
 
 		// Block Votings
-		assertThat(partyResults.get(CDU).getNumberOfBlockVotings()).isEqualTo(65);
-		assertThat(partyResults.get(SPD).getNumberOfBlockVotings()).isEqualTo(13);
-		assertThat(partyResults.get(AWG).getNumberOfBlockVotings()).isEqualTo(41);
-		assertThat(partyResults.get(FWR).getNumberOfBlockVotings()).isEqualTo(31);
+		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(65);
+		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(13);
+		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(41);
+		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(31);
 
 		// Certain Seats
-		assertThat(partyResults.get(CDU).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(SPD).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(AWG).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(FWR).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
 	}
 }
