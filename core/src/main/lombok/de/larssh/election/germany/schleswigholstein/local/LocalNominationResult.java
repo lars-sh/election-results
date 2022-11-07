@@ -88,6 +88,7 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType#DIRECT}.
 	 */
 	@ToString.Exclude
+	@Getter(AccessLevel.NONE)
 	Supplier<Boolean> certainDirectResult = lazy(() -> {
 		// In case of no votes there's no election
 		if (getNumberOfVotes() < 1) {
@@ -154,6 +155,7 @@ public class LocalNominationResult
 	 * Determines if the nomination is a candidate for
 	 * {@link LocalNominationResultType#DIRECT}.
 	 */
+	@Getter(AccessLevel.NONE)
 	Supplier<Boolean> directResultCandidate = lazy(() -> {
 		// The number of all ballots is required to calculate the number of direct
 		// result candidates.
