@@ -23,6 +23,7 @@ import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -137,6 +138,7 @@ public final class LocalBallot implements Ballot<LocalNomination>, Comparable<Lo
 	 */
 	@JsonIgnore
 	@ToString.Exclude
+	@Getter(AccessLevel.NONE)
 	Supplier<Boolean> blockVoting = lazy(() -> {
 		final List<Party> parties = getNominations().stream()
 				.map(LocalNomination::getParty)
