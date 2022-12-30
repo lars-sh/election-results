@@ -71,6 +71,11 @@ public class PollingStationResultFiles {
 	private static final char LINE_COMMENT = '#';
 
 	/**
+	 * Scale (decimal places) of Sainte Laguë values
+	 */
+	private static final int SAINTE_LAGUE_SCALE = 2;
+
+	/**
 	 * Parses the polling station's file format.
 	 *
 	 * @param election       Wahl
@@ -202,7 +207,7 @@ public class PollingStationResultFiles {
 						.forEachOrdered(entry -> parseLine(entry.getKey(), entry.getValue()));
 
 				final LocalElectionResult result = new LocalElectionResult(election,
-						2,
+						SAINTE_LAGUE_SCALE,
 						Maps.<District<?>, OptionalInt>builder().put(pollingStation, numberOfAllBallots.get()).get(),
 						emptySet(),
 						emptySet(),
