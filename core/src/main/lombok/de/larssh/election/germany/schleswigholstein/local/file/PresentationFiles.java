@@ -412,7 +412,7 @@ public class PresentationFiles {
 					.getParty()
 					.map(party -> String.format("\nListenposition %d der %s",
 							new ArrayList<>(this.result.getElection().getNominations(party)) //
-									.indexOf(result.getNomination())
+									.indexOf(result.getNomination()) //
 									+ 1,
 							party.getShortName()))
 					.ifPresent(builder::append);
