@@ -52,7 +52,6 @@
 	</ciManagement>
 
 	<properties>
-		<parent-pom.create-github-workflow-yml>false</parent-pom.create-github-workflow-yml>
 		<parent-pom.github.project>election-results</parent-pom.github.project>
 
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>
