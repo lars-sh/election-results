@@ -118,7 +118,11 @@ public class PresentationFiles {
 		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
 			final Class<?> clazz = MethodHandles.lookup().lookupClass();
 			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
-			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName)).get();
+			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName))
+					.orElseThrow(() -> new IllegalArgumentException(
+							Strings.format("Failed loading the resource file \"%s\" relative to class \"%s\".",
+									fileName,
+									clazz.getName())));
 
 			try {
 				return new String(Files.readAllBytes(path), Strings.DEFAULT_CHARSET);

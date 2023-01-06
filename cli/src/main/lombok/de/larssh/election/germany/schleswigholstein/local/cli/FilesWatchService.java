@@ -52,6 +52,7 @@ class FilesWatchService implements Closeable {
 	@Override
 	@SuppressWarnings("PMD.CloseResource")
 	public void close() throws IOException {
+		@SuppressWarnings("resource")
 		final WatchService watchService = this.watchService.get();
 		if (watchService != null) {
 			watchService.close();
