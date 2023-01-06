@@ -50,7 +50,7 @@ class FilesWatchService implements Closeable {
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressWarnings("PMD.CloseResource")
+	@SuppressWarnings({ "checkstyle:SuppressWarnings", "PMD.CloseResource" })
 	public void close() throws IOException {
 		@SuppressWarnings("resource")
 		final WatchService watchService = this.watchService.get();
