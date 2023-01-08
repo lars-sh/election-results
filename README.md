@@ -3,7 +3,7 @@ This project is meant to contain functionality to calculate the results of elect
 
 Implementation is mainly focussed on the local elections in Schleswig-Holstein, which is the northernmost state of Germany.
 
-[Changelog](CHANGELOG.md)  |  [JavaDoc](https://lars-sh.github.io/election-results/apidocs)  |  [Generated Reports](https://lars-sh.github.io/election-results/project-reports.html)
+[JavaDoc](https://lars-sh.github.io/election-results/apidocs)  |  [Generated Reports](https://lars-sh.github.io/election-results/project-reports.html)
 
 ## Getting started
 
