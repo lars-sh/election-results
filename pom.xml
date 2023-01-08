@@ -51,6 +51,7 @@
 	</ciManagement>
 
 	<properties>
+		<parent-pom.create-changelog-md>false</parent-pom.create-changelog-md>
 		<parent-pom.github.project>election-results</parent-pom.github.project>
 
 		<eclipse.compiler.javadoc>disabled</eclipse.compiler.javadoc>

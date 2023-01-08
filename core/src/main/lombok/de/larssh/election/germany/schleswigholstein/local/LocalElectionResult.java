@@ -382,6 +382,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return the ballot evaluation progress in percentage or empty if the number
 	 *         of all ballots is empty
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public Optional<BigDecimal> getEvaluationProgress(final int scale, final District<?> district) {
 		return OptionalInts.mapToObj(getNumberOfAllBallots(district),
 				numberOfAllBallots -> BigDecimals
