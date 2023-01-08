@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonKey;
 
 import de.larssh.utils.Optionals;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -151,6 +152,7 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	 *
 	 * @return unique key based on the names
 	 */
+	@JsonKey
 	@JsonIgnore
 	public String getKey() {
 		return getParent().map(parent -> Keys.escape(parent.getKey(), ", ", getName(), "")).orElse("");

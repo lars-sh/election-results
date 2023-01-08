@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Wahlergebnis auf Basis einer ggf. gefilterten Liste an Stimmzetteln
  *
@@ -28,6 +30,7 @@ public interface ElectionResult<B extends Ballot<? extends N>, N extends Nominat
 	 *
 	 * @return the number of all ballots of the election or empty
 	 */
+	@JsonIgnore
 	OptionalInt getNumberOfAllBallots();
 
 	/**

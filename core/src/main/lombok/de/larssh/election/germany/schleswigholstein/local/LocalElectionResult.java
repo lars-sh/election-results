@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -39,10 +38,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.election.germany.schleswigholstein.DistrictValueMap;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
@@ -136,7 +137,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * @return the scale (decimal places) of Sainte Laguë values
 	 */
-	@JsonProperty(index = 0)
+	@JsonProperty(access = Access.READ_ONLY, index = 0)
 	int sainteLagueScale;
 
 	/**
@@ -146,11 +147,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * In case this number is larger than the size of the list of ballots for the
 	 * district, not all ballots were evaluated, yet.
 	 */
-	@JsonIgnore
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
 	@EqualsAndHashCode.Include
-	Map<District<?>, OptionalInt> numberOfAllBallots;
+	@JsonProperty(access = Access.READ_ONLY, index = 1)
+	DistrictValueMap numberOfAllBallots;
 
 	/**
 	 * Ausgeloste Loskandidaten mit Direktmandat
@@ -238,10 +239,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			final List<LocalBallot> ballots) {
 		this.election = election;
 		this.sainteLagueScale = sainteLagueScale;
-		this.numberOfAllBallots = unmodifiableMap(new HashMap<>(numberOfAllBallots));
 		this.directDrawResults = unmodifiableSet(new LinkedHashSet<>(directDrawResults));
 		this.listDrawResults = unmodifiableSet(new LinkedHashSet<>(listDrawResults));
 		this.ballots = unmodifiableList(ballots);
+
+		this.numberOfAllBallots = new DistrictValueMap(election);
+		this.numberOfAllBallots.putAll(numberOfAllBallots);
 
 		for (final LocalBallot ballot : ballots) {
 			if (!ballot.getElection().equals(election)) {
@@ -323,11 +326,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return a new {@link ElectionResult} with filtered ballots
 	 */
 	public LocalElectionResult filterByDistrict(final District<?> district) {
-		final Map<District<?>, OptionalInt> filteredNumberOfAllBallots = new HashMap<>();
-		filteredNumberOfAllBallots.put(district, numberOfAllBallots.get(district));
-		for (final District<?> child : district.getAllChildren()) {
-			filteredNumberOfAllBallots.put(child, numberOfAllBallots.get(child));
-		}
+		final Map<District<?>, OptionalInt> filteredNumberOfAllBallots = numberOfAllBallots.entrySet()
+				.stream()
+				.filter(entry -> district.contains(entry.getKey()))
+				.collect(toMap(HashMap::new));
 
 		return new LocalElectionResult(getElection(),
 				sainteLagueScale,
@@ -419,46 +421,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
 	public OptionalInt getNumberOfAllBallots(final District<?> district) {
-		final OptionalInt numberOfAllBallots = this.numberOfAllBallots.get(district);
-		if (numberOfAllBallots != null && numberOfAllBallots.isPresent()) {
-			return OptionalInt.of(Math.max(numberOfAllBallots.getAsInt(), getBallots(district).size()));
-		}
-
-		final Set<? extends District<?>> children = district.getChildren();
-		if (children.isEmpty()) {
-			return OptionalInt.empty();
-		}
-
-		int calculated = 0;
-		for (final District<?> child : children) {
-			final OptionalInt numberOfAllBallotsOfChild = getNumberOfAllBallots(child);
-			if (!numberOfAllBallotsOfChild.isPresent()) {
-				return OptionalInt.empty();
-			}
-			calculated += numberOfAllBallotsOfChild.getAsInt();
-		}
-		return OptionalInt.of(Math.max(calculated, getBallots(district).size()));
-	}
-
-	/**
-	 * Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
-	 *
-	 * <p>
-	 * In case this number is larger than the size of the list of ballots for the
-	 * district, not all ballots were evaluated, yet.
-	 *
-	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
-	 */
-	@JsonProperty(value = "numberOfAllBallots", index = 1)
-	@SuppressWarnings("PMD.UnusedPrivateMethod")
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, Integer> getNumberOfAllBallotsForJackson() {
-		return numberOfAllBallots.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue() != null && entry.getValue().isPresent())
-				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
+		final OptionalInt value = numberOfAllBallots.get(district);
+		return value.isPresent() ? OptionalInt.of(Math.max(value.getAsInt(), getBallots(district).size())) : value;
 	}
 
 	/**

@@ -129,7 +129,7 @@ public class LocalElectionTest {
 	@PackagePrivate
 	void testJson() throws IOException {
 		final ObjectWriter objectWriter = LocalElection.createJacksonObjectWriter().withDefaultPrettyPrinter();
-		final Path path = Files.createTempFile("", "");
+		final Path path = Files.createTempFile("", ".json");
 
 		// Create
 		final LocalElection electionCreated = createElection();

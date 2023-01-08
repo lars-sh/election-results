@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.OptionalInt;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
@@ -48,6 +50,7 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 *
 	 * @return Einwohnerzahl des Wahlgebiets
 	 */
+	@JsonIgnore
 	default int getPopulation() {
 		return getPopulation(getDistrict())
 				.orElseThrow(() -> new ElectionException("Missing population information for root district \"%s\".",
@@ -93,6 +96,7 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 *
 	 * @return Anzahl der Wahlberechtigten im Wahlgebiet
 	 */
+	@JsonIgnore
 	default OptionalInt getNumberOfEligibleVoters() {
 		return getNumberOfEligibleVoters(getDistrict());
 	}

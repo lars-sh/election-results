@@ -13,14 +13,12 @@ import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Supplier;
 
@@ -28,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -35,6 +34,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.election.germany.schleswigholstein.DistrictValueMap;
 import de.larssh.election.germany.schleswigholstein.Election;
 import de.larssh.election.germany.schleswigholstein.ElectionException;
 import de.larssh.election.germany.schleswigholstein.Party;
@@ -94,7 +94,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * @return the name of the election
 	 */
-	@JsonProperty(index = 0)
+	@JsonProperty(access = Access.READ_ONLY, index = 0)
 	@EqualsAndHashCode.Include
 	String name;
 
@@ -103,32 +103,32 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * @return the date of the election
 	 */
-	@JsonProperty(index = 1)
+	@JsonProperty(access = Access.READ_ONLY, index = 1)
 	@EqualsAndHashCode.Include
 	LocalDate date;
 
 	/**
 	 * Wahlgebiet
 	 */
-	@JsonProperty(index = 2)
+	@JsonProperty(access = Access.READ_ONLY, index = 2)
 	@EqualsAndHashCode.Include
 	LocalDistrictRoot district;
 
 	/**
 	 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@JsonIgnore
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> population = new HashMap<>();
+	@JsonProperty(access = Access.READ_ONLY, index = 3)
+	DistrictValueMap population = new DistrictValueMap(this);
 
 	/**
 	 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@JsonIgnore
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
-	Map<District<?>, OptionalInt> numberOfEligibleVoters = new HashMap<>();
+	@JsonProperty(access = Access.READ_ONLY, index = 4)
+	DistrictValueMap numberOfEligibleVoters = new DistrictValueMap(this);
 
 	/**
 	 * Bewerberinnen und Bewerber
@@ -163,8 +163,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	private LocalElection(final ParsableLocalElection parsable) {
 		this(parsable.getName(), parsable.getDate(), parsable.getDistrict());
 
-		parsable.addPopulationTo(this);
-		parsable.addNumberOfEligibleVotersTo(this);
+		population.putAllByKey(parsable.getPopulation());
+		numberOfEligibleVoters.putAllByKey(parsable.getNumberOfEligibleVoters());
 		parsable.addNominationsTo(this);
 	}
 
@@ -194,95 +194,26 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
 	public OptionalInt getPopulation(final District<?> district) {
-		final OptionalInt population = this.population.get(district);
-		if (population != null && population.isPresent()) {
-			return population;
-		}
-
-		final Set<? extends District<?>> children = district.getChildren();
-		if (children.isEmpty()) {
-			return OptionalInt.empty();
-		}
-
-		int calculated = 0;
-		for (final District<?> child : children) {
-			final OptionalInt populationOfChild = getPopulation(child);
-			if (!populationOfChild.isPresent()) {
-				return OptionalInt.empty();
-			}
-			calculated += populationOfChild.getAsInt();
-		}
-		return OptionalInt.of(calculated);
-	}
-
-	/**
-	 * Population information as JSON property
-	 *
-	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
-	 */
-	@JsonProperty(value = "population", index = 3)
-	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.UnusedPrivateMethod" })
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, Integer> getPopulationForJackson() {
-		return population.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().isPresent())
-				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
+		return population.get(district);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void setPopulation(final District<?> district, final OptionalInt population) {
-		setDistrictsMap(this.population, "population", district, population);
+		this.population.put(district, population);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_CHECKING_REFERENCE", justification = "optimized map contains")
 	public OptionalInt getNumberOfEligibleVoters(final District<?> district) {
-		final OptionalInt numberOfEligibleVoters = this.numberOfEligibleVoters.get(district);
-		if (numberOfEligibleVoters != null && numberOfEligibleVoters.isPresent()) {
-			return numberOfEligibleVoters;
-		}
-
-		final Set<? extends District<?>> children = district.getChildren();
-		if (children.isEmpty()) {
-			return OptionalInt.empty();
-		}
-
-		int calculated = 0;
-		for (final District<?> child : children) {
-			final OptionalInt numberOfEligibleVotersOfChild = getNumberOfEligibleVoters(child);
-			if (!numberOfEligibleVotersOfChild.isPresent()) {
-				return OptionalInt.empty();
-			}
-			calculated += numberOfEligibleVotersOfChild.getAsInt();
-		}
-		return OptionalInt.of(calculated);
-	}
-
-	/**
-	 * The number of eligible voters as JSON property
-	 *
-	 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
-	 *         Wahlbezirk
-	 */
-	@JsonProperty(value = "numberOfEligibleVoters", index = 4)
-	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.UnusedPrivateMethod" })
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
-	private Map<String, Integer> getNumberOfEligibleVotersForJackson() {
-		return numberOfEligibleVoters.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().isPresent())
-				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
+		return numberOfEligibleVoters.get(district);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void setNumberOfEligibleVoters(final District<?> district, final OptionalInt numberOfEligibleVoters) {
-		setDistrictsMap(this.numberOfEligibleVoters, "number of eligible voters", district, numberOfEligibleVoters);
+		this.numberOfEligibleVoters.put(district, numberOfEligibleVoters);
 	}
 
 	/**
@@ -421,34 +352,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	}
 
 	/**
-	 * Updates {@code map} by putting {@code value} for the key {@code district}.
-	 * There must not be such an entry yet and the {@code district} must be part of
-	 * the root district.
-	 *
-	 * <p>
-	 * {@code type} is used in error case only.
-	 *
-	 * @param <T>      the type of {@code value}
-	 * @param map      the map to update
-	 * @param type     the maps kind
-	 * @param district the district to update
-	 * @param value    the value to insert
-	 */
-	private <T> void setDistrictsMap(final Map<District<?>, T> map,
-			final String type,
-			final District<?> district,
-			final T value) {
-		if (!district.getRoot().equals(getDistrict())) {
-			throw new ElectionException("District \"%s\" is not part of the elections district hierarchy.",
-					district.getKey());
-		}
-		if (map.containsKey(district)) {
-			throw new ElectionException("The %s has already been set for district \"%s\".", type, district.getKey());
-		}
-		map.put(district, value);
-	}
-
-	/**
 	 * JSON delegate for {@link LocalElection}
 	 */
 	@Getter
@@ -534,33 +437,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			this.numberOfEligibleVoters = Nullables.orElseGet(numberOfEligibleVoters, Collections::emptyMap);
 			this.nominations = Nullables.orElseGet(nominations, Collections::emptyList);
 			this.parties = Nullables.orElseGet(parties, Collections::emptySet);
-		}
-
-		/**
-		 * Adds population information to {@code election}.
-		 *
-		 * @param election Wahl
-		 */
-		public void addPopulationTo(final LocalElection election) {
-			final Map<String, OptionalInt> population = getPopulation();
-
-			for (final District<?> district : election.getAllDistricts()) {
-				election.setPopulation(district, population.getOrDefault(district.getKey(), OptionalInt.empty()));
-			}
-		}
-
-		/**
-		 * Adds the numbers of eligible voters to {@code election}.
-		 *
-		 * @param election Wahl
-		 */
-		public void addNumberOfEligibleVotersTo(final LocalElection election) {
-			final Map<String, OptionalInt> numberOfEligibleVoters = getNumberOfEligibleVoters();
-
-			for (final District<?> district : election.getAllDistricts()) {
-				election.setNumberOfEligibleVoters(district,
-						numberOfEligibleVoters.getOrDefault(district.getKey(), OptionalInt.empty()));
-			}
 		}
 
 		/**
