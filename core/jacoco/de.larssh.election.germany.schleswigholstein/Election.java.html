@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Election.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Election Results Core</a> &gt; <a href="index.source.html" class="el_package">de.larssh.election.germany.schleswigholstein</a> &gt; <span class="el_source">Election.java</span></div><h1>Election.java</h1><pre class="source lang-java linenums">package de.larssh.election.germany.schleswigholstein;
+
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.OptionalInt;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
+
+/**
+ * Wahlen in den Gemeinden und Kreisen in Schleswig-Holstein gem. Gemeinde- und
+ * Kreiswahlgesetz (GKWG)
+ *
+ * @param &lt;D&gt; the type of the root district
+ * @param &lt;N&gt; the type of nominations
+ */
+public interface Election&lt;D extends District&lt;?&gt;, N extends Nomination&lt;? extends N&gt;&gt; extends Comparable&lt;Election&lt;?, ?&gt;&gt; {
+	/**
+	 * Comparator by district, name and date
+	 */
+<span class="fc" id="L23">	Comparator&lt;Election&lt;?, ?&gt;&gt; COMPARATOR = Comparator.&lt;Election&lt;?, ?&gt;, District&lt;?&gt;&gt;comparing(Election::getDistrict)</span>
+<span class="fc" id="L24">			.thenComparing(Election::getName)</span>
+<span class="fc" id="L25">			.thenComparing(Election::getDate);</span>
+
+	/**
+	 * Wahlgebiet (§ 2 GKWG)
+	 *
+	 * @return Wahlgebiet
+	 */
+	D getDistrict();
+
+	/**
+	 * Date of the election
+	 *
+	 * @return the date of the election
+	 */
+	LocalDate getDate();
+
+	/**
+	 * Name of the election
+	 *
+	 * @return the name of the election
+	 */
+	String getName();
+
+	/**
+	 * Einwohnerzahl des Wahlgebiets
+	 *
+	 * @return Einwohnerzahl des Wahlgebiets
+	 */
+	@JsonIgnore
+	default int getPopulation() {
+<span class="fc" id="L55">		return getPopulation(getDistrict())</span>
+<span class="pc" id="L56">				.orElseThrow(() -&gt; new ElectionException(&quot;Missing population information for root district \&quot;%s\&quot;.&quot;,</span>
+<span class="nc" id="L57">						getDistrict().getName()));</span>
+	}
+
+	/**
+	 * Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @return Einwohnerzahl nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 */
+	OptionalInt getPopulation(District&lt;?&gt; district);
+
+	/**
+	 * Sets population information for {@code district}.
+	 *
+	 * &lt;p&gt;
+	 * Population information, that's already been set cannot be overwritten and
+	 * {@code district} must be part of elections district hierarchy.
+	 *
+	 * @param district   Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param population Einwohnerzahl
+	 */
+	default void setPopulation(final District&lt;?&gt; district, final int population) {
+<span class="nc" id="L79">		setPopulation(district, OptionalInt.of(population));</span>
+<span class="nc" id="L80">	}</span>
+
+	/**
+	 * Sets population information for {@code district}.
+	 *
+	 * &lt;p&gt;
+	 * Population information, that's already been set cannot be overwritten and
+	 * {@code district} must be part of elections district hierarchy.
+	 *
+	 * @param district   Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param population Einwohnerzahl
+	 */
+	void setPopulation(District&lt;?&gt; district, OptionalInt population);
+
+	/**
+	 * Anzahl der Wahlberechtigten im Wahlgebiet
+	 *
+	 * @return Anzahl der Wahlberechtigten im Wahlgebiet
+	 */
+	@JsonIgnore
+	default OptionalInt getNumberOfEligibleVoters() {
+<span class="fc" id="L101">		return getNumberOfEligibleVoters(getDistrict());</span>
+	}
+
+	/**
+	 * Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @return Anzahl der Wahlberechtigten nach Wahlgebiet, Wahlkreis oder
+	 *         Wahlbezirk
+	 */
+	OptionalInt getNumberOfEligibleVoters(District&lt;?&gt; district);
+
+	/**
+	 * Sets the number of eligible voters for {@code district}.
+	 *
+	 * &lt;p&gt;
+	 * The number of eligible voters, that's already been set cannot be overwritten
+	 * and {@code district} must be part of elections district hierarchy.
+	 *
+	 * @param district               Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten
+	 */
+	default void setNumberOfEligibleVoters(final District&lt;?&gt; district, final int numberOfEligibleVoters) {
+<span class="nc" id="L124">		setNumberOfEligibleVoters(district, OptionalInt.of(numberOfEligibleVoters));</span>
+<span class="nc" id="L125">	}</span>
+
+	/**
+	 * Sets the number of eligible voters for {@code district}.
+	 *
+	 * &lt;p&gt;
+	 * The number of eligible voters, that's already been set cannot be overwritten
+	 * and {@code district} must be part of elections district hierarchy.
+	 *
+	 * @param district               Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @param numberOfEligibleVoters Anzahl der Wahlberechtigten
+	 */
+	void setNumberOfEligibleVoters(District&lt;?&gt; district, OptionalInt numberOfEligibleVoters);
+
+	/**
+	 * Bewerberinnen und Bewerber
+	 *
+	 * @return Bewerberinnen und Bewerber
+	 */
+	Set&lt;? extends N&gt; getNominations();
+
+	/** {@inheritDoc} */
+	@Override
+	default int compareTo(@Nullable final Election&lt;?, ?&gt; election) {
+<span class="fc" id="L149">		return COMPARATOR.compare(this, election);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

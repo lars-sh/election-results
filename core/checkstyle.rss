@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>Election Results Core - Checkstyle report</title>
+    <link>https://lars-sh.github.io/election-results/election-results-core/</link>
+    <description>Election Results Core - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2023</copyright>
+    <item>
+      <title>File: 48,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 1
+      </title>
+            <link>https://lars-sh.github.io/election-results/election-results-core//checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalDistrictType.java">de/larssh/election/germany/schleswigholstein/local/LocalDistrictType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalNominationResultTest.java">de/larssh/election/germany/schleswigholstein/local/LocalNominationResultTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Address.java">de/larssh/election/germany/schleswigholstein/Address.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalPartyResult.java">de/larssh/election/germany/schleswigholstein/local/LocalPartyResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.utils.BigDecimals.java">de/larssh/election/utils/BigDecimals.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.PopulationInformation.java">de/larssh/election/germany/schleswigholstein/local/PopulationInformation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.package-info.java">de/larssh/election/germany/schleswigholstein/local/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalPartyResultTest.java">de/larssh/election/germany/schleswigholstein/local/LocalPartyResultTest.java</a>
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.package-info.java">de/larssh/election/germany/schleswigholstein/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles.java">de/larssh/election/germany/schleswigholstein/local/file/PresentationFiles.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalNominationType.java">de/larssh/election/germany/schleswigholstein/local/LocalNominationType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#target.maven-archiver.pom.properties">target/maven-archiver/pom.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalElection.java">de/larssh/election/germany/schleswigholstein/local/LocalElection.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.utils.package-info.java">de/larssh/election/utils/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalDistrictRoot.java">de/larssh/election/germany/schleswigholstein/local/LocalDistrictRoot.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFilesTest.java">de/larssh/election/germany/schleswigholstein/local/file/AwgWebsiteFilesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PresentationFilesTest.java">de/larssh/election/germany/schleswigholstein/local/file/PresentationFilesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalElectionResultTest.java">de/larssh/election/germany/schleswigholstein/local/LocalElectionResultTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Election.java">de/larssh/election/germany/schleswigholstein/Election.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalElectionTest.java">de/larssh/election/germany/schleswigholstein/local/LocalElectionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.package-info.java">de/larssh/election/germany/schleswigholstein/local/file/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalDistrict.java">de/larssh/election/germany/schleswigholstein/local/LocalDistrict.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.ElectionResult.java">de/larssh/election/germany/schleswigholstein/ElectionResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.NominationResult.java">de/larssh/election/germany/schleswigholstein/NominationResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Person.java">de/larssh/election/germany/schleswigholstein/Person.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalElectionResult.java">de/larssh/election/germany/schleswigholstein/local/LocalElectionResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles.java">de/larssh/election/germany/schleswigholstein/local/file/PollingStationResultFiles.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.DistrictValueMap.java">de/larssh/election/germany/schleswigholstein/DistrictValueMap.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.ElectionException.java">de/larssh/election/germany/schleswigholstein/ElectionException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#target.formatter-maven-cache.properties">target/formatter-maven-cache.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalPollingStation.java">de/larssh/election/germany/schleswigholstein/local/LocalPollingStation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Ballot.java">de/larssh/election/germany/schleswigholstein/Ballot.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileLineParseException.java">de/larssh/election/germany/schleswigholstein/local/file/PollingStationResultFileLineParseException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Color.java">de/larssh/election/germany/schleswigholstein/Color.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalBallot.java">de/larssh/election/germany/schleswigholstein/local/LocalBallot.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles.java">de/larssh/election/germany/schleswigholstein/local/file/AwgWebsiteFiles.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Gender.java">de/larssh/election/germany/schleswigholstein/Gender.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Nomination.java">de/larssh/election/germany/schleswigholstein/Nomination.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalNomination.java">de/larssh/election/germany/schleswigholstein/local/LocalNomination.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.PartyType.java">de/larssh/election/germany/schleswigholstein/PartyType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.PartyResult.java">de/larssh/election/germany/schleswigholstein/PartyResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.District.java">de/larssh/election/germany/schleswigholstein/District.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFileParseException.java">de/larssh/election/germany/schleswigholstein/local/file/PollingStationResultFileParseException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Keys.java">de/larssh/election/germany/schleswigholstein/Keys.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.java">de/larssh/election/germany/schleswigholstein/local/LocalNominationResultType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalNominationResult.java">de/larssh/election/germany/schleswigholstein/local/LocalNominationResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.Party.java">de/larssh/election/germany/schleswigholstein/Party.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFilesTest.java">de/larssh/election/germany/schleswigholstein/local/file/PollingStationResultFilesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

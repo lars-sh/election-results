@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LocalPollingStation.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Election Results CLI</a> &gt; <a href="../index.html" class="el_bundle">election-results-core</a> &gt; <a href="index.source.html" class="el_package">de.larssh.election.germany.schleswigholstein.local</a> &gt; <span class="el_source">LocalPollingStation.java</span></div><h1>LocalPollingStation.java</h1><pre class="source lang-java linenums">package de.larssh.election.germany.schleswigholstein.local;
+
+import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.utils.annotations.PackagePrivate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+/**
+ * Wahlbezirk (§ 16 GKWG)
+ */
+@JsonIgnoreProperties(&quot;children&quot;)
+@SuppressFBWarnings(value = &quot;FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY&quot;,
+		justification = &quot;no circular dependency, but a hierarchical&quot;)
+public class LocalPollingStation extends District&lt;District&lt;?&gt;&gt; {
+	/**
+	 * Wahlbezirk (§ 16 GKWG)
+	 *
+	 * @param parent Wahlkreis
+	 * @param name   Name
+	 */
+	@PackagePrivate
+	LocalPollingStation(final LocalDistrict parent, final String name) {
+<span class="fc" id="L27">		super(Optional.of(parent), name);</span>
+<span class="fc" id="L28">	}</span>
+
+	/** {@inheritDoc} */
+	@Override
+	public District&lt;?&gt; createChild(@SuppressWarnings(&quot;unused&quot;) final String name) {
+<span class="nc" id="L33">		throw new UnsupportedOperationException();</span>
+	}
+
+	/**
+	 * {@link LocalDistrict} of this {@link LocalPollingStation}
+	 *
+	 * @return the {@link LocalDistrict} of this {@link LocalPollingStation}
+	 */
+	@JsonIgnore
+	public LocalDistrict getDistrict() {
+<span class="fc" id="L43">		return getParent().get();</span>
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@JsonIgnore
+	public Optional&lt;LocalDistrict&gt; getParent() {
+<span class="fc" id="L50">		return super.getParent().map(LocalDistrict.class::cast);</span>
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@JsonIgnore
+	public LocalDistrictRoot getRoot() {
+<span class="fc" id="L57">		return (LocalDistrictRoot) super.getRoot();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
