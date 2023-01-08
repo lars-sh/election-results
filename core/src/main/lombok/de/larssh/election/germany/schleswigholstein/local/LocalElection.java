@@ -140,22 +140,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * Wahlgebiet, Wahlkreise und Wahlbezirke
 	 */
 	@ToString.Exclude
-	Supplier<Set<District<?>>> districts = lazy(() -> {
-		final Set<District<?>> districts = new LinkedHashSet<>();
-
-		// Root
-		districts.add(getDistrict());
-
-		// Districts
-		districts.addAll(getDistrict().getChildren());
-
-		// Polling Stations
-		for (final LocalDistrict district : getDistrict().getChildren()) {
-			districts.addAll(district.getChildren());
-		}
-
-		return unmodifiableSet(districts);
-	});
+	Supplier<Set<District<?>>> allDistricts = lazy(() -> getDistrict().getAllChildren());
 
 	/**
 	 * Bewerberinnen und Bewerber
@@ -181,6 +166,30 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		parsable.addPopulationTo(this);
 		parsable.addNumberOfEligibleVotersTo(this);
 		parsable.addNominationsTo(this);
+	}
+
+	/**
+	 * Wahlgebiet, Wahlkreise und Wahlbezirke
+	 *
+	 * @return Wahlgebiet, Wahlkreise und Wahlbezirke
+	 */
+	@JsonIgnore
+	public Set<District<?>> getAllDistricts() {
+		return allDistricts.get();
+	}
+
+	/**
+	 * Collects all {@link LocalPollingStation}s of this election.
+	 *
+	 * @return all {@link LocalPollingStation}s
+	 */
+	@JsonIgnore
+	public Set<LocalPollingStation> getPollingStations() {
+		return getDistrict().getChildren()
+				.stream()
+				.map(LocalDistrict::getChildren)
+				.flatMap(Set::stream)
+				.collect(toLinkedHashSet());
 	}
 
 	/** {@inheritDoc} */
@@ -332,16 +341,6 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 			nominationsAsList.addAll(nominations);
 		}
 		return unmodifiableList(nominationsAsList);
-	}
-
-	/**
-	 * Wahlgebiet, Wahlkreise und Wahlbezirke
-	 *
-	 * @return Wahlgebiet, Wahlkreise und Wahlbezirke
-	 */
-	@JsonIgnore
-	public Set<District<?>> getDistricts() {
-		return districts.get();
 	}
 
 	/**
@@ -545,7 +544,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		public void addPopulationTo(final LocalElection election) {
 			final Map<String, OptionalInt> population = getPopulation();
 
-			for (final District<?> district : election.getDistricts()) {
+			for (final District<?> district : election.getAllDistricts()) {
 				election.setPopulation(district, population.getOrDefault(district.getKey(), OptionalInt.empty()));
 			}
 		}
@@ -558,7 +557,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		public void addNumberOfEligibleVotersTo(final LocalElection election) {
 			final Map<String, OptionalInt> numberOfEligibleVoters = getNumberOfEligibleVoters();
 
-			for (final District<?> district : election.getDistricts()) {
+			for (final District<?> district : election.getAllDistricts()) {
 				election.setNumberOfEligibleVoters(district,
 						numberOfEligibleVoters.getOrDefault(district.getKey(), OptionalInt.empty()));
 			}
@@ -571,7 +570,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 		 */
 		public void addNominationsTo(final LocalElection election) {
 			final Map<String, District<?>> districts
-					= election.getDistricts().stream().collect(toMap(District::getKey, identity()));
+					= election.getAllDistricts().stream().collect(toMap(District::getKey, identity()));
 			final Map<String, Party> parties = getParties().stream().collect(toMap(Party::getKey, identity()));
 
 			for (final ParsableLocalNomination nomination : getNominations()) {

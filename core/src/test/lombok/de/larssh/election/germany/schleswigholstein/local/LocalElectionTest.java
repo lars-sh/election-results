@@ -8,7 +8,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
@@ -115,11 +114,8 @@ public class LocalElectionTest {
 	 * @return the polling station
 	 */
 	public static LocalPollingStation findPollingStation(final LocalElection election, final String name) {
-		return election.getDistrict()
-				.getChildren()
+		return election.getPollingStations()
 				.stream()
-				.map(LocalDistrict::getChildren)
-				.flatMap(Collection::stream)
 				.filter(district -> name.equals(district.getName()))
 				.findAny()
 				.orElseThrow(() -> new ElectionException("Cannot find a polling station named \"%s\".", name));

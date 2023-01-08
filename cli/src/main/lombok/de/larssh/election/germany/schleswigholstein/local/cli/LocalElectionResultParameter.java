@@ -11,13 +11,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import de.larssh.election.germany.schleswigholstein.ElectionException;
-import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
@@ -175,11 +173,8 @@ public class LocalElectionResultParameter {
 				emptyList());
 		for (final Entry<String, Path> resultPath : getResultPaths().entrySet()) {
 			// Find Polling Station
-			final LocalPollingStation pollingStation = election.getDistrict()
-					.getChildren()
+			final LocalPollingStation pollingStation = election.getPollingStations()
 					.stream()
-					.map(LocalDistrict::getChildren)
-					.flatMap(Collection::stream)
 					.filter(district -> resultPath.getKey().equals(district.getName()))
 					.findAny()
 					.orElseThrow(() -> new ElectionException("Cannot find a polling station named \"%s\".",

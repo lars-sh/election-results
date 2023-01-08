@@ -277,7 +277,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 		// Calculate number of all ballots
 		final Map<District<?>, OptionalInt> numberOfAllBallots = new HashMap<>();
-		for (final District<?> district : getElection().getDistricts()) {
+		for (final District<?> district : getElection().getAllDistricts()) {
 			Optionals.ofSingle(results.stream()
 					.map(result -> result.getNumberOfAllBallots(district))
 					.filter(OptionalInt::isPresent)
@@ -323,12 +323,15 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return a new {@link ElectionResult} with filtered ballots
 	 */
 	public LocalElectionResult filterByDistrict(final District<?> district) {
-		final Map<District<?>, OptionalInt> numberOfFilteredBallots
-				= Maps.<District<?>, OptionalInt>builder().put(district, getNumberOfAllBallots(district)).get();
+		final Map<District<?>, OptionalInt> filteredNumberOfAllBallots = new HashMap<>();
+		filteredNumberOfAllBallots.put(district, numberOfAllBallots.get(district));
+		for (final District<?> child : district.getAllChildren()) {
+			filteredNumberOfAllBallots.put(child, numberOfAllBallots.get(child));
+		}
 
 		return new LocalElectionResult(getElection(),
 				sainteLagueScale,
-				numberOfFilteredBallots,
+				filteredNumberOfAllBallots,
 				getDirectDrawResults(),
 				getListDrawResults(),
 				getBallots(district));
@@ -452,11 +455,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	@SuppressWarnings("PMD.UnusedPrivateMethod")
 	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "JSON property")
 	private Map<String, Integer> getNumberOfAllBallotsForJackson() {
-		return numberOfAllBallots.keySet()
+		return numberOfAllBallots.entrySet()
 				.stream()
-				.map(district -> Maps.entry(district.getKey(), getNumberOfAllBallots(district)))
-				.filter(entry -> entry.getValue().isPresent())
-				.collect(toMap(Entry::getKey, entry -> entry.getValue().getAsInt(), TreeMap::new));
+				.filter(entry -> entry.getValue() != null && entry.getValue().isPresent())
+				.collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue().getAsInt(), TreeMap::new));
 	}
 
 	/**
@@ -1051,7 +1053,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 */
 		public Map<District<?>, OptionalInt> getNumberOfAllBallots() {
 			return ELECTION_FOR_JSON_CREATOR.get()
-					.getDistricts()
+					.getAllDistricts()
 					.stream()
 					.collect(toMap(identity(),
 							district -> numberOfAllBallots.getOrDefault(district.getKey(), OptionalInt.empty())));
@@ -1095,11 +1097,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		 */
 		public LocalPollingStation getPollingStation() {
 			return ELECTION_FOR_JSON_CREATOR.get()
-					.getDistrict()
-					.getChildren()
+					.getPollingStations()
 					.stream()
-					.map(LocalDistrict::getChildren)
-					.flatMap(Collection::stream)
 					.filter(district -> pollingStation.equals(district.getKey()))
 					.findAny()
 					.orElseThrow(() -> new ElectionException(

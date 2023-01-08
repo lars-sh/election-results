@@ -203,7 +203,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 		// Read full result
 		final LocalElectionResult fullResult = result.read();
 		final Map<District<?>, OptionalInt> numberOfAllBallotsPerDistrict = fullResult.getElection()
-				.getDistricts()
+				.getAllDistricts()
 				.stream()
 				.collect(toMap(identity(), fullResult::getNumberOfAllBallots));
 

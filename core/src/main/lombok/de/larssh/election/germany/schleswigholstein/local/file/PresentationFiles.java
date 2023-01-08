@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
-import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType;
@@ -204,12 +203,7 @@ public class PresentationFiles {
 		 * @return the polling stations overview
 		 */
 		private String formatPollingStations() {
-			final Set<LocalPollingStation> pollingStations = result.getElection()
-					.getDistricts()
-					.stream()
-					.filter(LocalPollingStation.class::isInstance)
-					.map(LocalPollingStation.class::cast)
-					.collect(toLinkedHashSet());
+			final Set<LocalPollingStation> pollingStations = result.getElection().getPollingStations();
 			final BigDecimal evaluationProgressIfUnknown
 					= HUNDRED.divide(BigDecimal.valueOf(pollingStations.size()), 1, RoundingMode.HALF_UP);
 
@@ -566,14 +560,7 @@ public class PresentationFiles {
 							* Math.min(this.result.getElection().getNumberOfDirectSeatsPerLocalDistrict(),
 									this.result.getElection().getNominations(result.getParty()).size())));
 
-			final Set<LocalPollingStation> pollingStations = this.result.getElection()
-					.getDistrict()
-					.getChildren()
-					.stream()
-					.map(LocalDistrict::getChildren)
-					.flatMap(Set::stream)
-					.collect(toLinkedHashSet());
-			for (final LocalPollingStation pollingStation : pollingStations) {
+			for (final LocalPollingStation pollingStation : this.result.getElection().getPollingStations()) {
 				final long numberOfPartyVotesInPollingStation = result.getBallots()
 						.stream()
 						.filter(ballot -> ballot.getPollingStation().equals(pollingStation))

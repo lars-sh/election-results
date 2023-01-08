@@ -109,6 +109,32 @@ public abstract class District<C extends District<?>> implements Comparable<Dist
 	public abstract C createChild(String name);
 
 	/**
+	 * Checks if {@code district} is part of the current district's hierarchy.
+	 *
+	 * @param district the district to search for
+	 * @return {@code true} if {@code district} is a child or equal to this
+	 *         district, else {@code false}
+	 */
+	public boolean contains(final District<?> district) {
+		return equals(district) || district.getParent().filter(this::contains).isPresent();
+	}
+
+	/**
+	 * Collects all children of this district recursively.
+	 *
+	 * @return all children
+	 */
+	@JsonIgnore
+	public Set<District<?>> getAllChildren() {
+		final Set<District<?>> allChildren = new LinkedHashSet<>();
+		for (final C child : getChildren()) {
+			allChildren.add(child);
+			allChildren.addAll(child.getAllChildren());
+		}
+		return allChildren;
+	}
+
+	/**
 	 * Children of this district
 	 *
 	 * @return the children

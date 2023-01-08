@@ -9,13 +9,11 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
-import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
@@ -208,11 +206,8 @@ public class AwgWebsiteFiles {
 		 */
 		private String formatData() {
 			return result.getElection()
-					.getDistrict()
-					.getChildren()
+					.getPollingStations()
 					.stream()
-					.map(LocalDistrict::getChildren)
-					.flatMap(Set::stream)
 					.map(pollingStation -> String.format("\t\t%s => array(%s)",
 							createPhpIdentifier(pollingStation.getName()),
 							formatNominationVotes(pollingStation)))
@@ -289,11 +284,8 @@ public class AwgWebsiteFiles {
 		 */
 		private String formatTypes() {
 			return result.getElection()
-					.getDistrict()
-					.getChildren()
+					.getPollingStations()
 					.stream()
-					.map(LocalDistrict::getChildren)
-					.flatMap(Set::stream)
 					.map(pollingStation -> String.format("\t\t%s => %s",
 							createPhpIdentifier(pollingStation.getName()),
 							createPhpString(pollingStation.getName())))
