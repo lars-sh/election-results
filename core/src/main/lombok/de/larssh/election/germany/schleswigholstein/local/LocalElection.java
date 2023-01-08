@@ -119,6 +119,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@JsonProperty(access = Access.READ_ONLY, index = 3)
 	DistrictValueMap population = new DistrictValueMap(this);
 
@@ -127,6 +128,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@ToString.Exclude
 	@Getter(AccessLevel.NONE)
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@JsonProperty(access = Access.READ_ONLY, index = 4)
 	DistrictValueMap numberOfEligibleVoters = new DistrictValueMap(this);
 
@@ -341,7 +343,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 *
 	 * @return Politische Parteien und Wählergruppen
 	 */
-	@JsonProperty(index = 6)
+	@JsonProperty(access = Access.READ_ONLY, index = 6)
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public Set<Party> getParties() {
 		return getNominations().stream()
