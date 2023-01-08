@@ -8,7 +8,6 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +31,7 @@ import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultT
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
+import de.larssh.election.utils.BigDecimals;
 import de.larssh.utils.Finals;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
@@ -71,9 +71,9 @@ public class PresentationFiles {
 			justification = "Creating system independent output by design")
 	private static class PresentationFileWriter {
 		/**
-		 * The value 100, with a scale of 0.
+		 * The value 100 as long
 		 */
-		private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
+		private static final long HUNDRED = 100;
 
 		/**
 		 * Template file body (lazily loaded)
@@ -147,17 +147,6 @@ public class PresentationFiles {
 		}
 
 		/**
-		 * Formats {@code value} according to {@link Locale#GERMAN} and using the
-		 * precision of one decimal.
-		 *
-		 * @param value the value
-		 * @return the formatted value
-		 */
-		private static String formatBigDecimal(final BigDecimal value) {
-			return String.format(Locale.GERMAN, "%.1f", value);
-		}
-
-		/**
 		 * Election Result to write
 		 *
 		 * @return the election result to write
@@ -204,8 +193,7 @@ public class PresentationFiles {
 		 */
 		private String formatPollingStations() {
 			final Set<LocalPollingStation> pollingStations = result.getElection().getPollingStations();
-			final BigDecimal evaluationProgressIfUnknown
-					= HUNDRED.divide(BigDecimal.valueOf(pollingStations.size()), 1, RoundingMode.HALF_UP);
+			final BigDecimal evaluationProgressIfUnknown = BigDecimals.divide(HUNDRED, pollingStations.size(), 1);
 
 			return pollingStations.stream()
 					.map(pollingStation -> formatPollingStation(pollingStation,
@@ -241,9 +229,7 @@ public class PresentationFiles {
 			}
 
 			// Increase the sum of known ballots proportionally
-			return BigDecimal.valueOf(sumOfAllBallots)
-					.multiply(BigDecimal.valueOf(pollingStations.size()))
-					.divide(BigDecimal.valueOf(numberOfPresent), 3, RoundingMode.HALF_UP);
+			return BigDecimals.divide((long) sumOfAllBallots * pollingStations.size(), numberOfPresent, 3);
 		}
 
 		/**
@@ -267,15 +253,14 @@ public class PresentationFiles {
 					pollingStation.getFontColor().toHex(),
 					OptionalInts
 							.mapToObj(result.getNumberOfAllBallots(pollingStation),
-									numOfBallots -> estimatedNumberOfAllBallots.compareTo(BigDecimal.ZERO) == 0
+									numOfBallots -> BigDecimals.isZero(estimatedNumberOfAllBallots)
 											? null
-											: BigDecimal.valueOf(numOfBallots)
-													.multiply(HUNDRED)
-													.divide(estimatedNumberOfAllBallots, 1, RoundingMode.HALF_UP))
+											: BigDecimals
+													.divide(HUNDRED * numOfBallots, estimatedNumberOfAllBallots, 1))
 							.orElse(evaluationProgressIfUnknown),
 					encodeXml(formatPollingStationTitle(pollingStation)),
 					encodeXml(pollingStation.getName()),
-					formatBigDecimal(evaluationProgress),
+					BigDecimals.format(evaluationProgress, 1, Locale.GERMAN),
 					evaluationProgress);
 		}
 
@@ -291,8 +276,9 @@ public class PresentationFiles {
 					(int) result.getBallots(pollingStation).stream().filter(ballot -> !ballot.isValid()).count(),
 					result.getElection().getNumberOfEligibleVoters(pollingStation))
 
-					+ String.format("\n\nGesamt: %s\u202f%%\n",
-							formatBigDecimal(result.getEvaluationProgress(1).orElse(BigDecimal.ZERO)))
+					+ String.format(Locale.GERMAN,
+							"\n\nGesamt: %.1f\u202f%%\n",
+							result.getEvaluationProgress(1).orElse(BigDecimal.ZERO))
 
 					+ formatPollingStationTitlePart(result.getBallots().size(),
 							result.getNumberOfAllBallots(),
@@ -330,12 +316,11 @@ public class PresentationFiles {
 			if (numberOfEligibleVoters.isPresent()) {
 				builder.append(String.format("\n\n%d Stimmberechtigte", numberOfEligibleVoters.getAsInt()));
 				if (numberOfAllBallots.isPresent()) {
-					builder.append(String.format("\nWahlbeteiligung: %s\u202f%%",
-							formatBigDecimal(BigDecimal.valueOf(numberOfAllBallots.getAsInt())
-									.multiply(HUNDRED)
-									.divide(BigDecimal.valueOf(numberOfEligibleVoters.getAsInt()),
-											1,
-											RoundingMode.HALF_UP))));
+					builder.append(String.format(Locale.GERMAN,
+							"\nWahlbeteiligung: %.1f\u202f%%",
+							BigDecimals.divide(HUNDRED * numberOfAllBallots.getAsInt(),
+									numberOfEligibleVoters.getAsInt(),
+									1)));
 				}
 			}
 			return builder.toString();
@@ -347,13 +332,12 @@ public class PresentationFiles {
 		 * @return the nomination results overview
 		 */
 		private String formatNominationResults() {
-			final BigDecimal maxNumberOfVotes = result.getNominationResults()
+			final int maxNumberOfVotes = result.getNominationResults()
 					.values()
 					.stream()
 					.map(LocalNominationResult::getNumberOfVotes)
 					.max(Integer::compare)
-					.map(BigDecimal::valueOf)
-					.orElse(BigDecimal.ZERO);
+					.orElse(0);
 
 			return result.getNominationResults()
 					.values()
@@ -371,7 +355,7 @@ public class PresentationFiles {
 		 * @param maxNumberOfVotes the max number of votes of all nomination results
 		 * @return the formatted nomination result
 		 */
-		private String formatNominationResult(final LocalNominationResult result, final BigDecimal maxNumberOfVotes) {
+		private String formatNominationResult(final LocalNominationResult result, final int maxNumberOfVotes) {
 			return String.format(Locale.ROOT,
 					TEMPLATE_NOMINATION_RESULT.get(),
 					Strings.toLowerCaseAscii(result.getType().toString()),
@@ -383,11 +367,7 @@ public class PresentationFiles {
 					result.getNumberOfVotes(),
 					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toHex(),
 					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toHex(),
-					maxNumberOfVotes.compareTo(BigDecimal.ZERO) == 0
-							? BigDecimal.ZERO
-							: BigDecimal.valueOf(result.getNumberOfVotes())
-									.multiply(HUNDRED)
-									.divide(maxNumberOfVotes, 1, RoundingMode.HALF_UP));
+					BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), maxNumberOfVotes, 1));
 		}
 
 		/**
@@ -399,12 +379,9 @@ public class PresentationFiles {
 		@SuppressWarnings("checkstyle:MultipleStringLiterals")
 		private String formatNominationResultTitle(final LocalNominationResult result) {
 			final int numberOfBallots = this.result.getBallots(result.getNomination().getDistrict()).size();
-			final StringBuilder builder = new StringBuilder(String.format("Anteil: %s\u202f%%",
-					formatBigDecimal(numberOfBallots == 0
-							? BigDecimal.ZERO
-							: BigDecimal.valueOf(result.getNumberOfVotes())
-									.multiply(HUNDRED)
-									.divide(BigDecimal.valueOf(numberOfBallots), 1, RoundingMode.HALF_UP))));
+			final StringBuilder builder = new StringBuilder(String.format(Locale.GERMAN,
+					"Anteil: %.1f\u202f%%",
+					BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), numberOfBallots, 1)));
 
 			result.getNomination()
 					.getParty()
@@ -427,15 +404,12 @@ public class PresentationFiles {
 						.count();
 				final long numberOfBallotsInPollingStation = this.result.getBallots(pollingStation).size();
 
-				builder.append(String.format("\n\n%s: %s\u202f%%\nStimmen: %d",
+				builder.append(String.format(Locale.GERMAN,
+						"\n\n%s: %.1f\u202f%%\nStimmen: %d",
 						pollingStation.getName(),
-						formatBigDecimal(numberOfBallotsInPollingStation == 0
-								? BigDecimal.ZERO
-								: BigDecimal.valueOf(numberOfVotesInPollingStation)
-										.multiply(HUNDRED)
-										.divide(BigDecimal.valueOf(numberOfBallotsInPollingStation),
-												1,
-												RoundingMode.HALF_UP)),
+						BigDecimals.divideOrZero(HUNDRED * numberOfVotesInPollingStation,
+								numberOfBallotsInPollingStation,
+								1),
 						numberOfVotesInPollingStation));
 			}
 
@@ -449,12 +423,12 @@ public class PresentationFiles {
 		 * @return the party results overview
 		 */
 		private String formatPartyResults() {
-			final BigDecimal numberOfAllVotes = BigDecimal.valueOf(this.result.getBallots()
+			final int numberOfAllVotes = this.result.getBallots()
 					.stream()
 					.filter(LocalBallot::isValid)
 					.map(LocalBallot::getNominations)
 					.mapToInt(Set::size)
-					.sum());
+					.sum();
 			final String formattedParties = result.getPartyResults()
 					.values()
 					.stream()
@@ -492,7 +466,7 @@ public class PresentationFiles {
 		 * @param numberOfAllVotes the sum of votes of all valid ballots
 		 * @return the formatted party result
 		 */
-		private String formatPartyResult(final LocalPartyResult result, final BigDecimal numberOfAllVotes) {
+		private String formatPartyResult(final LocalPartyResult result, final int numberOfAllVotes) {
 			return formatPartyResult(result.getParty().getBackgroundColor(),
 					result.getParty().getFontColor(),
 					formatPartyResultTitle(result),
@@ -523,7 +497,7 @@ public class PresentationFiles {
 				final String name,
 				final int numberOfSeats,
 				final int numberOfVotes,
-				final BigDecimal numberOfAllVotes,
+				final int numberOfAllVotes,
 				final Collection<LocalNominationResult> nominationResults) {
 			return String.format(Locale.ROOT,
 					TEMPLATE_PARTY_RESULT.get(),
@@ -532,11 +506,9 @@ public class PresentationFiles {
 					encodeXml(title),
 					encodeXml(name),
 					numberOfSeats,
-					formatBigDecimal(numberOfAllVotes.compareTo(BigDecimal.ZERO) == 0
-							? BigDecimal.ZERO
-							: BigDecimal.valueOf(numberOfVotes)
-									.multiply(HUNDRED)
-									.divide(numberOfAllVotes, 1, RoundingMode.HALF_UP)),
+					BigDecimals.format(BigDecimals.divideOrZero(HUNDRED * numberOfVotes, numberOfAllVotes, 1),
+							1,
+							Locale.GERMAN),
 					nominationResults.stream()
 							.filter(nominationResult -> nominationResult.getType().isElected())
 							.map(nominationResult -> "<li>"
@@ -573,15 +545,12 @@ public class PresentationFiles {
 						.sum();
 				final int numberOfVotesInPollingStation = this.result.getNumberOfVotes(pollingStation);
 
-				builder.append(String.format("\n\n%s: %s\u202f%%\nStimmen: %d",
+				builder.append(String.format(Locale.GERMAN,
+						"\n\n%s: %.1f\u202f%%\nStimmen: %d",
 						pollingStation.getName(),
-						formatBigDecimal(numberOfVotesInPollingStation == 0
-								? BigDecimal.ZERO
-								: BigDecimal.valueOf(numberOfPartyVotesInPollingStation)
-										.multiply(HUNDRED)
-										.divide(BigDecimal.valueOf(numberOfVotesInPollingStation),
-												1,
-												RoundingMode.HALF_UP)),
+						BigDecimals.divideOrZero(HUNDRED * numberOfPartyVotesInPollingStation,
+								numberOfVotesInPollingStation,
+								1),
 						numberOfPartyVotesInPollingStation));
 			}
 

@@ -16,7 +16,6 @@ import static java.util.stream.Collectors.toSet;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -49,6 +48,7 @@ import de.larssh.election.germany.schleswigholstein.ElectionResult;
 import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.PartyResult;
+import de.larssh.election.utils.BigDecimals;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.Optionals;
@@ -384,12 +384,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	public Optional<BigDecimal> getEvaluationProgress(final int scale, final District<?> district) {
 		return OptionalInts.mapToObj(getNumberOfAllBallots(district),
-				numberOfAllBallots -> numberOfAllBallots == 0
-						? BigDecimal.ZERO
-						: BigDecimal.valueOf(getBallots(district).size())
-								.multiply(BigDecimal.TEN)
-								.multiply(BigDecimal.TEN)
-								.divide(BigDecimal.valueOf(numberOfAllBallots), scale, RoundingMode.HALF_UP));
+				numberOfAllBallots -> BigDecimals
+						.divideOrZero(100L * getBallots(district).size(), numberOfAllBallots, scale));
 	}
 
 	/**
@@ -608,11 +604,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 			final Party party,
 			final int votesOfParty) {
 		final Set<LocalNomination> nominationsOfParty = getSainteLagueNominationsOfParty(votes, party);
-		final BigDecimal votesOfPartyAsBigDecimal = BigDecimal.valueOf(votesOfParty);
 		final Iterator<LocalNomination> iterator = nominationsOfParty.iterator();
 
 		return IntStream.range(0, nominationsOfParty.size())
-				.mapToObj(step -> getSainteLagueValue(votesOfPartyAsBigDecimal, step))
+				.mapToObj(step -> getSainteLagueValue(votesOfParty, step))
 				.collect(toLinkedHashMap(step -> iterator.next(), identity()));
 	}
 
@@ -660,8 +655,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return the Sainte Laguë value
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
-	private BigDecimal getSainteLagueValue(final BigDecimal votesOfParty, final int step) {
-		return votesOfParty.divide(BigDecimal.valueOf(step * 10 + 5, 1), getSainteLagueScale(), RoundingMode.HALF_UP);
+	private BigDecimal getSainteLagueValue(final int votesOfParty, final int step) {
+		return BigDecimals.divide(votesOfParty, BigDecimal.valueOf(step * 10 + 5, 1), getSainteLagueScale());
 	}
 
 	/**
