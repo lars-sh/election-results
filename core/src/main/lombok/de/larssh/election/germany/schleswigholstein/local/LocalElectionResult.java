@@ -3,7 +3,6 @@ package de.larssh.election.germany.schleswigholstein.local;
 import static de.larssh.utils.Collectors.toLinkedHashMap;
 import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
-import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
@@ -30,7 +29,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -198,14 +196,6 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	Map<Party, LocalPartyResult> partyResults;
 
 	/**
-	 * Number of invalid ballots
-	 */
-	@JsonIgnore
-	@ToString.Exclude
-	Supplier<Integer> numberOfInvalidBallots
-			= lazy(() -> (int) getBallots().stream().filter(ballot -> !ballot.isValid()).count());
-
-	/**
 	 * Wahlergebnis
 	 *
 	 * @param parsable JSON delegate
@@ -346,11 +336,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return Stimmzettel
 	 */
 	public List<LocalBallot> getBallots(final District<?> district) {
-		return ballots.stream()
-				.filter(ballot -> ballot.getPollingStation().equals(district)
-						|| ballot.getPollingStation().getDistrict().equals(district)
-						|| ballot.getPollingStation().getRoot().equals(district))
-				.collect(toList());
+		return ballots.stream().filter(ballot -> district.contains(ballot.getPollingStation())).collect(toList());
 	}
 
 	/**
@@ -429,7 +415,17 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return the number of invalid ballots
 	 */
 	public int getNumberOfInvalidBallots() {
-		return numberOfInvalidBallots.get();
+		return getNumberOfInvalidBallots(getElection().getDistrict());
+	}
+
+	/**
+	 * Anzahl ungültiger Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 * @return the number of invalid ballots
+	 */
+	public int getNumberOfInvalidBallots(final District<?> district) {
+		return (int) getBallots(district).stream().filter(ballot -> !ballot.isValid()).count();
 	}
 
 	/**

@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles;
+import de.larssh.election.germany.schleswigholstein.local.file.MetricsFiles;
 import de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles;
 import de.larssh.utils.Nullables;
 import de.larssh.utils.function.DoubleToDoubleFunction;
@@ -110,6 +112,21 @@ public class LocalElectionResultCli implements IVersionProvider {
 			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE) final Path output) throws IOException {
 		try (Writer writer = Files.newBufferedWriter(output)) {
 			AwgWebsiteFiles.write(result.read(), writer);
+		}
+	}
+
+	/**
+	 * Creates an Excel spreadsheet (XLSX) with metrics of the election result.
+	 *
+	 * @param result the result
+	 * @param output the path to write to
+	 * @throws IOException on IO error
+	 */
+	@Command(description = "Creates an Excel spreadsheet (XLSX) with metrics of the election results.")
+	public void metrics(@Mixin final LocalElectionResultParameter result,
+			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE) final Path output) throws IOException {
+		try (OutputStream outputStream = Files.newOutputStream(output)) {
+			MetricsFiles.write(result.read(), outputStream);
 		}
 	}
 

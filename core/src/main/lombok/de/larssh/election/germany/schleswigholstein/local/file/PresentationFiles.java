@@ -273,7 +273,7 @@ public class PresentationFiles {
 		private String formatPollingStationTitle(final LocalPollingStation pollingStation) {
 			return formatPollingStationTitlePart(result.getBallots(pollingStation).size(),
 					result.getNumberOfAllBallots(pollingStation),
-					(int) result.getBallots(pollingStation).stream().filter(ballot -> !ballot.isValid()).count(),
+					result.getNumberOfInvalidBallots(pollingStation),
 					result.getElection().getNumberOfEligibleVoters(pollingStation))
 
 					+ String.format(Locale.GERMAN,
