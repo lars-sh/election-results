@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +28,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -32,6 +36,7 @@ import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STTotalsRowFunction;
 
 import de.larssh.election.germany.schleswigholstein.Color;
@@ -122,6 +127,16 @@ public class MetricsFiles {
 			} catch (final IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+
+		private static void setCellValue(final XSSFCell cell, final Number value) {
+			// TODO: Move formatter to constant
+			final NumberFormat formatter = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
+			formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
+
+			// TODO: Use this method for all integer/long instances!
+			cell.getCTCell().setT(STCellType.N);
+			cell.getCTCell().setV(formatter.format(value));
 		}
 
 		/**
@@ -429,11 +444,11 @@ public class MetricsFiles {
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
 				headers.add(pollingStation.getName());
 				headers.add(pollingStation.getName() + " %");
-				headers.add(pollingStation.getName() + " +-%");
+				headers.add(pollingStation.getName() + " ±%");
 			}
 			headers.add("Gesamt");
 			headers.add("Gesamt %");
-			headers.add("Gesamt +-%");
+			headers.add("Gesamt ±%");
 			createHeader(CellUtil.getRow(rowIndex, sheet), headers.toArray(new String[0]));
 
 			for (final Party party : result.getPartyResults().keySet()) {
@@ -472,7 +487,7 @@ public class MetricsFiles {
 						+ pollingStation.getName()
 						+ "])");
 
-				// Stimmen +-%
+				// Stimmen ±%
 				columnIndex += 1;
 				getCell(row, columnIndex, cellStyle).setCellFormula("Blockstimmen["
 						+ pollingStation.getName()
@@ -494,7 +509,7 @@ public class MetricsFiles {
 			getCell(row, columnIndex, cellStyle)
 					.setCellFormula("Blockstimmen[[#This Row],[Gesamt]] / SUM(Blockstimmen[Gesamt])");
 
-			// Gesamt +-%
+			// Gesamt ±%
 			columnIndex += 1;
 			getCell(row, columnIndex, cellStyle).setCellFormula(
 					"Blockstimmen[Gesamt %] - INDEX(Gruppierungen[Gesamt %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
@@ -578,9 +593,8 @@ public class MetricsFiles {
 
 			// Sainte-Laguë-Wert
 			columnIndex += 1;
-			nominationResult.getSainteLagueValue()
-					.map(BigDecimal::doubleValue) // TODO
-					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
+			final XSSFCell cell = (XSSFCell) getCell(row, columnIndex, cellStyle);
+			nominationResult.getSainteLagueValue().ifPresent(v -> setCellValue(cell, v));
 
 			// Mandat
 			columnIndex += 1;
