@@ -514,11 +514,11 @@ public class MetricsFiles {
 
 			// #
 			int columnIndex = 0;
-			// TODO: calculate using the sates table
+			// TODO: calculate using the seats table
 
 			// Gruppierung
 			columnIndex += 1;
-			// TODO: calculate using the sates table
+			// TODO: calculate using the seats table
 
 			// Nachname
 			columnIndex += 1;
@@ -546,7 +546,7 @@ public class MetricsFiles {
 					.collect(joining("] + Kandidierende[", "Kandidierende[", "]")));
 
 			// Mandat
-			// TODO: calculate using the sates table
+			// TODO: calculate using the seats table
 		}
 	}
 }
