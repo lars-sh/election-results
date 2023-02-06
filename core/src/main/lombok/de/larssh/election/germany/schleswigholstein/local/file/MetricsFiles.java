@@ -163,10 +163,10 @@ public class MetricsFiles {
 				}
 
 				writeOverview(workbook.createSheet("Übersicht"));
+				// TODO: writeSeats(workbook.createSheet("Sitze"));
+				writeDirectNominations(workbook.createSheet("Kandidierende"));
 				writeParties(workbook.createSheet("Gruppierungen"));
 				writeBlockVotes(workbook.createSheet("Blockstimmen"));
-				writeDirectNominations(workbook.createSheet("Kandidierende"));
-				// TODO: writeSeats(workbook.createSheet("Sitze"));
 				// TODO: writeBallotsByGroups(workbook.createSheet("Verteilung nach G."));
 				// TODO: writeBallotsByNominations(workbook.createSheet("Verteilung nach K."));
 
