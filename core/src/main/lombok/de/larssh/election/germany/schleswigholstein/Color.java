@@ -89,23 +89,59 @@ public class Color {
 	/**
 	 * Percentage of the green channel
 	 *
-	 * @return the green of the red channel
+	 * @return the percentage of the green channel
 	 */
 	double green;
 
 	/**
 	 * Percentage of the blue channel
 	 *
-	 * @return the blue of the red channel
+	 * @return the percentage of the blue channel
 	 */
 	double blue;
 
 	/**
 	 * Percentage of the alpha channel
 	 *
-	 * @return the alpha of the red channel
+	 * @return the percentage of the alpha channel
 	 */
 	double alpha;
+
+	/**
+	 * Converts the red channel into a byte value (0-255)
+	 *
+	 * @return the red channel as byte value
+	 */
+	public int getRedAsByte() {
+		return (int) (MAX_UNSIGNED_BYTE_VALUE * getRed());
+	}
+
+	/**
+	 * Converts the green channel into a byte value (0-255)
+	 *
+	 * @return the green channel as byte value
+	 */
+	public int getGreenAsByte() {
+		return (int) (MAX_UNSIGNED_BYTE_VALUE * getGreen());
+	}
+
+	/**
+	 * Converts the blue channel into a byte value (0-255)
+	 *
+	 * @return the blue channel as byte value
+	 */
+	public int getBlueAsByte() {
+		return (int) (MAX_UNSIGNED_BYTE_VALUE * getBlue());
+	}
+
+	/**
+	 * Converts the alpha channel into a byte value (0-255)
+	 *
+	 * @return the alpha channel as byte value
+	 */
+	public int getAlphaAsByte() {
+		return (int) (MAX_UNSIGNED_BYTE_VALUE * getAlpha());
+	}
 
 	/**
 	 * Formats the color in hexadecimal form, prefixed with a hash. The alpha value
@@ -115,12 +151,9 @@ public class Color {
 	 */
 	@JsonValue
 	public String toHex() {
-		final String cssColor = String.format("#%02x%02x%02x",
-				(int) (MAX_UNSIGNED_BYTE_VALUE * getRed()),
-				(int) (MAX_UNSIGNED_BYTE_VALUE * getGreen()),
-				(int) (MAX_UNSIGNED_BYTE_VALUE * getBlue()));
+		final String cssColor = String.format("#%02x%02x%02x", getRedAsByte(), getGreenAsByte(), getBlueAsByte());
 
-		final int alpha = (int) (MAX_UNSIGNED_BYTE_VALUE * getAlpha());
+		final int alpha = getAlphaAsByte();
 		return cssColor + (alpha < MAX_UNSIGNED_BYTE_VALUE ? String.format("%02x", alpha) : "");
 	}
 
