@@ -425,7 +425,9 @@ public class MetricsFiles {
 					.setCellFormula("Gruppierungen[[#This Row],[Gesamt]] / SUM(Gruppierungen[Gesamt])");
 
 			// Sitze
-			// TODO: Need to implement the seats table first
+			columnIndex += 1;
+			getCell(row, columnIndex, cellStyle).setCellFormula(
+					"COUNTIFS(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]], Kandidierende[Mandat], \"<>\")");
 		}
 
 		private void writeBlockVotes(final Sheet sheet) {
