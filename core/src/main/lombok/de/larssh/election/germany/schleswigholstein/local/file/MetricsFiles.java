@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +41,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType;
-import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
@@ -74,6 +74,34 @@ public class MetricsFiles {
 	 */
 	@RequiredArgsConstructor
 	private static class MetricsFileWriter {
+		private static Cell getCell(final Row row, final int columnIndex, final Optional<CellStyle> cellStyle) {
+			final Cell cell = CellUtil.getCell(row, columnIndex);
+			cellStyle.ifPresent(cell::setCellStyle);
+			return cell;
+		}
+
+		private static Optional<String> getDisplayValue(final LocalNominationResultType type) {
+			if (type == LocalNominationResultType.DIRECT) {
+				return Optional.of("Direkt");
+			}
+			if (type == LocalNominationResultType.DIRECT_DRAW) {
+				return Optional.of("Los");
+			}
+			if (type == LocalNominationResultType.DIRECT_BALANCE_SEAT) {
+				return Optional.of("Mehrsitz");
+			}
+			if (type == LocalNominationResultType.LIST) {
+				return Optional.of("Liste");
+			}
+			if (type == LocalNominationResultType.LIST_DRAW) {
+				return Optional.of("Los");
+			}
+			if (type == LocalNominationResultType.LIST_OVERHANG_SEAT) {
+				return Optional.of("Überhang");
+			}
+			return Optional.empty();
+		}
+
 		/**
 		 * Loads a resource from a folder next to this class. The file name is build by
 		 * concatenating the class name, a dash and {@code fileNameSuffix}.
@@ -110,6 +138,8 @@ public class MetricsFiles {
 		 */
 		OutputStream outputStream;
 
+		Map<Party, CellStyle> cellStyleParties = new HashMap<>();
+
 		@NonFinal
 		@Nullable
 		CellStyle cellStylePercentage = null;
@@ -118,7 +148,9 @@ public class MetricsFiles {
 		@Nullable
 		CellStyle cellStylePercentageWithSign = null;
 
-		Map<Party, CellStyle> cellStyleParties = new HashMap<>();
+		@NonFinal
+		@Nullable
+		CellStyle cellStyleSainteLagueValue = null;
 
 		/**
 		 * Formats and writes {@link #result} to {@link #writer}.
@@ -129,15 +161,6 @@ public class MetricsFiles {
 		void write() throws IOException {
 			try (XSSFWorkbook workbook = new XSSFWorkbook()) {
 				workbook.setCellFormulaValidation(false);
-
-				final CellStyle cellStylePercentage = workbook.createCellStyle();
-				cellStylePercentage.setDataFormat(workbook.createDataFormat().getFormat("0.0%"));
-				this.cellStylePercentage = cellStylePercentage;
-
-				final CellStyle cellStylePercentageWithSign = workbook.createCellStyle();
-				cellStylePercentageWithSign
-						.setDataFormat(workbook.createDataFormat().getFormat("\\+0.0%;\\-0.0%;0.0%"));
-				this.cellStylePercentageWithSign = cellStylePercentageWithSign;
 
 				for (final Party party : result.getPartyResults().keySet()) {
 					final CellStyle partyCellStyle = workbook.createCellStyle();
@@ -162,11 +185,23 @@ public class MetricsFiles {
 					cellStyleParties.put(party, partyCellStyle);
 				}
 
+				final CellStyle cellStylePercentage = workbook.createCellStyle();
+				cellStylePercentage.setDataFormat(workbook.createDataFormat().getFormat("0.0%"));
+				this.cellStylePercentage = cellStylePercentage;
+
+				final CellStyle cellStylePercentageWithSign = workbook.createCellStyle();
+				cellStylePercentageWithSign
+						.setDataFormat(workbook.createDataFormat().getFormat("\\+0.0%;\\-0.0%;0.0%"));
+				this.cellStylePercentageWithSign = cellStylePercentageWithSign;
+
+				final CellStyle cellStyleSainteLagueValue = workbook.createCellStyle();
+				cellStyleSainteLagueValue.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+				this.cellStyleSainteLagueValue = cellStyleSainteLagueValue;
+
 				writeOverview(workbook.createSheet("Übersicht"));
-				// TODO: writeSeats(workbook.createSheet("Sitze"));
-				writeDirectNominations(workbook.createSheet("Kandidierende"));
 				writeParties(workbook.createSheet("Gruppierungen"));
 				writeBlockVotes(workbook.createSheet("Blockstimmen"));
+				writeNominations(workbook.createSheet("Kandidierende"));
 				// TODO: writeBallotsByGroups(workbook.createSheet("Verteilung nach G."));
 				// TODO: writeBallotsByNominations(workbook.createSheet("Verteilung nach K."));
 
@@ -232,15 +267,13 @@ public class MetricsFiles {
 
 			// Wahlberechtigte
 			columnIndex += 1;
-			final Cell cellNumberOfEligibleVoters = CellUtil.getCell(row, columnIndex);
 			result.getElection()
 					.getNumberOfEligibleVoters(district)
-					.ifPresent(cellNumberOfEligibleVoters::setCellValue);
+					.ifPresent(CellUtil.getCell(row, columnIndex)::setCellValue);
 
 			// Stimmzettel
 			columnIndex += 1;
-			final Cell cellNumberOfAllBallots = CellUtil.getCell(row, columnIndex);
-			result.getNumberOfAllBallots(district).ifPresent(cellNumberOfAllBallots::setCellValue);
+			result.getNumberOfAllBallots(district).ifPresent(CellUtil.getCell(row, columnIndex)::setCellValue);
 
 			// Wahlbeteiligung
 			columnIndex += 1;
@@ -248,8 +281,7 @@ public class MetricsFiles {
 
 			// ausgezählt
 			columnIndex += 1;
-			final Cell cellNumberOfBallots = CellUtil.getCell(row, columnIndex);
-			cellNumberOfBallots.setCellValue(result.getBallots(district).size());
+			CellUtil.getCell(row, columnIndex).setCellValue(result.getBallots(district).size());
 
 			// ausgezählt %
 			columnIndex += 1;
@@ -310,7 +342,7 @@ public class MetricsFiles {
 			sheet.createFreezePane(1, 0);
 			final int max = 2 + 2 * result.getElection().getPollingStations().size();
 			for (int i = 2; i <= max; i += 2) {
-				sheet.setDefaultColumnStyle(i, cellStylePercentage);
+				sheet.setDefaultColumnStyle(i, cellStylePercentage); // TODO
 			}
 
 			// TODO: Information rows
@@ -385,8 +417,8 @@ public class MetricsFiles {
 			sheet.createFreezePane(1, 0);
 			final int max = 2 + 3 * result.getElection().getPollingStations().size();
 			for (int i = 2; i <= max; i += 3) {
-				sheet.setDefaultColumnStyle(i, cellStylePercentage);
-				sheet.setDefaultColumnStyle(i + 1, cellStylePercentageWithSign);
+				sheet.setDefaultColumnStyle(i, cellStylePercentage); // TODO
+				sheet.setDefaultColumnStyle(i + 1, cellStylePercentageWithSign); // TODO
 			}
 
 			// TODO: Information rows
@@ -417,12 +449,6 @@ public class MetricsFiles {
 			table.setStyleName("TableStyleLight1");
 			table.getCTTable().addNewAutoFilter();
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
-		}
-
-		private Cell getCell(final Row row, final int columnIndex, final Optional<CellStyle> cellStyle) {
-			final Cell cell = CellUtil.getCell(row, columnIndex);
-			cellStyle.ifPresent(cell::setCellStyle);
-			return cell;
 		}
 
 		private void writeBlockVotesOfParty(final Row row, final Party party) {
@@ -474,8 +500,10 @@ public class MetricsFiles {
 					"Blockstimmen[Gesamt %] - INDEX(Gruppierungen[Gesamt %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
 		}
 
-		private void writeDirectNominations(final Sheet sheet) {
+		private void writeNominations(final Sheet sheet) {
 			sheet.createFreezePane(4, 0);
+			sheet.setDefaultColumnStyle(5 + result.getElection().getPollingStations().size(),
+					cellStyleSainteLagueValue); // TODO: Sainte-Laguë-Wert
 
 			// TODO: Information rows
 
@@ -489,15 +517,13 @@ public class MetricsFiles {
 				headers.add(pollingStation.getName());
 			}
 			headers.add("Gesamt");
+			headers.add("Sainte-Laguë-Wert");
 			headers.add("Mandat");
 			createHeader(CellUtil.getRow(rowIndex, sheet), headers.toArray(new String[0]));
 
 			for (final LocalNominationResult nominationResult : result.getNominationResults().values()) {
-				if (nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						|| nominationResult.getType() != LocalNominationResultType.NOT_ELECTED) {
-					rowIndex += 1;
-					writeDirectNomination(CellUtil.getRow(rowIndex, sheet), nominationResult.getNomination());
-				}
+				rowIndex += 1;
+				writeNomination(CellUtil.getRow(rowIndex, sheet), nominationResult);
 			}
 
 			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
@@ -509,16 +535,21 @@ public class MetricsFiles {
 			table.getCTTable().addNewAutoFilter();
 		}
 
-		private void writeDirectNomination(final Row row, final LocalNomination nomination) {
+		private void writeNomination(final Row row, final LocalNominationResult nominationResult) {
+			final LocalNomination nomination = nominationResult.getNomination();
 			final Optional<CellStyle> cellStyle = nomination.getParty().map(cellStyleParties::get);
 
 			// #
 			int columnIndex = 0;
-			// TODO: calculate using the seats table
+			nomination.getParty()
+					.map(party -> new ArrayList<>(result.getElection().getNominations(party)).indexOf(nomination) + 1)
+					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
 
 			// Gruppierung
 			columnIndex += 1;
-			// TODO: calculate using the seats table
+			nomination.getParty()
+					.map(Party::getShortName)
+					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
 
 			// Nachname
 			columnIndex += 1;
@@ -545,8 +576,15 @@ public class MetricsFiles {
 					.map(LocalPollingStation::getName)
 					.collect(joining("] + Kandidierende[", "Kandidierende[", "]")));
 
+			// Sainte-Laguë-Wert
+			columnIndex += 1;
+			nominationResult.getSainteLagueValue()
+					.map(BigDecimal::doubleValue) // TODO
+					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
+
 			// Mandat
-			// TODO: calculate using the seats table
+			columnIndex += 1;
+			getDisplayValue(nominationResult.getType()).ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
 		}
 	}
 }
