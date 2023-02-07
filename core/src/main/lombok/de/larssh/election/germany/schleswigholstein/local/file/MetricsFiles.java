@@ -223,7 +223,7 @@ public class MetricsFiles {
 				workbook.sheetIterator().forEachRemaining(sheet -> {
 					final int numberOfColumns = sheet.getRow(0).getLastCellNum();
 					for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex += 1) {
-						sheet.autoSizeColumn(columnIndex, true);
+						sheet.autoSizeColumn(columnIndex);
 					}
 				});
 
