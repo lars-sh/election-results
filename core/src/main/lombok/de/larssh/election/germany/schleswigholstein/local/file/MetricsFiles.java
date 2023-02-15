@@ -167,6 +167,16 @@ public class MetricsFiles {
 		@Nullable
 		CellStyle cellStyleSainteLagueValue = null;
 
+		private static void createHeader(final Row row, final String... values) {
+			int columnIndex = 0;
+			for (final String value : values) {
+				if (!value.isEmpty()) {
+					CellUtil.getCell(row, columnIndex).setCellValue(value);
+				}
+				columnIndex += 1;
+			}
+		}
+
 		/**
 		 * Formats and writes {@link #result} to {@link #writer}.
 		 *
@@ -217,8 +227,6 @@ public class MetricsFiles {
 				writeParties(workbook.createSheet("Gruppierungen"));
 				writeBlockVotes(workbook.createSheet("Blockstimmen"));
 				writeNominations(workbook.createSheet("Kandidierende"));
-				// TODO: writeBallotsByGroups(workbook.createSheet("Verteilung nach G."));
-				// TODO: writeBallotsByNominations(workbook.createSheet("Verteilung nach K."));
 
 				workbook.sheetIterator().forEachRemaining(sheet -> {
 					final int numberOfColumns = sheet.getRow(0).getLastCellNum();
@@ -228,16 +236,6 @@ public class MetricsFiles {
 				});
 
 				workbook.write(outputStream);
-			}
-		}
-
-		private void createHeader(final Row row, final String... values) {
-			int columnIndex = 0;
-			for (final String value : values) {
-				if (!value.isEmpty()) {
-					CellUtil.getCell(row, columnIndex).setCellValue(value);
-				}
-				columnIndex += 1;
 			}
 		}
 
