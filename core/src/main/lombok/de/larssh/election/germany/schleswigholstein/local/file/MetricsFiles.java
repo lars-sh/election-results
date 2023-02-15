@@ -28,6 +28,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.ss.util.SheetUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -232,6 +233,21 @@ public class MetricsFiles {
 					final int numberOfColumns = sheet.getRow(0).getLastCellNum();
 					for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex += 1) {
 						sheet.autoSizeColumn(columnIndex);
+
+						// Add the width of the auto filter
+						double widthOfHeader = SheetUtil.getColumnWidth(sheet, columnIndex, false, 0, 0);
+						if (widthOfHeader != -1) {
+							// The maximum column width for an individual cell is 255 characters
+							widthOfHeader = Math.min(widthOfHeader, 255);
+
+							// Difference of a cell without and with auto filter in Excel
+							widthOfHeader += 2.28515625;
+
+							final int intWidth = (int) Math.round(256 * widthOfHeader);
+							if (intWidth > sheet.getColumnWidth(columnIndex)) {
+								sheet.setColumnWidth(columnIndex, intWidth);
+							}
+						}
 					}
 				});
 
