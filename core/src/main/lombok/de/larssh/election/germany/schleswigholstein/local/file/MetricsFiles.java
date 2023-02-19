@@ -14,10 +14,11 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,6 +26,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.CellUtil;
@@ -35,6 +37,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
@@ -42,24 +45,27 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.STTotalsRowFunction;
 
 import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.District;
+import de.larssh.election.germany.schleswigholstein.Keys;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
+import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import de.larssh.utils.text.Strings;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.NonFinal;
 import lombok.experimental.UtilityClass;
 
 /**
  * This class contains helper methods to write an Excel spreadsheet (XLSX) with
  * metrics of an election result.
+ *
+ * <p>
+ * TODO: Information rows
  */
 @UtilityClass
 public class MetricsFiles {
@@ -80,32 +86,53 @@ public class MetricsFiles {
 	 */
 	@RequiredArgsConstructor
 	private static class MetricsFileWriter {
-		private static Cell getCell(final Row row, final int columnIndex, final Optional<CellStyle> cellStyle) {
-			final Cell cell = CellUtil.getCell(row, columnIndex);
-			cellStyle.ifPresent(cell::setCellStyle);
-			return cell;
+		private static final String DATA_FORMAT_PERCENTAGE = "0.0%";
+
+		private static final String DATA_FORMAT_PERCENTAGE_WITH_SIGN = "\\+0.0%;\\-0.0%;0.0%";
+
+		private static final String DATA_FORMAT_SAINTE_LAGUE_VALUE = "0.00";
+
+		private static final NumberFormat DECIMAL_FORMAT
+				= new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
+		static {
+			DECIMAL_FORMAT.setMaximumFractionDigits(Integer.MAX_VALUE);
 		}
 
-		private static Optional<String> getDisplayValue(final LocalNominationResultType type) {
+		private static Row appendRow(final Sheet sheet) {
+			return CellUtil.getRow(sheet.getLastRowNum() + 1, sheet);
+		}
+
+		private static XSSFTable createTable(final Sheet sheet, final String name) {
+			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
+					new CellReference(sheet.getLastRowNum(), CellUtil.getRow(0, sheet).getLastCellNum() - 1),
+					SpreadsheetVersion.EXCEL2007));
+			table.setName(name);
+			table.setDisplayName(name);
+			table.setStyleName("TableStyleLight1");
+			table.getCTTable().addNewAutoFilter();
+			return table;
+		}
+
+		private static String getDisplayValue(final LocalNominationResultType type) {
 			if (type == LocalNominationResultType.DIRECT) {
-				return Optional.of("Direkt");
+				return "Direkt";
 			}
 			if (type == LocalNominationResultType.DIRECT_DRAW) {
-				return Optional.of("Los");
+				return "Los";
 			}
 			if (type == LocalNominationResultType.DIRECT_BALANCE_SEAT) {
-				return Optional.of("Mehrsitz");
+				return "Mehrsitz";
 			}
 			if (type == LocalNominationResultType.LIST) {
-				return Optional.of("Liste");
+				return "Liste";
 			}
 			if (type == LocalNominationResultType.LIST_DRAW) {
-				return Optional.of("Los");
+				return "Los";
 			}
 			if (type == LocalNominationResultType.LIST_OVERHANG_SEAT) {
-				return Optional.of("Überhang");
+				return "Überhang";
 			}
-			return Optional.empty();
+			return "";
 		}
 
 		/**
@@ -130,14 +157,10 @@ public class MetricsFiles {
 			}
 		}
 
-		private static void setCellValue(final XSSFCell cell, final Number value) {
-			// TODO: Move formatter to constant
-			final NumberFormat formatter = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
-			formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-
-			// TODO: Use this method for all integer/long instances!
-			cell.getCTCell().setT(STCellType.N);
-			cell.getCTCell().setV(formatter.format(value));
+		private static void setCellValue(final Cell cell, final Number value) {
+			final CTCell ctCell = ((XSSFCell) cell).getCTCell();
+			ctCell.setT(STCellType.N);
+			ctCell.setV(DECIMAL_FORMAT.format(value));
 		}
 
 		/**
@@ -154,28 +177,82 @@ public class MetricsFiles {
 		 */
 		OutputStream outputStream;
 
-		Map<Party, CellStyle> cellStyleParties = new HashMap<>();
+		Map<String, CellStyle> cellStyles = new HashMap<>();
 
-		@NonFinal
-		@Nullable
-		CellStyle cellStylePercentage = null;
-
-		@NonFinal
-		@Nullable
-		CellStyle cellStylePercentageWithSign = null;
-
-		@NonFinal
-		@Nullable
-		CellStyle cellStyleSainteLagueValue = null;
-
-		private static void createHeader(final Row row, final String... values) {
-			int columnIndex = 0;
-			for (final String value : values) {
-				if (!value.isEmpty()) {
-					CellUtil.getCell(row, columnIndex).setCellValue(value);
-				}
-				columnIndex += 1;
+		@SuppressWarnings("resource")
+		private <T> void appendCell(final Row row,
+				final Optional<Party> party,
+				final BiConsumer<Cell, T> setValue,
+				final Optional<String> dataFormat,
+				final Optional<T> value) {
+			final Cell cell = CellUtil.getCell(row, Math.max(0, row.getLastCellNum()));
+			getCellStyle(row.getSheet().getWorkbook(), party, dataFormat).ifPresent(cell::setCellStyle);
+			if (value.isPresent()) {
+				setValue.accept(cell, value.get());
 			}
+		}
+
+		private void appendFormula(final Row row, final Optional<Party> party, final String value) {
+			appendCell(row, party, Cell::setCellFormula, Optional.empty(), Optional.of(value));
+		}
+
+		private void appendFormula(final Row row,
+				final Optional<Party> party,
+				final String dataFormat,
+				final String value) {
+			appendCell(row, party, Cell::setCellFormula, Optional.of(dataFormat), Optional.of(value));
+		}
+
+		private void appendNumber(final Row row,
+				final Optional<Party> cellStyle,
+				final Optional<? extends Number> value) {
+			appendCell(row, cellStyle, MetricsFileWriter::setCellValue, Optional.empty(), value);
+		}
+
+		private void appendString(final Row row, final Optional<Party> party, final String value) {
+			appendCell(row, party, Cell::setCellValue, Optional.empty(), Optional.of(value));
+		}
+
+		private void appendStrings(final Row row, final String... values) {
+			for (final String value : values) {
+				appendString(row, Optional.empty(), value);
+			}
+		}
+
+		private Optional<CellStyle> getCellStyle(final Workbook workbook,
+				final Optional<Party> party,
+				final Optional<String> dataFormat) {
+			if (!party.isPresent() && !dataFormat.isPresent()) {
+				return Optional.empty();
+			}
+
+			final String key = Keys.escape(party.map(Party::getKey).orElse(""), "TODO", "TODO", dataFormat.orElse(""));
+			return Optional.of(cellStyles.computeIfAbsent(key, k -> {
+				final CellStyle cellStyle = workbook.createCellStyle();
+
+				party.ifPresent(p -> {
+					cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+					final Color backgroundColor = p.getBackgroundColor();
+					cellStyle.setFillForegroundColor(new XSSFColor(new byte[] {
+							(byte) backgroundColor.getAlphaAsByte(),
+							(byte) backgroundColor.getRedAsByte(),
+							(byte) backgroundColor.getGreenAsByte(),
+							(byte) backgroundColor.getBlueAsByte() }));
+
+					final Color fontColor = p.getFontColor();
+					final XSSFFont font = (XSSFFont) workbook.createFont();
+					font.setColor(new XSSFColor(new byte[] {
+							(byte) fontColor.getAlphaAsByte(),
+							(byte) fontColor.getRedAsByte(),
+							(byte) fontColor.getGreenAsByte(),
+							(byte) fontColor.getBlueAsByte() }));
+					cellStyle.setFont(font);
+				});
+
+				dataFormat.ifPresent(f -> cellStyle.setDataFormat(workbook.createDataFormat().getFormat(f)));
+				return cellStyle;
+			}));
 		}
 
 		/**
@@ -188,47 +265,12 @@ public class MetricsFiles {
 			try (XSSFWorkbook workbook = new XSSFWorkbook()) {
 				workbook.setCellFormulaValidation(false);
 
-				for (final Party party : result.getPartyResults().keySet()) {
-					final CellStyle partyCellStyle = workbook.createCellStyle();
-					partyCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-					final Color backgroundColor = party.getBackgroundColor();
-					partyCellStyle.setFillForegroundColor(new XSSFColor(new byte[] {
-							(byte) backgroundColor.getAlphaAsByte(),
-							(byte) backgroundColor.getRedAsByte(),
-							(byte) backgroundColor.getGreenAsByte(),
-							(byte) backgroundColor.getBlueAsByte() }));
-
-					final Color fontColor = party.getFontColor();
-					final XSSFFont font = workbook.createFont();
-					font.setColor(new XSSFColor(new byte[] {
-							(byte) fontColor.getAlphaAsByte(),
-							(byte) fontColor.getRedAsByte(),
-							(byte) fontColor.getGreenAsByte(),
-							(byte) fontColor.getBlueAsByte() }));
-					partyCellStyle.setFont(font);
-
-					cellStyleParties.put(party, partyCellStyle);
-				}
-
-				final CellStyle cellStylePercentage = workbook.createCellStyle();
-				cellStylePercentage.setDataFormat(workbook.createDataFormat().getFormat("0.0%"));
-				this.cellStylePercentage = cellStylePercentage;
-
-				final CellStyle cellStylePercentageWithSign = workbook.createCellStyle();
-				cellStylePercentageWithSign
-						.setDataFormat(workbook.createDataFormat().getFormat("\\+0.0%;\\-0.0%;0.0%"));
-				this.cellStylePercentageWithSign = cellStylePercentageWithSign;
-
-				final CellStyle cellStyleSainteLagueValue = workbook.createCellStyle();
-				cellStyleSainteLagueValue.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
-				this.cellStyleSainteLagueValue = cellStyleSainteLagueValue;
-
 				writeOverview(workbook.createSheet("Übersicht"));
 				writeParties(workbook.createSheet("Gruppierungen"));
 				writeBlockVotes(workbook.createSheet("Blockstimmen"));
 				writeNominations(workbook.createSheet("Kandidierende"));
 
+				// Auto Size Columns
 				workbook.sheetIterator().forEachRemaining(sheet -> {
 					final int numberOfColumns = sheet.getRow(0).getLastCellNum();
 					for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex += 1) {
@@ -256,12 +298,8 @@ public class MetricsFiles {
 		}
 
 		private void writeOverview(final Sheet sheet) {
-			sheet.createFreezePane(1, 0);
-			sheet.setDefaultColumnStyle(3, cellStylePercentage); // Wahlbeteiligung
-			sheet.setDefaultColumnStyle(5, cellStylePercentage); // ausgezählt
-
-			int rowIndex = 0;
-			createHeader(CellUtil.getRow(rowIndex, sheet), //
+			// Header
+			appendStrings(appendRow(sheet),
 					"Wahlbezirk",
 					"Wahlberechtigte",
 					"Stimmzettel",
@@ -270,351 +308,305 @@ public class MetricsFiles {
 					"ausgezählt %",
 					"ungültig");
 
+			// Content
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
-				rowIndex += 1;
-				writeOverviewOfDistrict(CellUtil.getRow(rowIndex, sheet), pollingStation.getName(), pollingStation);
+				writeOverviewOfDistrict(appendRow(sheet), pollingStation);
 			}
 
-			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
-					new CellReference(rowIndex + 1, CellUtil.getRow(0, sheet).getLastCellNum() - 1),
-					SpreadsheetVersion.EXCEL2007));
-			table.setName("Übersicht");
-			table.setDisplayName("Übersicht");
-			table.setStyleName("TableStyleLight1");
-			table.getCTTable().addNewAutoFilter();
+			// Table
+			sheet.createFreezePane(1, 0);
+			final XSSFTable table = createTable(sheet, "Übersicht");
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
 			table.getCTTable().getTableStyleInfo().setShowRowStripes(true);
 
-			rowIndex += 1;
-			writeOverviewTotalRow(CellUtil.getRow(rowIndex, sheet), table.getCTTable());
+			// Totals Row
+			table.setDataRowCount(table.getDataRowCount() + 1);
+			writeOverviewTotalsRow(appendRow(sheet), table.getCTTable());
 		}
 
-		private void writeOverviewOfDistrict(final Row row, final String name, final District<?> district) {
+		private void writeOverviewOfDistrict(final Row row, final District<?> district) {
 			// Wahlbezirk
-			int columnIndex = 0;
-			CellUtil.getCell(row, columnIndex).setCellValue(name);
+			appendStrings(row, district.getName());
 
 			// Wahlberechtigte
-			columnIndex += 1;
-			result.getElection()
-					.getNumberOfEligibleVoters(district)
-					.ifPresent(CellUtil.getCell(row, columnIndex)::setCellValue);
+			appendNumber(row,
+					Optional.empty(),
+					OptionalInts.boxed(result.getElection().getNumberOfEligibleVoters(district)));
 
 			// Stimmzettel
-			columnIndex += 1;
-			result.getNumberOfAllBallots(district).ifPresent(CellUtil.getCell(row, columnIndex)::setCellValue);
+			appendNumber(row, Optional.empty(), OptionalInts.boxed(result.getNumberOfAllBallots(district)));
 
 			// Wahlbeteiligung
-			columnIndex += 1;
-			CellUtil.getCell(row, columnIndex).setCellFormula("Übersicht[Stimmzettel] / Übersicht[Wahlberechtigte]");
+			appendFormula(row,
+					Optional.empty(),
+					DATA_FORMAT_PERCENTAGE,
+					"Übersicht[Stimmzettel] / Übersicht[Wahlberechtigte]");
 
 			// ausgezählt
-			columnIndex += 1;
-			CellUtil.getCell(row, columnIndex).setCellValue(result.getBallots(district).size());
+			appendNumber(row, Optional.empty(), Optional.of(result.getBallots(district).size()));
 
 			// ausgezählt %
-			columnIndex += 1;
-			CellUtil.getCell(row, columnIndex).setCellFormula("Übersicht[ausgezählt] / Übersicht[Stimmzettel]");
+			appendFormula(row,
+					Optional.empty(),
+					DATA_FORMAT_PERCENTAGE,
+					"Übersicht[ausgezählt] / Übersicht[Stimmzettel]");
 
 			// ungültig
-			columnIndex += 1;
-			CellUtil.getCell(row, columnIndex).setCellValue(result.getNumberOfInvalidBallots(district));
+			appendNumber(row, Optional.empty(), Optional.of(result.getNumberOfInvalidBallots(district)));
 		}
 
-		private void writeOverviewTotalRow(final Row row, final CTTable ctTable) {
+		private void writeOverviewTotalsRow(final Row row, final CTTable ctTable) {
 			ctTable.setTotalsRowCount(1);
-			final List<CTTableColumn> columns = ctTable.getTableColumns().getTableColumnList();
+			final Iterator<CTTableColumn> columns = ctTable.getTableColumns().getTableColumnList().iterator();
 
 			// Wahlbezirk
-			int columnIndex = 0;
-			columns.get(columnIndex).setTotalsRowLabel("Gesamt");
-			CellUtil.getCell(row, columnIndex).setCellValue("Gesamt");
+			columns.next().setTotalsRowLabel("Gesamt");
+			appendStrings(row, "Gesamt");
 
 			// Wahlberechtigte
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("SUM(Übersicht[" + columns.get(columnIndex).getName() + "])");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row, Optional.empty(), "SUM(Übersicht[Wahlberechtigte])");
 
 			// Stimmzettel
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("SUM(Übersicht[" + columns.get(columnIndex).getName() + "])");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row, Optional.empty(), "SUM(Übersicht[Stimmzettel])");
 
 			// Wahlbeteiligung
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("Übersicht[[#Totals],[Stimmzettel]] / Übersicht[[#Totals],[Wahlberechtigte]]");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row,
+					Optional.empty(),
+					DATA_FORMAT_PERCENTAGE,
+					"Übersicht[[#Totals],[Stimmzettel]] / Übersicht[[#Totals],[Wahlberechtigte]]");
 
 			// ausgezählt
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("SUM(Übersicht[" + columns.get(columnIndex).getName() + "])");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row, Optional.empty(), "SUM(Übersicht[ausgezählt])");
 
 			// ausgezählt %
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("Übersicht[[#Totals],[ausgezählt]] / Übersicht[[#Totals],[Stimmzettel]]");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row,
+					Optional.empty(),
+					DATA_FORMAT_PERCENTAGE,
+					"Übersicht[[#Totals],[ausgezählt]] / Übersicht[[#Totals],[Stimmzettel]]");
 
 			// ungültig
-			columnIndex += 1;
-			columns.get(columnIndex).setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
-			CellUtil.getCell(row, columnIndex)
-					.setCellFormula("SUM(Übersicht[" + columns.get(columnIndex).getName() + "])");
+			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+			appendFormula(row, Optional.empty(), "SUM(Übersicht[ungültig])");
 		}
 
 		private void writeParties(final Sheet sheet) {
-			sheet.createFreezePane(1, 0);
-			final int max = 2 + 2 * result.getElection().getPollingStations().size();
-			for (int i = 2; i <= max; i += 2) {
-				sheet.setDefaultColumnStyle(i, cellStylePercentage); // TODO
-			}
-
-			// TODO: Information rows
-
-			int rowIndex = 0;
-			final List<String> headers = new ArrayList<>();
-			headers.add("Gruppierung");
+			final Row row = appendRow(sheet);
+			appendStrings(row, "Gruppierung");
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
-				headers.add(pollingStation.getName());
-				headers.add(pollingStation.getName() + " %");
+				appendStrings(row, pollingStation.getName(), pollingStation.getName() + " %");
 			}
-			headers.add("Gesamt");
-			headers.add("Gesamt %");
-			headers.add("Sitze");
-			createHeader(CellUtil.getRow(rowIndex, sheet), headers.toArray(new String[0]));
+			appendStrings(row, "Gesamt", "Gesamt %", "Sitze");
 
+			// Content
 			for (final Party party : result.getPartyResults().keySet()) {
-				rowIndex += 1;
-				writeParty(CellUtil.getRow(rowIndex, sheet), party);
+				writeParty(appendRow(sheet), party);
 			}
 
-			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
-					new CellReference(rowIndex, CellUtil.getRow(0, sheet).getLastCellNum() - 1),
-					SpreadsheetVersion.EXCEL2007));
-			table.setName("Gruppierungen");
-			table.setDisplayName("Gruppierungen");
-			table.setStyleName("TableStyleLight1");
-			table.getCTTable().addNewAutoFilter();
+			// Table
+			sheet.createFreezePane(1, 0);
+			final XSSFTable table = createTable(sheet, "Gruppierungen");
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
 		}
 
 		private void writeParty(final Row row, final Party party) {
-			final Optional<CellStyle> cellStyle = Optional.of(cellStyleParties.get(party));
+			final Optional<Party> optionalParty = Optional.of(party);
 
 			// Gruppierung
-			int columnIndex = 0;
-			getCell(row, columnIndex, cellStyle).setCellValue(party.getShortName());
+			appendString(row, optionalParty, party.getShortName());
 
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
 				// Stimmen
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellValue(
-						result.filterByDistrict(pollingStation).getPartyResults().get(party).getNumberOfVotes());
+				appendNumber(row,
+						optionalParty,
+						Optional.of(result.filterByDistrict(pollingStation)
+								.getPartyResults()
+								.get(party)
+								.getNumberOfVotes()));
 
 				// Stimmen %
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellFormula("Gruppierungen[[#This Row],["
-						+ pollingStation.getName()
-						+ "]] / SUM(Gruppierungen["
-						+ pollingStation.getName()
-						+ "])");
+				appendFormula(row,
+						optionalParty,
+						DATA_FORMAT_PERCENTAGE,
+						"Gruppierungen[[#This Row],["
+								+ pollingStation.getName()
+								+ "]] / SUM(Gruppierungen["
+								+ pollingStation.getName()
+								+ "])");
 			}
 
 			// Gesamt
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellFormula(result.getElection()
-					.getPollingStations()
-					.stream()
-					.map(LocalPollingStation::getName)
-					.collect(joining("] + Gruppierungen[", "Gruppierungen[", "]")));
+			appendFormula(row,
+					optionalParty,
+					result.getElection()
+							.getPollingStations()
+							.stream()
+							.map(LocalPollingStation::getName)
+							.collect(joining("] + Gruppierungen[", "Gruppierungen[", "]")));
 
 			// Gesamt %
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle)
-					.setCellFormula("Gruppierungen[[#This Row],[Gesamt]] / SUM(Gruppierungen[Gesamt])");
+			appendFormula(row,
+					optionalParty,
+					DATA_FORMAT_PERCENTAGE,
+					"Gruppierungen[[#This Row],[Gesamt]] / SUM(Gruppierungen[Gesamt])");
 
 			// Sitze
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellFormula(
+			appendFormula(row,
+					optionalParty,
 					"COUNTIFS(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]], Kandidierende[Mandat], \"<>\")");
 		}
 
 		private void writeBlockVotes(final Sheet sheet) {
-			sheet.createFreezePane(1, 0);
-			final int max = 2 + 3 * result.getElection().getPollingStations().size();
-			for (int i = 2; i <= max; i += 3) {
-				sheet.setDefaultColumnStyle(i, cellStylePercentage); // TODO
-				sheet.setDefaultColumnStyle(i + 1, cellStylePercentageWithSign); // TODO
-			}
-
-			// TODO: Information rows
-
-			int rowIndex = 0;
-			final List<String> headers = new ArrayList<>();
-			headers.add("Gruppierung");
+			// Header
+			final Row row = appendRow(sheet);
+			appendStrings(row, "Gruppierung");
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
-				headers.add(pollingStation.getName());
-				headers.add(pollingStation.getName() + " %");
-				headers.add(pollingStation.getName() + " ±%");
+				appendStrings(row,
+						pollingStation.getName(),
+						pollingStation.getName() + " %",
+						pollingStation.getName() + " ±%");
 			}
-			headers.add("Gesamt");
-			headers.add("Gesamt %");
-			headers.add("Gesamt ±%");
-			createHeader(CellUtil.getRow(rowIndex, sheet), headers.toArray(new String[0]));
+			appendStrings(row, "Gesamt", "Gesamt %", "Gesamt ±%");
 
+			// Content
 			for (final Party party : result.getPartyResults().keySet()) {
-				rowIndex += 1;
-				writeBlockVotesOfParty(CellUtil.getRow(rowIndex, sheet), party);
+				writeBlockVotesOfParty(appendRow(sheet), party);
 			}
 
-			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
-					new CellReference(rowIndex, CellUtil.getRow(0, sheet).getLastCellNum() - 1),
-					SpreadsheetVersion.EXCEL2007));
-			table.setName("Blockstimmen");
-			table.setDisplayName("Blockstimmen");
-			table.setStyleName("TableStyleLight1");
-			table.getCTTable().addNewAutoFilter();
+			// Table
+			sheet.createFreezePane(1, 0);
+			final XSSFTable table = createTable(sheet, "Blockstimmen");
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
 		}
 
 		private void writeBlockVotesOfParty(final Row row, final Party party) {
-			final Optional<CellStyle> cellStyle = Optional.of(cellStyleParties.get(party));
+			final Optional<Party> optionalParty = Optional.of(party);
 
 			// Gruppierung
-			int columnIndex = 0;
-			getCell(row, columnIndex, cellStyle).setCellValue(party.getShortName());
+			appendString(row, optionalParty, party.getShortName());
 
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
 				// Stimmen
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellValue(
-						result.filterByDistrict(pollingStation).getPartyResults().get(party).getNumberOfBlockVotings());
+				appendNumber(row,
+						optionalParty,
+						Optional.of(result.filterByDistrict(pollingStation)
+								.getPartyResults()
+								.get(party)
+								.getNumberOfBlockVotings()));
 
 				// Stimmen %
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellFormula("Blockstimmen[[#This Row],["
-						+ pollingStation.getName()
-						+ "]] / SUM(Blockstimmen["
-						+ pollingStation.getName()
-						+ "])");
+				appendFormula(row,
+						optionalParty,
+						DATA_FORMAT_PERCENTAGE,
+						"Blockstimmen[[#This Row],["
+								+ pollingStation.getName()
+								+ "]] / SUM(Blockstimmen["
+								+ pollingStation.getName()
+								+ "])");
 
 				// Stimmen ±%
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellFormula("Blockstimmen["
-						+ pollingStation.getName()
-						+ " %] - INDEX(Gruppierungen["
-						+ pollingStation.getName()
-						+ " %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
+				appendFormula(row,
+						optionalParty,
+						DATA_FORMAT_PERCENTAGE_WITH_SIGN,
+						"Blockstimmen["
+								+ pollingStation.getName()
+								+ " %] - INDEX(Gruppierungen["
+								+ pollingStation.getName()
+								+ " %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
 			}
 
 			// Gesamt
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellFormula(result.getElection()
-					.getPollingStations()
-					.stream()
-					.map(LocalPollingStation::getName)
-					.collect(joining("] + Blockstimmen[", "Blockstimmen[", "]")));
+			appendFormula(row,
+					optionalParty,
+					result.getElection()
+							.getPollingStations()
+							.stream()
+							.map(LocalPollingStation::getName)
+							.collect(joining("] + Blockstimmen[", "Blockstimmen[", "]")));
 
 			// Gesamt %
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle)
-					.setCellFormula("Blockstimmen[[#This Row],[Gesamt]] / SUM(Blockstimmen[Gesamt])");
+			appendFormula(row,
+					optionalParty,
+					DATA_FORMAT_PERCENTAGE,
+					"Blockstimmen[[#This Row],[Gesamt]] / SUM(Blockstimmen[Gesamt])");
 
 			// Gesamt ±%
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellFormula(
+			appendFormula(row,
+					optionalParty,
+					DATA_FORMAT_PERCENTAGE_WITH_SIGN,
 					"Blockstimmen[Gesamt %] - INDEX(Gruppierungen[Gesamt %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
 		}
 
 		private void writeNominations(final Sheet sheet) {
-			sheet.createFreezePane(4, 0);
-			sheet.setDefaultColumnStyle(5 + result.getElection().getPollingStations().size(),
-					cellStyleSainteLagueValue); // TODO: Sainte-Laguë-Wert
-
-			// TODO: Information rows
-
-			int rowIndex = 0;
-			final List<String> headers = new ArrayList<>();
-			headers.add("#");
-			headers.add("Gruppierung");
-			headers.add("Nachname");
-			headers.add("Vorname");
+			// Header
+			final Row row = appendRow(sheet);
+			appendStrings(row, "#", "Gruppierung", "Nachname", "Vorname");
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
-				headers.add(pollingStation.getName());
+				appendStrings(row, pollingStation.getName());
 			}
-			headers.add("Gesamt");
-			headers.add("Sainte-Laguë-Wert");
-			headers.add("Mandat");
-			createHeader(CellUtil.getRow(rowIndex, sheet), headers.toArray(new String[0]));
+			appendStrings(row, "Gesamt", "Sainte-Laguë-Wert", "Mandat");
 
+			// Content
 			for (final LocalNominationResult nominationResult : result.getNominationResults().values()) {
-				rowIndex += 1;
-				writeNomination(CellUtil.getRow(rowIndex, sheet), nominationResult);
+				writeNomination(appendRow(sheet), nominationResult);
 			}
 
-			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
-					new CellReference(rowIndex, CellUtil.getRow(0, sheet).getLastCellNum() - 1),
-					SpreadsheetVersion.EXCEL2007));
-			table.setName("Kandidierende");
-			table.setDisplayName("Kandidierende");
-			table.setStyleName("TableStyleLight1");
-			table.getCTTable().addNewAutoFilter();
+			// Table
+			sheet.createFreezePane(4, 0);
+			createTable(sheet, "Kandidierende");
 		}
 
 		private void writeNomination(final Row row, final LocalNominationResult nominationResult) {
 			final LocalNomination nomination = nominationResult.getNomination();
-			final Optional<CellStyle> cellStyle = nomination.getParty().map(cellStyleParties::get);
+			final Optional<Party> party = nomination.getParty();
 
 			// #
-			int columnIndex = 0;
-			nomination.getParty()
-					.map(party -> new ArrayList<>(result.getElection().getNominations(party)).indexOf(nomination) + 1)
-					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
+			appendNumber(row,
+					party,
+					nomination.getParty()
+							.map(p -> new ArrayList<>(result.getElection().getNominations(p)).indexOf(nomination) + 1));
 
 			// Gruppierung
-			columnIndex += 1;
-			nomination.getParty()
-					.map(Party::getShortName)
-					.ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
+			appendCell(row, party, Cell::setCellValue, Optional.empty(), party.map(Party::getShortName));
 
 			// Nachname
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellValue(nomination.getPerson().getFamilyName());
+			appendString(row, party, nomination.getPerson().getFamilyName());
 
 			// Vorname
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellValue(nomination.getPerson().getGivenName());
+			appendString(row, party, nomination.getPerson().getGivenName());
 
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
 				// Stimmen
-				columnIndex += 1;
-				getCell(row, columnIndex, cellStyle).setCellValue(result.filterByDistrict(pollingStation)
-						.getNominationResults()
-						.get(nomination)
-						.getNumberOfVotes());
+				appendNumber(row,
+						party,
+						Optional.of(result.filterByDistrict(pollingStation)
+								.getNominationResults()
+								.get(nomination)
+								.getNumberOfVotes()));
 			}
 
 			// Gesamt
-			columnIndex += 1;
-			getCell(row, columnIndex, cellStyle).setCellFormula(result.getElection()
-					.getPollingStations()
-					.stream()
-					.map(LocalPollingStation::getName)
-					.collect(joining("] + Kandidierende[", "Kandidierende[", "]")));
+			appendFormula(row,
+					party,
+					result.getElection()
+							.getPollingStations()
+							.stream()
+							.map(LocalPollingStation::getName)
+							.collect(joining("] + Kandidierende[", "Kandidierende[", "]")));
 
 			// Sainte-Laguë-Wert
-			columnIndex += 1;
-			final XSSFCell cell = (XSSFCell) getCell(row, columnIndex, cellStyle);
-			nominationResult.getSainteLagueValue().ifPresent(v -> setCellValue(cell, v));
+			appendCell(row,
+					party,
+					MetricsFileWriter::setCellValue,
+					Optional.of(DATA_FORMAT_SAINTE_LAGUE_VALUE),
+					nominationResult.getSainteLagueValue());
 
 			// Mandat
-			columnIndex += 1;
-			getDisplayValue(nominationResult.getType()).ifPresent(getCell(row, columnIndex, cellStyle)::setCellValue);
+			appendString(row, party, getDisplayValue(nominationResult.getType()));
 		}
 	}
 }
