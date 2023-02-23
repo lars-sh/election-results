@@ -25,7 +25,6 @@ mvn --quiet de.lars-sh:jar-runner-maven-plugin:run -Dartifact=de.lars-sh.electio
 * Move methods for statistic needs from the formatting classes to utility classes
 * Tests for isCertain
 * Test for a rare problem with DIRECT_BALANCE_SEAT or LIST_OVERHANG_SEAT
-* Metrics Export (Excel via POI)
 
 ## Known Problems
 * Officially the order of direct and list candidates of a party can differ. Right now that cannot be handled correctly. Instead the order of the first list candidates must be the same as the direct candidates.
