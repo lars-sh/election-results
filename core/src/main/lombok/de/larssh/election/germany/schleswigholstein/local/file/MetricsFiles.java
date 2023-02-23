@@ -4,11 +4,6 @@ import static java.util.stream.Collectors.joining;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -54,8 +49,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultT
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.OptionalInts;
 import de.larssh.utils.annotations.PackagePrivate;
-import de.larssh.utils.io.Resources;
-import de.larssh.utils.text.Strings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.experimental.UtilityClass;
 
@@ -68,6 +61,7 @@ import lombok.experimental.UtilityClass;
  * TODO: reduce duplicate strings
  */
 @UtilityClass
+@SuppressWarnings("PMD.ExcessiveImports")
 public class MetricsFiles {
 	/**
 	 * Formats and writes {@code result} to {@code outputStream}.
@@ -86,6 +80,22 @@ public class MetricsFiles {
 	 */
 	private static class MetricsFileWriter {
 		/**
+		 * Width of the auto filter control in Excel, calculated using the difference of
+		 * a cell without and with auto filter
+		 */
+		private static final double AUTO_FILTER_WIDTH = 585;
+
+		/**
+		 * Width of one character
+		 */
+		private static final double CHARACTER_WIDTH = 256;
+
+		/**
+		 * The maximum width of a column in number of characters
+		 */
+		private static final double COLUMN_WIDTH_MAX_CHARACTERS = 255;
+
+		/**
 		 * Excel data format for percentage values
 		 */
 		private static final String DATA_FORMAT_PERCENTAGE = "0.0%";
@@ -99,11 +109,11 @@ public class MetricsFiles {
 		/**
 		 * Excel data format for any number with any number of decimal places
 		 */
-		private static final NumberFormat DECIMAL_FORMAT
-				= new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
-		static {
-			DECIMAL_FORMAT.setMaximumFractionDigits(Integer.MAX_VALUE);
-		}
+		private static final ThreadLocal<NumberFormat> DECIMAL_FORMAT = ThreadLocal.withInitial(() -> {
+			final DecimalFormat format = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
+			format.setMaximumFractionDigits(Integer.MAX_VALUE);
+			return format;
+		});
 
 		/**
 		 * Appends a row to {@code sheet} below the currently last row.
@@ -163,30 +173,6 @@ public class MetricsFiles {
 		}
 
 		/**
-		 * Loads a resource from a folder next to this class. The file name is build by
-		 * concatenating the class name, a dash and {@code fileNameSuffix}.
-		 *
-		 * @param fileNameSuffix the file name's suffix
-		 * @return the resource file content
-		 */
-		@SuppressFBWarnings(value = { "EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS", "PATH_TRAVERSAL_IN" },
-				justification = "IOExceptions in here are not expected to be related to user input or behavior "
-						+ "and fileNameSuffix is expected to be a constant value within this class.")
-		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
-			final Class<?> clazz = MethodHandles.lookup().lookupClass();
-			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
-			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName))
-					.orElseThrow(() -> new RuntimeException(
-							String.format("The resource \"%s\" could not be loaded.", fileName)));
-
-			try {
-				return new String(Files.readAllBytes(path), Strings.DEFAULT_CHARSET);
-			} catch (final IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		}
-
-		/**
 		 * Sets a numeric {@code value} for {@code cell}.
 		 *
 		 * <p>
@@ -199,7 +185,7 @@ public class MetricsFiles {
 		private static void setCellValue(final Cell cell, final Number value) {
 			final CTCell ctCell = ((XSSFCell) cell).getCTCell();
 			ctCell.setT(STCellType.N);
-			ctCell.setV(DECIMAL_FORMAT.format(value));
+			ctCell.setV(DECIMAL_FORMAT.get().format(value));
 		}
 
 		/**
@@ -234,7 +220,8 @@ public class MetricsFiles {
 		 * @param result       the {@link LocalElectionResult} to create metrics of
 		 * @param outputStream the {@link OutputStream} to write to
 		 */
-		public MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream) {
+		@PackagePrivate
+		MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream) {
 			this.result = result;
 			this.outputStream = outputStream;
 
@@ -254,7 +241,7 @@ public class MetricsFiles {
 		 * @param value      the value to set or empty
 		 * @return the created cell
 		 */
-		@SuppressWarnings("resource")
+		@SuppressWarnings({ "checkstyle:SuppressWarnings", "resource" })
 		private <T> Cell appendCell(final Row row,
 				final Optional<Party> party,
 				final Optional<String> dataFormat,
@@ -405,15 +392,11 @@ public class MetricsFiles {
 						sheet.autoSizeColumn(columnIndex);
 
 						// Add the width of the auto filter
-						double widthOfHeader = SheetUtil.getColumnWidth(sheet, columnIndex, false, 0, 0);
+						final double widthOfHeader = SheetUtil.getColumnWidth(sheet, columnIndex, false, 0, 0);
 						if (widthOfHeader != -1) {
-							// The maximum column width for an individual cell is 255 characters
-							widthOfHeader = Math.min(widthOfHeader, 255);
-
-							// Difference of a cell without and with auto filter in Excel
-							widthOfHeader += 2.28515625;
-
-							final int intWidth = (int) Math.round(256 * widthOfHeader);
+							final int intWidth = (int) Math
+									.round(CHARACTER_WIDTH * Math.min(widthOfHeader, COLUMN_WIDTH_MAX_CHARACTERS)
+											+ AUTO_FILTER_WIDTH);
 							if (intWidth > sheet.getColumnWidth(columnIndex)) {
 								sheet.setColumnWidth(columnIndex, intWidth);
 							}
@@ -463,6 +446,8 @@ public class MetricsFiles {
 		 * @param row      the row to write to
 		 * @param district the district
 		 */
+		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
+				justification = "need to match generics")
 		private void writeOverviewOfDistrict(final Row row, final District<?> district) {
 			// Wahlbezirk
 			appendStrings(row, district.getName());
@@ -569,6 +554,8 @@ public class MetricsFiles {
 		 * @param row   the row to write to
 		 * @param party the party
 		 */
+		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
+				justification = "need to match generics")
 		private void writeParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -651,6 +638,8 @@ public class MetricsFiles {
 		 * @param row   the row to write to
 		 * @param party the party
 		 */
+		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
+				justification = "need to match generics")
 		private void writeBlockVotesOfParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -718,6 +707,7 @@ public class MetricsFiles {
 			// Header
 			final Row row = appendRow(sheet);
 			appendStrings(row, "#", "Gruppierung", "Nachname", "Vorname");
+			final int freezeColumn = row.getLastCellNum();
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
 				appendStrings(row, pollingStation.getName());
 			}
@@ -729,7 +719,7 @@ public class MetricsFiles {
 			}
 
 			// Table
-			sheet.createFreezePane(4, 0);
+			sheet.createFreezePane(freezeColumn, 0);
 			createTable(sheet, "Kandidierende");
 		}
 
@@ -739,6 +729,8 @@ public class MetricsFiles {
 		 * @param row              the row to write to
 		 * @param nominationResult the nomination's results
 		 */
+		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
+				justification = "need to match generics")
 		private void writeNomination(final Row row, final LocalNominationResult nominationResult) {
 			final LocalNomination nomination = nominationResult.getNomination();
 			final Optional<Party> party = nomination.getParty();

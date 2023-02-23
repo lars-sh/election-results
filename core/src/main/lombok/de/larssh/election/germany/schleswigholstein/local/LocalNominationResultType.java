@@ -56,5 +56,5 @@ public enum LocalNominationResultType {
 	 * @return {@code true} if a nomination is meant to be elected, else
 	 *         {@code false}
 	 */
-	boolean isElected;
+	boolean elected;
 }
