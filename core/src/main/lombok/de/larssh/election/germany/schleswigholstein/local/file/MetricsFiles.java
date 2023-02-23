@@ -55,9 +55,6 @@ import lombok.experimental.UtilityClass;
 /**
  * This class contains helper methods to write an Excel spreadsheet (XLSX) with
  * metrics of an election result.
- *
- * <p>
- * TODO: Information rows
  */
 @UtilityClass
 @SuppressWarnings("PMD.ExcessiveImports")
@@ -83,17 +80,17 @@ public class MetricsFiles {
 		 * Width of the auto filter control in Excel, calculated using the difference of
 		 * a cell without and with auto filter
 		 */
-		private static final double AUTO_FILTER_WIDTH = 585;
+		private static final int AUTO_FILTER_WIDTH = 563;
 
 		/**
 		 * Width of one character
 		 */
-		private static final double CHARACTER_WIDTH = 256;
+		private static final int CHARACTER_WIDTH = 256;
 
 		/**
-		 * The maximum width of a column in number of characters
+		 * The maximum width of a column
 		 */
-		private static final double COLUMN_WIDTH_MAX_CHARACTERS = 255;
+		private static final int COLUMN_MAX_WIDTH = 255 * CHARACTER_WIDTH;
 
 		/**
 		 * Excel data format for percentage values
@@ -394,9 +391,8 @@ public class MetricsFiles {
 						// Add the width of the auto filter
 						final double widthOfHeader = SheetUtil.getColumnWidth(sheet, columnIndex, false, 0, 0);
 						if (widthOfHeader != -1) {
-							final int intWidth = (int) Math
-									.round(CHARACTER_WIDTH * Math.min(widthOfHeader, COLUMN_WIDTH_MAX_CHARACTERS)
-											+ AUTO_FILTER_WIDTH);
+							final int intWidth = (int) Math.round(
+									Math.min(CHARACTER_WIDTH * widthOfHeader + AUTO_FILTER_WIDTH, COLUMN_MAX_WIDTH));
 							if (intWidth > sheet.getColumnWidth(columnIndex)) {
 								sheet.setColumnWidth(columnIndex, intWidth);
 							}
@@ -530,6 +526,7 @@ public class MetricsFiles {
 		 * @param sheet the sheet to write to
 		 */
 		private void writeParties(final Sheet sheet) {
+			// Header
 			final Row row = appendRow(sheet);
 			appendStrings(row, "Gruppierung");
 			for (final LocalPollingStation pollingStation : result.getElection().getPollingStations()) {
