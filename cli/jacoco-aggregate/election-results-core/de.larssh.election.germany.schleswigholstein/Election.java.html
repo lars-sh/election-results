@@ -2,8 +2,8 @@
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.OptionalInt;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -141,7 +141,7 @@ public interface Election&lt;D extends District&lt;?&gt;, N extends Nomination&l
 	 *
 	 * @return Bewerberinnen und Bewerber
 	 */
-	Set&lt;? extends N&gt; getNominations();
+	List&lt;? extends N&gt; getNominations();
 
 	/** {@inheritDoc} */
 	@Override
