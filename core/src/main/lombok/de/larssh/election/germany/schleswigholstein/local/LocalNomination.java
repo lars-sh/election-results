@@ -4,6 +4,7 @@ import static de.larssh.utils.Finals.lazy;
 
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,7 +37,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
 			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
-			.thenComparing(nomination -> nomination.getElection().getNominationsAsList().indexOf(nomination));
+			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	/**
 	 * Creates a unique key for the given person and party keys.
@@ -120,6 +121,17 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	@JsonIgnore
 	public String getKey() {
 		return createKey(getPerson().getKey(), getParty().map(Party::getKey));
+	}
+
+	/**
+	 * Determines the position of the nomination on the party's list.
+	 *
+	 * @return the position of the nomination on the party's list or empty if the
+	 *         nomination has no party assigned.
+	 */
+	@JsonIgnore
+	public OptionalInt getListPosition() {
+		return Optionals.mapToInt(getParty(), party -> getElection().getNominations(party).indexOf(this) + 1);
 	}
 
 	/**

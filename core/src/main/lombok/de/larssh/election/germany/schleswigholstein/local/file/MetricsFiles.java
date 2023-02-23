@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -733,10 +732,7 @@ public class MetricsFiles {
 			final Optional<Party> party = nomination.getParty();
 
 			// #
-			appendNumber(row,
-					party,
-					nomination.getParty()
-							.map(p -> new ArrayList<>(result.getElection().getNominations(p)).indexOf(nomination) + 1));
+			appendNumber(row, party, OptionalInts.boxed(nomination.getListPosition()));
 
 			// Gruppierung
 			appendCell(row, party, Optional.empty(), Cell::setCellValue, party.map(Party::getShortName));

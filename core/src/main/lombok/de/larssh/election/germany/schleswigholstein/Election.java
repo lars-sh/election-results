@@ -2,8 +2,8 @@ package de.larssh.election.germany.schleswigholstein;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.OptionalInt;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -141,7 +141,7 @@ public interface Election<D extends District<?>, N extends Nomination<? extends 
 	 *
 	 * @return Bewerberinnen und Bewerber
 	 */
-	Set<? extends N> getNominations();
+	List<? extends N> getNominations();
 
 	/** {@inheritDoc} */
 	@Override

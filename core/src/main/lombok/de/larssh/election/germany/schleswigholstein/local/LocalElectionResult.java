@@ -430,6 +430,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
+	 * Number of postal ballots
+	 *
+	 * @return the number of postal ballots
+	 */
+	@JsonIgnore
+	public int getNumberOfPostalBallots() {
+		return (int) getBallots().stream().filter(LocalBallot::isPostalVote).count();
+	}
+
+	/**
 	 * Number of votes
 	 *
 	 * @return the number of votes
@@ -579,7 +589,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
-		final List<LocalNomination> nominations = getElection().getNominationsAsList();
+		final List<LocalNomination> nominations = getElection().getNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
 						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))

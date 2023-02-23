@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import de.larssh.election.germany.schleswigholstein.Party;
-import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
@@ -75,7 +74,7 @@ public class AwgWebsiteFiles {
 		 * Pattern matching sequences to remove when stripping down a value to a PHP
 		 * compatible identifier.
 		 */
-		private static final Pattern PHP_IDENTIFIER_REMOVE = Pattern.compile("(?:^[-0-9]+)|(?:-+$)");
+		private static final Pattern PHP_IDENTIFIER_REMOVE = Pattern.compile("(^[-0-9]+)|(-+$)");
 
 		/**
 		 * PHP reserved literal for {@code null}
@@ -147,7 +146,9 @@ public class AwgWebsiteFiles {
 		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
 			final Class<?> clazz = MethodHandles.lookup().lookupClass();
 			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
-			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName)).get();
+			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName))
+					.orElseThrow(() -> new RuntimeException(
+							String.format("Could not load \"%s\" from resources.", fileName)));
 
 			try {
 				return new String(Files.readAllBytes(path), Strings.DEFAULT_CHARSET);
@@ -177,20 +178,13 @@ public class AwgWebsiteFiles {
 		 */
 		@PackagePrivate
 		void write() throws IOException {
-			final String wahlberechtigteOrNull
-					= OptionalInts.mapToObj(result.getElection().getNumberOfEligibleVoters(), Integer::toString)
-							.orElse(PHP_NULL);
-			final String stimmzettelOrNull
-					= OptionalInts.mapToObj(result.getNumberOfAllBallots(), Integer::toString).orElse(PHP_NULL);
-			final long davonBriefwaehler = result.getBallots().stream().filter(LocalBallot::isPostalVote).count();
-			final int ungueltigeStimmen = result.getNumberOfInvalidBallots();
-
 			writer.write(String.format(TEMPLATE.get(),
 					result.getElection().getDate(),
-					wahlberechtigteOrNull,
-					stimmzettelOrNull,
-					davonBriefwaehler,
-					ungueltigeStimmen,
+					OptionalInts.mapToObj(result.getElection().getNumberOfEligibleVoters(), Integer::toString)
+							.orElse(PHP_NULL),
+					OptionalInts.mapToObj(result.getNumberOfAllBallots(), Integer::toString).orElse(PHP_NULL),
+					result.getNumberOfPostalBallots(),
+					result.getNumberOfInvalidBallots(),
 					formatData(),
 					formatPersons(),
 					formatSeats(),

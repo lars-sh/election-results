@@ -4,16 +4,15 @@ import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -136,23 +135,13 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * Bewerberinnen und Bewerber
 	 */
 	@ToString.Exclude
-	Set<LocalNomination> nominations = new LinkedHashSet<>();
+	List<LocalNomination> nominations = new ArrayList<>();
 
 	/**
 	 * Wahlgebiet, Wahlkreise und Wahlbezirke
 	 */
 	@ToString.Exclude
 	Supplier<Set<District<?>>> allDistricts = lazy(() -> getDistrict().getAllChildren());
-
-	/**
-	 * Bewerberinnen und Bewerber
-	 *
-	 * <p>
-	 * This field stores an unmodifiable copy of the nominations as list for
-	 * internal purpose only, as some comparators need it.
-	 */
-	@ToString.Exclude
-	List<LocalNomination> nominationsAsList = new ArrayList<>();
 
 	/**
 	 * Wahl
@@ -241,8 +230,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 
 	/** {@inheritDoc} */
 	@Override
-	public Set<LocalNomination> getNominations() {
-		return unmodifiableSet(nominations);
+	public List<LocalNomination> getNominations() {
+		return unmodifiableList(nominations);
 	}
 
 	/**
@@ -251,29 +240,10 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @param party Gruppierung
 	 * @return the nominations
 	 */
-	public Set<LocalNomination> getNominations(final Party party) {
+	public List<LocalNomination> getNominations(final Party party) {
 		return getNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
-				.collect(toLinkedHashSet());
-	}
-
-	/**
-	 * Bewerberinnen und Bewerber
-	 *
-	 * <p>
-	 * This method returns an unmodifiable copy of the nominations as list for
-	 * internal purpose only, as some comparators need it.
-	 *
-	 * @return Bewerberinnen und Bewerber
-	 */
-	@PackagePrivate
-	List<LocalNomination> getNominationsAsList() {
-		final Set<LocalNomination> nominations = getNominations();
-		if (nominationsAsList.size() != nominations.size()) {
-			nominationsAsList.clear();
-			nominationsAsList.addAll(nominations);
-		}
-		return unmodifiableList(nominationsAsList);
+				.collect(toList());
 	}
 
 	/**

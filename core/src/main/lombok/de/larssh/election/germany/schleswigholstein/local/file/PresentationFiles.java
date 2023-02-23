@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -335,10 +334,11 @@ public class PresentationFiles {
 			final int maxNumberOfVotes = result.getNominationResults()
 					.values()
 					.stream()
-					.map(LocalNominationResult::getNumberOfVotes)
-					.max(Integer::compare)
+					.mapToInt(LocalNominationResult::getNumberOfVotes)
+					.max()
 					.orElse(0);
 
+			// Show all direct nominations and probably elected list nominations
 			return result.getNominationResults()
 					.values()
 					.stream()
@@ -386,9 +386,7 @@ public class PresentationFiles {
 			result.getNomination()
 					.getParty()
 					.map(party -> String.format("\nListenposition %d der %s",
-							new ArrayList<>(this.result.getElection().getNominations(party)) //
-									.indexOf(result.getNomination()) //
-									+ 1,
+							result.getNomination().getListPosition().orElseThrow(),
 							party.getShortName()))
 					.ifPresent(builder::append);
 			result.getSainteLagueValue()

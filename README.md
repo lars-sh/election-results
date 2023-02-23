@@ -27,6 +27,5 @@ Officially the order of direct and list nominations of a party could differ. We 
 Therefore, this project works with one order only, automatically taking the first nominations as direct nominations. Results are correct as long as all direct nominations have a place at the beginning of the party's list. In that case the order of the direct nominations does not matter.
 
 ## Open Points
-* Move methods for statistic needs from the formatting classes to utility classes
 * Tests for isCertain
 * Test for a rare problem with DIRECT_BALANCE_SEAT or LIST_OVERHANG_SEAT
