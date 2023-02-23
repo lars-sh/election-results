@@ -57,7 +57,6 @@ import de.larssh.utils.annotations.PackagePrivate;
 import de.larssh.utils.io.Resources;
 import de.larssh.utils.text.Strings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -84,13 +83,10 @@ public class MetricsFiles {
 	 * This class writes metrics of a {@link LocalElectionResult} to an Excel
 	 * spreadsheet (XLSX).
 	 */
-	@RequiredArgsConstructor
 	private static class MetricsFileWriter {
 		private static final String DATA_FORMAT_PERCENTAGE = "0.0%";
 
 		private static final String DATA_FORMAT_PERCENTAGE_WITH_SIGN = "\\+0.0%;\\-0.0%;0.0%";
-
-		private static final String DATA_FORMAT_SAINTE_LAGUE_VALUE = "0.00";
 
 		private static final NumberFormat DECIMAL_FORMAT
 				= new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
@@ -178,6 +174,17 @@ public class MetricsFiles {
 		OutputStream outputStream;
 
 		Map<String, CellStyle> cellStyles = new HashMap<>();
+
+		String dataFormatSainteLague;
+
+		public MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream) {
+			this.result = result;
+			this.outputStream = outputStream;
+
+			dataFormatSainteLague = result.getSainteLagueScale() == 0
+					? "0"
+					: String.format("0.%0" + result.getSainteLagueScale() + "d", 0);
+		}
 
 		@SuppressWarnings("resource")
 		private <T> void appendCell(final Row row,
@@ -602,7 +609,7 @@ public class MetricsFiles {
 			appendCell(row,
 					party,
 					MetricsFileWriter::setCellValue,
-					Optional.of(DATA_FORMAT_SAINTE_LAGUE_VALUE),
+					Optional.of(dataFormatSainteLague),
 					nominationResult.getSainteLagueValue());
 
 			// Mandat
