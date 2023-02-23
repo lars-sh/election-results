@@ -414,6 +414,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * @return the number of invalid ballots
 	 */
+	@JsonIgnore
 	public int getNumberOfInvalidBallots() {
 		return getNumberOfInvalidBallots(getElection().getDistrict());
 	}
