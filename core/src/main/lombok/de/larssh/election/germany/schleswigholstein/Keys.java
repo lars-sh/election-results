@@ -139,8 +139,8 @@ public class Keys {
 		}
 
 		final String escapedValue = valueToEscape.replace(ESCAPE_CHARACTER, ESCAPE_CHARACTER + ESCAPE_CHARACTER)
-				.replace(Character.toString(prefix.charAt(0)) + Character.toString(prefix.charAt(1)),
-						Character.toString(prefix.charAt(0)) + ESCAPE_CHARACTER + Character.toString(prefix.charAt(1)));
+				.replace(Character.toString(prefix.charAt(0)) + prefix.substring(1),
+						Character.toString(prefix.charAt(0)) + ESCAPE_CHARACTER + prefix.substring(1));
 		return value.isEmpty() ? escapedValue : value + prefix + escapedValue + suffix;
 	}
 }

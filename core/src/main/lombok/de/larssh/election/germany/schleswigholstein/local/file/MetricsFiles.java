@@ -57,8 +57,7 @@ import lombok.experimental.UtilityClass;
  * metrics of an election result.
  *
  * <p>
- * TODO: Information rows<br>
- * TODO: reduce duplicate strings
+ * TODO: Information rows
  */
 @UtilityClass
 @SuppressWarnings("PMD.ExcessiveImports")
@@ -78,6 +77,7 @@ public class MetricsFiles {
 	 * This class writes metrics of a {@link LocalElectionResult} to an Excel
 	 * spreadsheet (XLSX).
 	 */
+	@SuppressWarnings({ "checkstyle:MultipleStringLiterals", "PMD.AvoidDuplicateLiterals" })
 	private static class MetricsFileWriter {
 		/**
 		 * Width of the auto filter control in Excel, calculated using the difference of
@@ -341,7 +341,7 @@ public class MetricsFiles {
 				return Optional.empty();
 			}
 
-			final String key = Keys.escape(party.map(Party::getKey).orElse(""), "TODO", "TODO", dataFormat.orElse(""));
+			final String key = Keys.escape(party.map(Party::getKey).orElse(""), ", ", dataFormat.orElse(""), "");
 			return Optional.of(cellStyleCache.computeIfAbsent(key, k -> {
 				final CellStyle cellStyle = workbook.createCellStyle();
 
