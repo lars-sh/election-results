@@ -64,7 +64,8 @@ import lombok.experimental.UtilityClass;
  * metrics of an election result.
  *
  * <p>
- * TODO: Information rows
+ * TODO: Information rows<br>
+ * TODO: reduce duplicate strings
  */
 @UtilityClass
 public class MetricsFiles {
@@ -84,20 +85,44 @@ public class MetricsFiles {
 	 * spreadsheet (XLSX).
 	 */
 	private static class MetricsFileWriter {
+		/**
+		 * Excel data format for percentage values
+		 */
 		private static final String DATA_FORMAT_PERCENTAGE = "0.0%";
 
+		/**
+		 * Excel data format for differences between two percentage values, showing the
+		 * plus sign in case of a positive value
+		 */
 		private static final String DATA_FORMAT_PERCENTAGE_WITH_SIGN = "\\+0.0%;\\-0.0%;0.0%";
 
+		/**
+		 * Excel data format for any number with any number of decimal places
+		 */
 		private static final NumberFormat DECIMAL_FORMAT
 				= new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
 		static {
 			DECIMAL_FORMAT.setMaximumFractionDigits(Integer.MAX_VALUE);
 		}
 
+		/**
+		 * Appends a row to {@code sheet} below the currently last row.
+		 *
+		 * @param sheet the sheet to modify
+		 * @return the created row
+		 */
 		private static Row appendRow(final Sheet sheet) {
 			return CellUtil.getRow(sheet.getLastRowNum() + 1, sheet);
 		}
 
+		/**
+		 * Creates a table with auto filter, default style and {@ode name}, spanning all
+		 * curently available cells.
+		 *
+		 * @param sheet the sheet to modify
+		 * @param name  the table name
+		 * @return the created table
+		 */
 		private static XSSFTable createTable(final Sheet sheet, final String name) {
 			final XSSFTable table = ((XSSFSheet) sheet).createTable(new AreaReference(new CellReference(0, 0),
 					new CellReference(sheet.getLastRowNum(), CellUtil.getRow(0, sheet).getLastCellNum() - 1),
@@ -109,6 +134,12 @@ public class MetricsFiles {
 			return table;
 		}
 
+		/**
+		 * Converts a {@link LocalNominationResultType} to a display value.
+		 *
+		 * @param type the type to convert
+		 * @return the type's display value
+		 */
 		private static String getDisplayValue(final LocalNominationResultType type) {
 			if (type == LocalNominationResultType.DIRECT) {
 				return "Direkt";
@@ -144,7 +175,9 @@ public class MetricsFiles {
 		private static String loadResourceRelativeToClass(final String fileNameSuffix) {
 			final Class<?> clazz = MethodHandles.lookup().lookupClass();
 			final String fileName = clazz.getSimpleName() + "-" + fileNameSuffix;
-			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName)).get();
+			final Path path = Resources.getResourceRelativeTo(clazz, Paths.get(fileName))
+					.orElseThrow(() -> new RuntimeException(
+							String.format("The resource \"%s\" could not be loaded.", fileName)));
 
 			try {
 				return new String(Files.readAllBytes(path), Strings.DEFAULT_CHARSET);
@@ -153,6 +186,16 @@ public class MetricsFiles {
 			}
 		}
 
+		/**
+		 * Sets a numeric {@code value} for {@code cell}.
+		 *
+		 * <p>
+		 * This method allows setting e.g. precise {@link java.math.BigDecimal} values,
+		 * but does not permit infinite and {@code NaN} values.
+		 *
+		 * @param cell  the cell to modify
+		 * @param value the value to set
+		 */
 		private static void setCellValue(final Cell cell, final Number value) {
 			final CTCell ctCell = ((XSSFCell) cell).getCTCell();
 			ctCell.setT(STCellType.N);
@@ -160,9 +203,9 @@ public class MetricsFiles {
 		}
 
 		/**
-		 * Election Result to write
+		 * Election Result to create metrics of
 		 *
-		 * @return the election result to write
+		 * @return the election result to create metrics of
 		 */
 		LocalElectionResult result;
 
@@ -173,10 +216,24 @@ public class MetricsFiles {
 		 */
 		OutputStream outputStream;
 
-		Map<String, CellStyle> cellStyles = new HashMap<>();
+		/**
+		 * Cache to simplify reusing {@link CellStyle} instances
+		 */
+		Map<String, CellStyle> cellStyleCache = new HashMap<>();
 
+		/**
+		 * The Excel data format for Sainte Laguë values, decimal places being derived
+		 * from {@link LocalElectionResult#getSainteLagueScale()}.
+		 */
 		String dataFormatSainteLague;
 
+		/**
+		 * This class writes metrics of a {@link LocalElectionResult} to an Excel
+		 * spreadsheet (XLSX).
+		 *
+		 * @param result       the {@link LocalElectionResult} to create metrics of
+		 * @param outputStream the {@link OutputStream} to write to
+		 */
 		public MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream) {
 			this.result = result;
 			this.outputStream = outputStream;
@@ -186,46 +243,110 @@ public class MetricsFiles {
 					: String.format("0.%0" + result.getSainteLagueScale() + "d", 0);
 		}
 
+		/**
+		 * Appends a cell to {@code row} after the currently last cell.
+		 *
+		 * @param <T>        the value's data type
+		 * @param row        the row to modify
+		 * @param party      the {@link Party} to be used for coloring or empty
+		 * @param dataFormat the Excel data format to set or empty
+		 * @param setValue   a method to set the value to the created cell
+		 * @param value      the value to set or empty
+		 * @return the created cell
+		 */
 		@SuppressWarnings("resource")
-		private <T> void appendCell(final Row row,
+		private <T> Cell appendCell(final Row row,
 				final Optional<Party> party,
-				final BiConsumer<Cell, T> setValue,
 				final Optional<String> dataFormat,
+				final BiConsumer<Cell, T> setValue,
 				final Optional<T> value) {
 			final Cell cell = CellUtil.getCell(row, Math.max(0, row.getLastCellNum()));
 			getCellStyle(row.getSheet().getWorkbook(), party, dataFormat).ifPresent(cell::setCellStyle);
 			if (value.isPresent()) {
 				setValue.accept(cell, value.get());
 			}
+			return cell;
 		}
 
-		private void appendFormula(final Row row, final Optional<Party> party, final String value) {
-			appendCell(row, party, Cell::setCellFormula, Optional.empty(), Optional.of(value));
+		/**
+		 * Appends a cell with {@code formula} to {@code row} after the currently last
+		 * cell.
+		 *
+		 * @param row     the row to modify
+		 * @param party   the {@link Party} to be used for coloring or empty
+		 * @param formula the formula to set
+		 * @return the created cell
+		 */
+		private Cell appendFormula(final Row row, final Optional<Party> party, final String formula) {
+			return appendCell(row, party, Optional.empty(), Cell::setCellFormula, Optional.of(formula));
 		}
 
-		private void appendFormula(final Row row,
+		/**
+		 * Appends a cell with {@code formula} to {@code row} after the currently last
+		 * cell.
+		 *
+		 * @param row        the row to modify
+		 * @param party      the {@link Party} to be used for coloring or empty
+		 * @param dataFormat the Excel data format to set or empty
+		 * @param formula    the formula to set
+		 * @return the created cell
+		 */
+		private Cell appendFormula(final Row row,
 				final Optional<Party> party,
 				final String dataFormat,
-				final String value) {
-			appendCell(row, party, Cell::setCellFormula, Optional.of(dataFormat), Optional.of(value));
+				final String formula) {
+			return appendCell(row, party, Optional.of(dataFormat), Cell::setCellFormula, Optional.of(formula));
 		}
 
-		private void appendNumber(final Row row,
-				final Optional<Party> cellStyle,
-				final Optional<? extends Number> value) {
-			appendCell(row, cellStyle, MetricsFileWriter::setCellValue, Optional.empty(), value);
+		/**
+		 * Appends a cell with numeric {@code value} to {@code row} after the currently
+		 * last cell.
+		 *
+		 * @param row   the row to modify
+		 * @param party the {@link Party} to be used for coloring or empty
+		 * @param value the value to set or empty
+		 * @return the created cell
+		 */
+		private Cell appendNumber(final Row row, final Optional<Party> party, final Optional<? extends Number> value) {
+			return appendCell(row, party, Optional.empty(), MetricsFileWriter::setCellValue, value);
 		}
 
-		private void appendString(final Row row, final Optional<Party> party, final String value) {
-			appendCell(row, party, Cell::setCellValue, Optional.empty(), Optional.of(value));
+		/**
+		 * Appends a cell with string {@code value} to {@code row} after the currently
+		 * last cell.
+		 *
+		 * @param row   the row to modify
+		 * @param party the {@link Party} to be used for coloring or empty
+		 * @param value the value to set or empty
+		 * @return the created cell
+		 */
+		private Cell appendString(final Row row, final Optional<Party> party, final String value) {
+			return appendCell(row, party, Optional.empty(), Cell::setCellValue, Optional.of(value));
 		}
 
+		/**
+		 * Appends cells with string {@code values} to {@code row} after the currently
+		 * last cell.
+		 *
+		 * @param row    the row to modify
+		 * @param values the values to set
+		 */
 		private void appendStrings(final Row row, final String... values) {
 			for (final String value : values) {
 				appendString(row, Optional.empty(), value);
 			}
 		}
 
+		/**
+		 * Returns a {@link CellStyle} instance with the coloring of {@code party} and
+		 * {@code dataFormat}. Cell styles are cached and reused.
+		 *
+		 * @param workbook   the current workbook
+		 * @param party      the {@link Party} to be used for coloring or empty
+		 * @param dataFormat the Excel data format to set or empty
+		 * @return the {@link CellStyle} instance with the coloring of {@code party} and
+		 *         {@code dataFormat}
+		 */
 		private Optional<CellStyle> getCellStyle(final Workbook workbook,
 				final Optional<Party> party,
 				final Optional<String> dataFormat) {
@@ -234,7 +355,7 @@ public class MetricsFiles {
 			}
 
 			final String key = Keys.escape(party.map(Party::getKey).orElse(""), "TODO", "TODO", dataFormat.orElse(""));
-			return Optional.of(cellStyles.computeIfAbsent(key, k -> {
+			return Optional.of(cellStyleCache.computeIfAbsent(key, k -> {
 				final CellStyle cellStyle = workbook.createCellStyle();
 
 				party.ifPresent(p -> {
@@ -304,6 +425,11 @@ public class MetricsFiles {
 			}
 		}
 
+		/**
+		 * Adds the sheet "Übersicht"
+		 *
+		 * @param sheet the sheet to write to
+		 */
 		private void writeOverview(final Sheet sheet) {
 			// Header
 			appendStrings(appendRow(sheet),
@@ -331,6 +457,12 @@ public class MetricsFiles {
 			writeOverviewTotalsRow(appendRow(sheet), table.getCTTable());
 		}
 
+		/**
+		 * Adds a row with district metrics to the sheet "Übersicht"
+		 *
+		 * @param row      the row to write to
+		 * @param district the district
+		 */
 		private void writeOverviewOfDistrict(final Row row, final District<?> district) {
 			// Wahlbezirk
 			appendStrings(row, district.getName());
@@ -362,9 +494,15 @@ public class MetricsFiles {
 			appendNumber(row, Optional.empty(), Optional.of(result.getNumberOfInvalidBallots(district)));
 		}
 
-		private void writeOverviewTotalsRow(final Row row, final CTTable ctTable) {
-			ctTable.setTotalsRowCount(1);
-			final Iterator<CTTableColumn> columns = ctTable.getTableColumns().getTableColumnList().iterator();
+		/**
+		 * Adds a total row to the sheet "Übersicht"
+		 *
+		 * @param row   the row to write to
+		 * @param table the Excel table to update
+		 */
+		private void writeOverviewTotalsRow(final Row row, final CTTable table) {
+			table.setTotalsRowCount(1);
+			final Iterator<CTTableColumn> columns = table.getTableColumns().getTableColumnList().iterator();
 
 			// Wahlbezirk
 			columns.next().setTotalsRowLabel("Gesamt");
@@ -401,6 +539,11 @@ public class MetricsFiles {
 			appendFormula(row, Optional.empty(), "SUM(Übersicht[ungültig])");
 		}
 
+		/**
+		 * Adds the sheet "Gruppierungen"
+		 *
+		 * @param sheet the sheet to write to
+		 */
 		private void writeParties(final Sheet sheet) {
 			final Row row = appendRow(sheet);
 			appendStrings(row, "Gruppierung");
@@ -420,6 +563,12 @@ public class MetricsFiles {
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
 		}
 
+		/**
+		 * Adds a row with party metrics to the sheet "Gruppierungen"
+		 *
+		 * @param row   the row to write to
+		 * @param party the party
+		 */
 		private void writeParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -467,6 +616,11 @@ public class MetricsFiles {
 					"COUNTIFS(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]], Kandidierende[Mandat], \"<>\")");
 		}
 
+		/**
+		 * Adds the sheet "Blockstimmen"
+		 *
+		 * @param sheet the sheet to write to
+		 */
 		private void writeBlockVotes(final Sheet sheet) {
 			// Header
 			final Row row = appendRow(sheet);
@@ -490,6 +644,13 @@ public class MetricsFiles {
 			table.getCTTable().getTableStyleInfo().setShowFirstColumn(true);
 		}
 
+		/**
+		 * Adds a row with block vote metrics of {@code party} to the sheet
+		 * "Blockstimmen"
+		 *
+		 * @param row   the row to write to
+		 * @param party the party
+		 */
 		private void writeBlockVotesOfParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -548,6 +709,11 @@ public class MetricsFiles {
 					"Blockstimmen[Gesamt %] - INDEX(Gruppierungen[Gesamt %], MATCH(Blockstimmen[Gruppierung], Gruppierungen[Gruppierung], 0))");
 		}
 
+		/**
+		 * Adds the sheet "Kandidierende"
+		 *
+		 * @param sheet the sheet to write to
+		 */
 		private void writeNominations(final Sheet sheet) {
 			// Header
 			final Row row = appendRow(sheet);
@@ -567,6 +733,12 @@ public class MetricsFiles {
 			createTable(sheet, "Kandidierende");
 		}
 
+		/**
+		 * Adds a row with nomination metrics to the sheet "Kandidierende"
+		 *
+		 * @param row              the row to write to
+		 * @param nominationResult the nomination's results
+		 */
 		private void writeNomination(final Row row, final LocalNominationResult nominationResult) {
 			final LocalNomination nomination = nominationResult.getNomination();
 			final Optional<Party> party = nomination.getParty();
@@ -578,7 +750,7 @@ public class MetricsFiles {
 							.map(p -> new ArrayList<>(result.getElection().getNominations(p)).indexOf(nomination) + 1));
 
 			// Gruppierung
-			appendCell(row, party, Cell::setCellValue, Optional.empty(), party.map(Party::getShortName));
+			appendCell(row, party, Optional.empty(), Cell::setCellValue, party.map(Party::getShortName));
 
 			// Nachname
 			appendString(row, party, nomination.getPerson().getFamilyName());
@@ -608,8 +780,8 @@ public class MetricsFiles {
 			// Sainte-Laguë-Wert
 			appendCell(row,
 					party,
-					MetricsFileWriter::setCellValue,
 					Optional.of(dataFormatSainteLague),
+					MetricsFileWriter::setCellValue,
 					nominationResult.getSainteLagueValue());
 
 			// Mandat
