@@ -21,10 +21,12 @@ As long as Maven is installed on your machine and you executed `mvn install` bef
 mvn --quiet de.lars-sh:jar-runner-maven-plugin:run -Dartifact=de.lars-sh.election-results:election-results-cli:0.9.0-SNAPSHOT -DmainClass=de.larssh.election.germany.schleswigholstein.local.cli.LocalElectionResultCli
 ```
 
+## Differentiating Direct and List Nominations
+Officially the order of direct and list nominations of a party could differ. We consider that a very rare case. This does no
+
+Therefore, this project works with one order only, automatically taking the first nominations as direct nominations. Results are correct as long as all direct nominations have a place at the beginning of the party's list. In that case the order of the direct nominations does not matter.
+
 ## Open Points
 * Move methods for statistic needs from the formatting classes to utility classes
 * Tests for isCertain
 * Test for a rare problem with DIRECT_BALANCE_SEAT or LIST_OVERHANG_SEAT
-
-## Known Problems
-* Officially the order of direct and list candidates of a party can differ. Right now that cannot be handled correctly. Instead the order of the first list candidates must be the same as the direct candidates.
