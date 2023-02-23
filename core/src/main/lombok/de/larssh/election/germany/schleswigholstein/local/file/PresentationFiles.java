@@ -386,7 +386,7 @@ public class PresentationFiles {
 			result.getNomination()
 					.getParty()
 					.map(party -> String.format("\nListenposition %d der %s",
-							result.getNomination().getListPosition().orElseThrow(),
+							result.getNomination().getListPosition().getAsInt(),
 							party.getShortName()))
 					.ifPresent(builder::append);
 			result.getSainteLagueValue()
