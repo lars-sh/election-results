@@ -316,14 +316,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return a new {@link ElectionResult} with filtered ballots
 	 */
 	public LocalElectionResult filterByDistrict(final District<?> district) {
-		final Map<District<?>, OptionalInt> filteredNumberOfAllBallots = numberOfAllBallots.entrySet()
-				.stream()
-				.filter(entry -> district.contains(entry.getKey()))
-				.collect(toMap(HashMap::new));
-
 		return new LocalElectionResult(getElection(),
 				sainteLagueScale,
-				filteredNumberOfAllBallots,
+				numberOfAllBallots,
 				getDirectDrawResults(),
 				getListDrawResults(),
 				getBallots(district));

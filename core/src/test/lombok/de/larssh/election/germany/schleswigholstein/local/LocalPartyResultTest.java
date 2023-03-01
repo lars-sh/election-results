@@ -122,12 +122,10 @@ class LocalPartyResultTest {
 		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(20);
 
 		// Certain Seats
-		// TODO: We should probably use the max eligible voters to calculate the certain
-		// seats here
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(1);
 		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
 		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
 	}
 
 	/**
@@ -196,9 +194,9 @@ class LocalPartyResultTest {
 		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(31);
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(3);
+		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
+		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(2);
+		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
 	}
 }
