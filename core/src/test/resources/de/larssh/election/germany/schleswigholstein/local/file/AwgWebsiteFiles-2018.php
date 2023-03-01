@@ -2,7 +2,7 @@
 function data_2018_get_meta() {
 	return array(
 		'wahlberechtigte' => 990,
-		'stimmzettel' => 627,
+		'stimmzettel' => 601,
 		'davon-briefwaehler' => 0,
 		'ungueltige-stimmen' => 3
 	);

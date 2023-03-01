@@ -65,7 +65,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
 @SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.DataClass", "PMD.ExcessiveImports", "PMD.GodClass" })
 public final class LocalElectionResult implements ElectionResult<LocalBallot, LocalNomination> {
 	/**
@@ -370,9 +370,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public Optional<BigDecimal> getEvaluationProgress(final int scale, final District<?> district) {
-		return OptionalInts.mapToObj(getNumberOfAllBallots(district),
-				numberOfAllBallots -> BigDecimals
-						.divideOrZero(100L * getBallots(district).size(), numberOfAllBallots, scale));
+		return OptionalInts
+				.mapToObj(getNumberOfAllBallots(district),
+						numberOfAllBallots -> BigDecimals
+								.divideOrZero(100L * getBallots(district).size(), numberOfAllBallots, scale))
+				.map(BigDecimal.valueOf(100).setScale(scale)::min);
 	}
 
 	/**
@@ -405,8 +407,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
 	public OptionalInt getNumberOfAllBallots(final District<?> district) {
-		final OptionalInt value = numberOfAllBallots.get(district);
-		return value.isPresent() ? OptionalInt.of(Math.max(value.getAsInt(), getBallots(district).size())) : value;
+		return numberOfAllBallots.get(district);
 	}
 
 	/**

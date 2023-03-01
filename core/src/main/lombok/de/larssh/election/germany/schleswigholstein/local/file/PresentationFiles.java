@@ -202,7 +202,7 @@ public class PresentationFiles {
 		}
 
 		/**
-		 * Returns the exact number of all ballots if available. ELse the number of all
+		 * Returns the exact number of all ballots if available. Else the number of all
 		 * ballots is estimated.
 		 *
 		 * @param pollingStations the polling stations

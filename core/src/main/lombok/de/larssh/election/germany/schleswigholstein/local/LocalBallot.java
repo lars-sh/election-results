@@ -33,8 +33,8 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuppressWarnings("PMD.DataClass")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class LocalBallot implements Ballot<LocalNomination>, Comparable<LocalBallot> {
 	/**
 	 * Comparator by election, polling station, postal vote, validity, block voting

@@ -55,7 +55,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
 @SuppressWarnings({ "PMD.ExcessiveImports", "PMD.GodClass" })
 public class LocalElection implements Election<LocalDistrictRoot, LocalNomination> {
 	/**

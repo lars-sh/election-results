@@ -23,6 +23,7 @@ public class DistrictValueMap extends ProxiedMap<District<?>, OptionalInt> {
 	/**
 	 * The election to provide available {@link District}s
 	 */
+	@EqualsAndHashCode.Include
 	Election<?, ?> election;
 
 	/**
