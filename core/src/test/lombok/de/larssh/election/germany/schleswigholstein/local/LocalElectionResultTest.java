@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.OptionalInt;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFilesTest;
@@ -33,23 +34,27 @@ class LocalElectionResultTest {
 		final LocalElectionResult result
 				= new LocalElectionResult(election, 2, emptyMap(), emptySet(), emptySet(), emptyList());
 
-		assertThat(result.getBallots()).isEmpty();
-		assertThat(result.getEvaluationProgress(1)).isEmpty();
-		assertThat(result.getNominationResults()).hasSameSizeAs(election.getNominations());
+		final SoftAssertions softAssertions = new SoftAssertions();
+
+		softAssertions.assertThat(result.getBallots()).isEmpty();
+		softAssertions.assertThat(result.getEvaluationProgress(1)).isEmpty();
+		softAssertions.assertThat(result.getNominationResults()).hasSameSizeAs(election.getNominations());
 		result.getNominationResults().values().forEach(nominationResult -> {
-			assertThat(nominationResult.getBallots()).isEmpty();
-			assertThat(nominationResult.getNumberOfVotes()).isZero();
-			assertThat(nominationResult.getSainteLagueValue()).isEmpty();
-			assertThat(nominationResult.getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
+			softAssertions.assertThat(nominationResult.getBallots()).isEmpty();
+			softAssertions.assertThat(nominationResult.getNumberOfVotes()).isZero();
+			softAssertions.assertThat(nominationResult.getSainteLagueValue()).isEmpty();
+			softAssertions.assertThat(nominationResult.getType()).isEqualTo(LocalNominationResultType.NOT_ELECTED);
 		});
-		assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.empty());
-		assertThat(result.getNumberOfInvalidBallots()).isZero();
-		assertThat(result.getPartyResults()).hasSameSizeAs(election.getParties());
+		softAssertions.assertThat(result.getNumberOfAllBallots()).isEqualTo(OptionalInt.empty());
+		softAssertions.assertThat(result.getNumberOfInvalidBallots()).isZero();
+		softAssertions.assertThat(result.getPartyResults()).hasSameSizeAs(election.getParties());
 		result.getPartyResults().values().forEach(partyResult -> {
-			assertThat(partyResult.getBallots()).isEmpty();
-			assertThat(partyResult.getNumberOfBlockVotings()).isZero();
-			assertThat(partyResult.getNumberOfVotes()).isZero();
+			softAssertions.assertThat(partyResult.getBallots()).isEmpty();
+			softAssertions.assertThat(partyResult.getNumberOfBlockVotings()).isZero();
+			softAssertions.assertThat(partyResult.getNumberOfVotes()).isZero();
 		});
+
+		softAssertions.assertAll();
 	}
 
 	/**

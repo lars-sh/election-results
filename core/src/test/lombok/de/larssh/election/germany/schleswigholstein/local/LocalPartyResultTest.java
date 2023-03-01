@@ -1,10 +1,9 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import de.larssh.election.germany.schleswigholstein.Party;
@@ -36,23 +35,27 @@ class LocalPartyResultTest {
 		final Party awg = LocalElectionTest.findParty(election, "AWG");
 		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+
 		// Votes
-		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(6);
-		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(6);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(6);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(6);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(6);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(6);
 
 		// Block Votings
-		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -72,23 +75,27 @@ class LocalPartyResultTest {
 		final Party awg = LocalElectionTest.findParty(election, "AWG");
 		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+
 		// Votes
-		assertThat(partyResults.get(cdu).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfVotes()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfVotes()).isZero();
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfVotes()).isZero();
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfVotes()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfVotes()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfVotes()).isZero();
 
 		// Block Votings
-		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isZero();
+
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -109,23 +116,27 @@ class LocalPartyResultTest {
 		final Party awg = LocalElectionTest.findParty(election, "AWG");
 		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+
 		// Votes
-		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(417);
-		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(110);
-		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(108);
-		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(249);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(417);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(110);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(108);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(249);
 
 		// Block Votings
-		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(41);
-		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(6);
-		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(4);
-		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(20);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(41);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(6);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(4);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(20);
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(1);
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(1);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isZero();
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
+
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -144,23 +155,27 @@ class LocalPartyResultTest {
 		final Party awg = LocalElectionTest.findParty(election, "AWG");
 		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+
 		// Votes
-		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(1322);
-		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(400);
-		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(787);
-		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(717);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(1322);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(400);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(787);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(717);
 
 		// Block Votings
-		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(106);
-		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(19);
-		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(45);
-		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(51);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(106);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(19);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(45);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(51);
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(5);
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(3);
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(2);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(5);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(3);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(2);
+
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -181,22 +196,26 @@ class LocalPartyResultTest {
 		final Party awg = LocalElectionTest.findParty(election, "AWG");
 		final Party fwr = LocalElectionTest.findParty(election, "FWR");
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+
 		// Votes
-		assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(905);
-		assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(290);
-		assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(679);
-		assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(468);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfVotes()).isEqualTo(905);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfVotes()).isEqualTo(290);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfVotes()).isEqualTo(679);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfVotes()).isEqualTo(468);
 
 		// Block Votings
-		assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(65);
-		assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(13);
-		assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(41);
-		assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(31);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfBlockVotings()).isEqualTo(65);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfBlockVotings()).isEqualTo(13);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfBlockVotings()).isEqualTo(41);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isEqualTo(31);
 
 		// Certain Seats
-		assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(3);
-		assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
-		assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(2);
-		assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(3);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(1);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(2);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(1);
+
+		softAssertions.assertAll();
 	}
 }
