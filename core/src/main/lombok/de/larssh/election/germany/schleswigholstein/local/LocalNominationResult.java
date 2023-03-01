@@ -122,7 +122,7 @@ public class LocalNominationResult
 				.filter(ballot -> ballot.getPollingStation().getDistrict().equals(district))
 				.count();
 		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
-				+ numberOfAllBallotsOfDistrict.getAsInt()
+				+ Math.max(numberOfAllBallotsOfDistrict.getAsInt(), numberOfEvaluatedBallotsOfDistrict)
 				- numberOfEvaluatedBallotsOfDistrict;
 	});
 
