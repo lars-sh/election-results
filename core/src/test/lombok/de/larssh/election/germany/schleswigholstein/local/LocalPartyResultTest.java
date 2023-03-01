@@ -26,7 +26,7 @@ class LocalPartyResultTest {
 	void testAllOne() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = LocalNominationResultTest.readResultKleinBoden(election,
-				Paths.get("../LocalNominationResult-all-one.txt"));
+				Paths.get("../LocalNominationResult-all-one-finished.txt"));
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties
@@ -66,7 +66,7 @@ class LocalPartyResultTest {
 	void testAllZero() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult result = LocalNominationResultTest.readResultKleinBoden(election,
-				Paths.get("../LocalNominationResult-all-zero.txt"));
+				Paths.get("../LocalNominationResult-all-zero-finished.txt"));
 		final Map<Party, LocalPartyResult> partyResults = result.getPartyResults();
 
 		// Parties

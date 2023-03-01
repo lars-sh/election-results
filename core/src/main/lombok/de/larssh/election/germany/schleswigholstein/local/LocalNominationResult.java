@@ -117,10 +117,7 @@ public class LocalNominationResult
 
 		// The number of already evaluated ballots of the nomination's district is
 		// required to calculate the number of remaining ballots in that district.
-		final long numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots()
-				.stream()
-				.filter(ballot -> ballot.getPollingStation().getDistrict().equals(district))
-				.count();
+		final int numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots(district).size();
 		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
 				+ Math.max(numberOfAllBallotsOfDistrict.getAsInt(), numberOfEvaluatedBallotsOfDistrict)
 				- numberOfEvaluatedBallotsOfDistrict;
@@ -133,12 +130,6 @@ public class LocalNominationResult
 	 */
 	@ToString.Exclude
 	Supplier<Optional<LocalNominationResultType>> certainResultType = lazy(() -> {
-		// The number of all ballots is required to calculate certainty
-		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
-		if (!numberOfAllBallots.isPresent()) {
-			return Optional.empty();
-		}
-
 		if (isCertainDirectResult()) {
 			return Optional.of(LocalNominationResultType.DIRECT);
 		}
@@ -292,6 +283,17 @@ public class LocalNominationResult
 	 *         else {@code false}
 	 */
 	private boolean isCertainNotElectedResult() {
+		// The number of all ballots of the nomination's district is required to
+		// decide if all ballots were evaluated already.
+		final LocalDistrict district = getNomination().getDistrict();
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots(district);
+		if (!numberOfAllBallots.isPresent()) {
+			return false;
+		}
+		if (getElectionResult().getBallots(district).size() >= numberOfAllBallots.getAsInt()) {
+			return getNumberOfVotes() == 0 || getType() == LocalNominationResultType.NOT_ELECTED;
+		}
+
 		return !isDirectResultCandidate() && !isListResultCandidate();
 	}
 

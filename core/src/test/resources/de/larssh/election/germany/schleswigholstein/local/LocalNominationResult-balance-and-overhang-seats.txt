@@ -1,3 +1,5 @@
+* Anzahl Stimmzettel: 0
+
 100 Poppinga,Jens 
 0 Eggers,Dirk
 0 Beck,Karsten

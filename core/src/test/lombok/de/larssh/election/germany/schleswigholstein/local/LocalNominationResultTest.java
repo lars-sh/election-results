@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -91,10 +93,46 @@ class LocalNominationResultTest {
 	public static LocalElectionResult readResultKleinBoden(final LocalElection election, final Path classRelativePath) {
 		final LocalElectionResult resultRethwischdorf = PollingStationResultFilesTest.readResult(election,
 				LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF,
-				Paths.get("../LocalNominationResult-all-zero.txt"));
+				Paths.get("../LocalNominationResult-all-zero-finished.txt"));
 		return PollingStationResultFilesTest
 				.readResult(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN, classRelativePath)
 				.add(resultRethwischdorf);
+	}
+
+	/**
+	 * Tests the result types in the case specified by the input data read using
+	 * {@code testKind} evaluated against the supplied expected values.
+	 *
+	 * @param testKind                     the test kind, used for the file name
+	 * @param expectedNominationResultType a function taking the currently tested
+	 *                                     nomination result and returning the
+	 *                                     expected nomination result type
+	 * @param expectedCertainResultType    a function taking the currently tested
+	 *                                     nomination result and returning the
+	 *                                     expected certain result type
+	 */
+	private static void testResultTypesForAllNominations(final String testKind,
+			final Function<LocalNominationResult, LocalNominationResultType> expectedNominationResultType,
+			final Function<LocalNominationResult, Optional<LocalNominationResultType>> expectedCertainResultType) {
+		final SoftAssertions softAssertions = new SoftAssertions();
+		final LocalElectionResult result = readResultKleinBoden(LocalElectionTest.createElection(),
+				Paths.get("../LocalNominationResult-" + testKind + ".txt"));
+
+		for (final LocalNominationResult nominationResult : getAndAssertNominationResults(softAssertions, result)
+				.values()) {
+			softAssertions.assertThat(nominationResult.getType())
+					.describedAs("Nomination Result Type of \"%s\" when \"%s\"",
+							nominationResult.getNomination().getKey(),
+							testKind)
+					.isEqualTo(expectedNominationResultType.apply(nominationResult));
+
+			softAssertions.assertThat(nominationResult.getCertainResultType())
+					.describedAs("Certain Result Type of \"%s\" when \"%s\"",
+							nominationResult.getNomination().getKey(),
+							testKind)
+					.isEqualTo(expectedCertainResultType.apply(nominationResult));
+		}
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -153,48 +191,83 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * Test types in case no ballot was evaluated
+	 * Tests the result types in case no ballot was evaluated and the election
+	 * evaluation finished.
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeAllZero() {
-		final LocalElection election = LocalElectionTest.createElection();
-
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final LocalElectionResult result
-				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-all-zero.txt"));
-
-		for (final LocalNominationResult nominationResult : getAndAssertNominationResults(softAssertions, result)
-				.values()) {
-			softAssertions.assertThat(nominationResult.getType())
-					.describedAs("Nomination Result Type of \"%s\"", nominationResult.getNomination().getKey())
-					.isEqualTo(NOT_ELECTED);
-		}
-		softAssertions.assertAll();
+	void testResultTypesForAllNominationsZeroFinished() {
+		testResultTypesForAllNominations("all-zero-finished",
+				nominationResult -> LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> Optional.of(LocalNominationResultType.NOT_ELECTED));
 	}
 
 	/**
-	 * Test types in case exactly the same number of votes were given to all
-	 * nominations.
+	 * Tests the result types in case no ballot was evaluated and the election
+	 * evaluation is partially done.
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeAllOne() {
-		final LocalElection election = LocalElectionTest.createElection();
+	void testResultTypesForAllNominationsZeroPartiallyDone() {
+		testResultTypesForAllNominations("all-zero-partially-done",
+				nominationResult -> LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> Optional.empty());
+	}
 
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final LocalElectionResult result
-				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-all-one.txt"));
+	/**
+	 * Tests the result types in case no ballot was evaluated and the election
+	 * evaluation is not started.
+	 */
+	@Test
+	@PackagePrivate
+	void testResultTypesForAllNominationsZeroNotStarted() {
+		testResultTypesForAllNominations("all-zero-not-started",
+				nominationResult -> LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> Optional.empty());
+	}
 
-		for (final LocalNominationResult nominationResult : getAndAssertNominationResults(softAssertions, result)
-				.values()) {
-			softAssertions.assertThat(nominationResult.getType())
-					.describedAs("Nomination Result Type of \"%s\"", nominationResult.getNomination().getKey())
-					.isEqualTo(nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-							? DIRECT_DRAW
-							: NOT_ELECTED);
-		}
-		softAssertions.assertAll();
+	/**
+	 * Tests the result types in case exactly the same number of votes were given to
+	 * all nominations and the election evaluation is finished.
+	 */
+	@Test
+	@PackagePrivate
+	void testResultTypesForAllNominationsOneFinished() {
+		testResultTypesForAllNominations("all-one-finished",
+				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+						? LocalNominationResultType.DIRECT_DRAW
+						: LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> nominationResult.getType() == DIRECT_DRAW || nominationResult.getType() == LIST_DRAW
+						? Optional.empty()
+						: Optional.of(nominationResult.getType()));
+	}
+
+	/**
+	 * Tests the result types in case exactly the same number of votes were given to
+	 * all nominations and the election evaluation is partially done.
+	 */
+	@Test
+	@PackagePrivate
+	void testResultTypesForAllNominationsOnePartiallyDone() {
+		testResultTypesForAllNominations("all-one-partially-done",
+				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+						? LocalNominationResultType.DIRECT_DRAW
+						: LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> Optional.empty());
+	}
+
+	/**
+	 * Tests the result types in case exactly the same number of votes were given to
+	 * all nominations and the election evaluation is not started.
+	 */
+	@Test
+	@PackagePrivate
+	void testResultTypesForAllNominationsOneNotStarted() {
+		testResultTypesForAllNominations("all-one-not-started",
+				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+						? LocalNominationResultType.DIRECT_DRAW
+						: LocalNominationResultType.NOT_ELECTED,
+				nominationResult -> Optional.empty());
 	}
 
 	/**

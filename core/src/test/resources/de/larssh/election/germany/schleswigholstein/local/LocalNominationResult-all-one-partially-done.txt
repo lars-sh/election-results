@@ -1,0 +1,29 @@
+* Anzahl Stimmzettel: 25
+
+1 Poppinga,Jens
+1 Eggers,Dirk
+1 Beck,Karsten
+1 Motzkus,Dietrich
+1 Behnk,Sönke
+1 Weger,Marcel
+
+1 Kröger,Dirk
+1 Eick,Ernst
+1 Jögimar,Helga
+1 Ehlert,Armin
+1 Ziebarth,Angelika
+1 Sauer,Joachim
+
+1 Gäde,Jan-Hendrik
+1 Böttger,Johannes
+1 Böttger,Volker
+1 Winter,Martin
+1 Gäde,Henning
+1 Stapelfeldt,Albert
+
+1 Kühn,Steffen
+1 Wahl,Joachim
+1 Kraus,Michael
+1 Breede,Rolf
+1 Schöning,Mathias
+1 König,Eva-Maria
