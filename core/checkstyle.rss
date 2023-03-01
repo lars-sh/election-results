@@ -28,7 +28,7 @@ under the License.
       <title>File: 49,
              Errors: 0,
              Warnings: 0,
-             Infos: 1
+             Infos: 0
       </title>
             <link>https://lars-sh.github.io/election-results/election-results-core//checkstyle.html</link>
       <description>
@@ -133,7 +133,7 @@ under the License.
                   <a href="https://lars-sh.github.io/election-results/election-results-core//checkstyle.html#de.larssh.election.germany.schleswigholstein.local.LocalPartyResultTest.java">de/larssh/election/germany/schleswigholstein/local/LocalPartyResultTest.java</a>
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
                   0
