@@ -9,7 +9,6 @@ import static de.larssh.election.germany.schleswigholstein.local.LocalNomination
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.LIST_OVERHANG_SEAT;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.NOT_ELECTED;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 
 import java.math.BigDecimal;
@@ -34,52 +33,88 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 class LocalNominationResultTest {
 	/**
-	 * Executes {@link LocalElectionResult#getNominationResults()} and asserts the
-	 * result for the expected number of results.
+	 * Looks up a nomination result and asserts its number of votes, nomination
+	 * result type and certain result type.
 	 *
-	 * @param softAssertions the {@link SoftAssertions} object to add assertions to
-	 * @param result         the {@link LocalElectionResult}
-	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 * @param softAssertions               the {@link SoftAssertions} instance to
+	 *                                     use for asserting
+	 * @param result                       the election result to lookup the
+	 *                                     nomination in
+	 * @param familyName                   the nomination's family name
+	 * @param givenName                    the nomination's given name
+	 * @param expectedNumberOfVotes        the expected number of votes
+	 * @param expectedNominationResultType the expected nomination result type
+	 * @param expectedCertainResultType    the expected certain result type
 	 */
-	private static Map<LocalNomination, LocalNominationResult> getAndAssertNominationResults(
-			final SoftAssertions softAssertions,
-			final LocalElectionResult result) {
-		final Map<LocalNomination, LocalNominationResult> nominationResults = result.getNominationResults();
-		softAssertions.assertThat(nominationResults).hasSameSizeAs(result.getElection().getNominations());
-		return nominationResults;
+	private static void assertNomination(final SoftAssertions softAssertions,
+			final LocalElectionResult result,
+			final String familyName,
+			final String givenName,
+			final int expectedNumberOfVotes,
+			final LocalNominationResultType expectedNominationResultType,
+			final Optional<LocalNominationResultType> expectedCertainResultType) {
+		assertNomination(softAssertions,
+				result.getNominationResults().get(findNomination(result.getElection(), familyName, givenName)),
+				expectedNumberOfVotes,
+				expectedNominationResultType,
+				expectedCertainResultType);
 	}
 
 	/**
-	 * Executes {@link LocalElectionResult#getNominationResults()} and asserts the
-	 * result for the expected number of results.
+	 * Asserts the nomination result's number of votes, nomination result type and
+	 * certain result type.
 	 *
-	 * <p>
-	 * {@code assertListNominationsAsNotElected} can be specified to test if list
-	 * nominations are not elected, which is the case as long as no balance seat is
-	 * involved.
-	 *
-	 * @param softAssertions                    the {@link SoftAssertions} object to
-	 *                                          add assertions to
-	 * @param result                            the {@link LocalElectionResult}
-	 * @param assertListNominationsAsNotElected {@code true} if list nominations
-	 *                                          shall be asserted as not elected,
-	 *                                          else {@code false}
-	 * @return Wahlergebnis einzelner Bewerberinnen und Bewerber
+	 * @param softAssertions               the {@link SoftAssertions} instance to
+	 *                                     use for asserting
+	 * @param nominationResult             the nomination result to assert
+	 * @param expectedNumberOfVotes        the expected number of votes
+	 * @param expectedNominationResultType the expected nomination result type
+	 * @param expectedCertainResultType    the expected certain result type
 	 */
-	private static Map<LocalNomination, LocalNominationResult> getAndAssertNominationResults(
-			final SoftAssertions softAssertions,
-			final LocalElectionResult result,
-			final boolean assertListNominationsAsNotElected) {
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result);
-		if (assertListNominationsAsNotElected) {
-			for (final LocalNominationResult nominationResult : result.getNominationResults().values()) {
-				if (nominationResult.getNomination().getType() == LocalNominationType.LIST) {
-					softAssertions.assertThat(nominationResult.getType()).isEqualTo(NOT_ELECTED);
-				}
-			}
+	private static void assertNomination(final SoftAssertions softAssertions,
+			final LocalNominationResult nominationResult,
+			final int expectedNumberOfVotes,
+			final LocalNominationResultType expectedNominationResultType,
+			final Optional<LocalNominationResultType> expectedCertainResultType) {
+		softAssertions.assertThat(nominationResult.getNumberOfVotes())
+				.describedAs("Number of Votes of \"%s\"", nominationResult.getNomination().getKey())
+				.isEqualTo(expectedNumberOfVotes);
+		softAssertions.assertThat(nominationResult.getType())
+				.describedAs("Nomination Result Type \"%s\"", nominationResult.getNomination().getKey())
+				.isEqualTo(expectedNominationResultType);
+		softAssertions.assertThat(nominationResult.getCertainResultType())
+				.describedAs("Certain Result Type of \"%s\"", nominationResult.getNomination().getKey())
+				.isEqualTo(expectedCertainResultType);
+	}
+
+	/**
+	 * Asserts the nomination results in the case specified by the input data read
+	 * using {@code testKind} evaluated against the supplied expected values.
+	 *
+	 * @param testKind                     the test kind, used for the file name
+	 * @param expectedNominationResultType a function taking the currently tested
+	 *                                     nomination result and returning the
+	 *                                     expected nomination result type
+	 * @param expectedCertainResultType    a function taking the currently tested
+	 *                                     nomination result and returning the
+	 *                                     expected certain result type
+	 */
+	private static void assertResultTypesForAllNominations(final String testKind,
+			final int expectedNumberOfVotes,
+			final Function<LocalNominationResult, LocalNominationResultType> expectedNominationResultType,
+			final Function<LocalNominationResult, Optional<LocalNominationResultType>> expectedCertainResultType) {
+		final LocalElectionResult result = readResultKleinBoden(LocalElectionTest.createElection(),
+				Paths.get("../LocalNominationResult-" + testKind + ".txt"));
+
+		final SoftAssertions softAssertions = new SoftAssertions();
+		for (final LocalNominationResult nominationResult : result.getNominationResults().values()) {
+			assertNomination(softAssertions,
+					nominationResult,
+					nominationResult.getNomination().getType() == LocalNominationType.LIST ? 0 : expectedNumberOfVotes,
+					expectedNominationResultType.apply(nominationResult),
+					expectedCertainResultType.apply(nominationResult));
 		}
-		return nominationResults;
+		softAssertions.assertAll();
 	}
 
 	/**
@@ -100,54 +135,17 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * Tests the result types in the case specified by the input data read using
-	 * {@code testKind} evaluated against the supplied expected values.
-	 *
-	 * @param testKind                     the test kind, used for the file name
-	 * @param expectedNominationResultType a function taking the currently tested
-	 *                                     nomination result and returning the
-	 *                                     expected nomination result type
-	 * @param expectedCertainResultType    a function taking the currently tested
-	 *                                     nomination result and returning the
-	 *                                     expected certain result type
-	 */
-	private static void testResultTypesForAllNominations(final String testKind,
-			final Function<LocalNominationResult, LocalNominationResultType> expectedNominationResultType,
-			final Function<LocalNominationResult, Optional<LocalNominationResultType>> expectedCertainResultType) {
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final LocalElectionResult result = readResultKleinBoden(LocalElectionTest.createElection(),
-				Paths.get("../LocalNominationResult-" + testKind + ".txt"));
-
-		for (final LocalNominationResult nominationResult : getAndAssertNominationResults(softAssertions, result)
-				.values()) {
-			softAssertions.assertThat(nominationResult.getType())
-					.describedAs("Nomination Result Type of \"%s\" when \"%s\"",
-							nominationResult.getNomination().getKey(),
-							testKind)
-					.isEqualTo(expectedNominationResultType.apply(nominationResult));
-
-			softAssertions.assertThat(nominationResult.getCertainResultType())
-					.describedAs("Certain Result Type of \"%s\" when \"%s\"",
-							nominationResult.getNomination().getKey(),
-							testKind)
-					.isEqualTo(expectedCertainResultType.apply(nominationResult));
-		}
-		softAssertions.assertAll();
-	}
-
-	/**
-	 * Test the Sainte Laguë value of the local district Rethwisch based on the
+	 * Tests the Sainte Laguë values of the local district Rethwisch based on the
 	 * official results from 2018
 	 */
 	@Test
 	@PackagePrivate
-	void testSainteLagueRethwisch() {
+	void testSainteLagueValuesRethwisch() {
 		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
 		final LocalElection election = result.getElection();
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
+		final Map<LocalNomination, LocalNominationResult> nominationResults = result.getNominationResults();
 
 		// @formatter:off
 		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getSainteLagueValue()).contains(BigDecimal.valueOf(24036, 2));
@@ -191,83 +189,87 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * Tests the result types in case no ballot was evaluated and the election
-	 * evaluation finished.
-	 */
-	@Test
-	@PackagePrivate
-	void testResultTypesForAllNominationsZeroFinished() {
-		testResultTypesForAllNominations("all-zero-finished",
-				nominationResult -> LocalNominationResultType.NOT_ELECTED,
-				nominationResult -> Optional.of(LocalNominationResultType.NOT_ELECTED));
-	}
-
-	/**
-	 * Tests the result types in case no ballot was evaluated and the election
-	 * evaluation is partially done.
-	 */
-	@Test
-	@PackagePrivate
-	void testResultTypesForAllNominationsZeroPartiallyDone() {
-		testResultTypesForAllNominations("all-zero-partially-done",
-				nominationResult -> LocalNominationResultType.NOT_ELECTED,
-				nominationResult -> Optional.empty());
-	}
-
-	/**
-	 * Tests the result types in case no ballot was evaluated and the election
+	 * Tests nomination results in case no ballot was evaluated and the election
 	 * evaluation is not started.
 	 */
 	@Test
 	@PackagePrivate
-	void testResultTypesForAllNominationsZeroNotStarted() {
-		testResultTypesForAllNominations("all-zero-not-started",
-				nominationResult -> LocalNominationResultType.NOT_ELECTED,
+	void testAllZeroNotStarted() {
+		assertResultTypesForAllNominations("all-zero-not-started",
+				0,
+				nominationResult -> NOT_ELECTED,
 				nominationResult -> Optional.empty());
 	}
 
 	/**
-	 * Tests the result types in case exactly the same number of votes were given to
-	 * all nominations and the election evaluation is finished.
+	 * Tests nomination results in case no ballot was evaluated and the election
+	 * evaluation is partially done.
 	 */
 	@Test
 	@PackagePrivate
-	void testResultTypesForAllNominationsOneFinished() {
-		testResultTypesForAllNominations("all-one-finished",
-				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? LocalNominationResultType.DIRECT_DRAW
-						: LocalNominationResultType.NOT_ELECTED,
-				nominationResult -> nominationResult.getType() == DIRECT_DRAW || nominationResult.getType() == LIST_DRAW
-						? Optional.empty()
-						: Optional.of(nominationResult.getType()));
-	}
-
-	/**
-	 * Tests the result types in case exactly the same number of votes were given to
-	 * all nominations and the election evaluation is partially done.
-	 */
-	@Test
-	@PackagePrivate
-	void testResultTypesForAllNominationsOnePartiallyDone() {
-		testResultTypesForAllNominations("all-one-partially-done",
-				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? LocalNominationResultType.DIRECT_DRAW
-						: LocalNominationResultType.NOT_ELECTED,
+	void testAllZeroPartiallyDone() {
+		assertResultTypesForAllNominations("all-zero-partially-done",
+				0,
+				nominationResult -> NOT_ELECTED,
 				nominationResult -> Optional.empty());
 	}
 
 	/**
-	 * Tests the result types in case exactly the same number of votes were given to
-	 * all nominations and the election evaluation is not started.
+	 * Tests nomination results in case no ballot was evaluated and the election
+	 * evaluation finished.
 	 */
 	@Test
 	@PackagePrivate
-	void testResultTypesForAllNominationsOneNotStarted() {
-		testResultTypesForAllNominations("all-one-not-started",
+	void testAllZeroFinished() {
+		assertResultTypesForAllNominations("all-zero-finished",
+				0,
+				nominationResult -> NOT_ELECTED,
+				nominationResult -> Optional.of(NOT_ELECTED));
+	}
+
+	/**
+	 * Tests nomination results in case exactly the same number of votes were given
+	 * to all nominations and the election evaluation is not started.
+	 */
+	@Test
+	@PackagePrivate
+	void testAllOneNotStarted() {
+		assertResultTypesForAllNominations("all-one-not-started",
+				1,
 				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? LocalNominationResultType.DIRECT_DRAW
-						: LocalNominationResultType.NOT_ELECTED,
+						? DIRECT_DRAW
+						: NOT_ELECTED,
 				nominationResult -> Optional.empty());
+	}
+
+	/**
+	 * Tests nomination results in case exactly the same number of votes were given
+	 * to all nominations and the election evaluation is partially done.
+	 */
+	@Test
+	@PackagePrivate
+	void testAllOnePartiallyDone() {
+		assertResultTypesForAllNominations("all-one-partially-done",
+				1,
+				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+						? DIRECT_DRAW
+						: NOT_ELECTED,
+				nominationResult -> Optional.empty());
+	}
+
+	/**
+	 * Tests nomination results in case exactly the same number of votes were given
+	 * to all nominations and the election evaluation is finished.
+	 */
+	@Test
+	@PackagePrivate
+	void testAllOneFinished() {
+		assertResultTypesForAllNominations("all-one-finished",
+				1,
+				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+						? DIRECT_DRAW
+						: NOT_ELECTED,
+				nominationResult -> Optional.of(nominationResult.getType()));
 	}
 
 	/**
@@ -275,53 +277,102 @@ class LocalNominationResultTest {
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeBalanceAndOverhangSeats() {
-		final LocalElection election = LocalElectionTest.createElection();
-		final LocalElectionResult result
-				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-balance-and-overhang-seats.txt"));
+	void testBalanceAndOverhangSeats() {
+		final LocalElectionResult result = readResultKleinBoden(LocalElectionTest.createElection(),
+				Paths.get("../LocalNominationResult-balance-and-overhang-seats.txt"));
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result);
+		assertNomination(softAssertions,
+				result,
+				"Beck",
+				"Karsten",
+				0,
+				LIST_OVERHANG_SEAT,
+				Optional.of(LIST_OVERHANG_SEAT));
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Bernhardt", "Christian", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Breede", "Rolf", 12, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 20, LIST, Optional.of(LIST));
+		assertNomination(softAssertions,
+				result,
+				"Böttger",
+				"Volker",
+				19,
+				LIST_OVERHANG_SEAT,
+				Optional.of(LIST_OVERHANG_SEAT));
+		assertNomination(softAssertions, result, "Dohrendorf", "Martina", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Dohrendorf", "Thomas", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Efrom", "Joachim", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 0, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 24, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Eick", "Ernst", 26, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Feddern", "Axel", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Feddern", "Hartmut", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gräpel", "Carola", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Henning", 17, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 21, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Hartz", "Catrin", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 25, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Klein", "Erik", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kraus", "Michael", 13, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 27, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 10, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 15, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 100, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 22, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schwarz", "Rupert", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 11, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 16, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Topel", "Andreas", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 14, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Weger", "Marcel", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Winter", "Martin", 18, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions,
+				result,
+				"Ziebarth",
+				"Angelika",
+				23,
+				DIRECT_BALANCE_SEAT,
+				Optional.of(DIRECT_BALANCE_SEAT));
+		softAssertions.assertAll();
+	}
 
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LIST_OVERHANG_SEAT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Bernhardt", "Christian")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(LIST_OVERHANG_SEAT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Dohrendorf", "Martina")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Dohrendorf", "Thomas")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Efrom", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Feddern", "Axel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Feddern", "Hartmut")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gräpel", "Carola")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Hartz", "Catrin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Klein", "Erik")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schwarz", "Rupert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Topel", "Andreas")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(DIRECT_BALANCE_SEAT);
-		// @formatter:on
+	/**
+	 * Test types in case of completely open draws
+	 */
+	@Test
+	@PackagePrivate
+	void testOpenDraws() {
+		final LocalElection election = LocalElectionTest.createElection();
+		final LocalElectionResult result
+				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
 
+		final SoftAssertions softAssertions = new SoftAssertions();
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
 		softAssertions.assertAll();
 	}
 
@@ -331,49 +382,43 @@ class LocalNominationResultTest {
 	 */
 	@Test
 	@PackagePrivate
-	void testTypePartiallyClosedDraws1() {
+	void testPartiallyClosedDraws1() { // TODO: Finish
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults
 				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				2,
-				emptyMap(),
+				resultWithoutDrawResults.getNumberOfAllBallotsMap(),
 				new HashSet<>(asList(findNomination(election, "Böttger", "Johannes"),
 						findNomination(election, "Eggers", "Dirk"))),
 				singleton(findNomination(election, "Beck", "Karsten")),
 				resultWithoutDrawResults.getBallots());
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(NOT_ELECTED);
-		// @formatter:on
-
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW, Optional.of(LIST_DRAW));
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
 		softAssertions.assertAll();
 	}
 
@@ -383,13 +428,13 @@ class LocalNominationResultTest {
 	 */
 	@Test
 	@PackagePrivate
-	void testTypePartiallyClosedDraws2() {
+	void testPartiallyClosedDraws2() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults
 				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
 		final LocalElectionResult result = new LocalElectionResult(election,
 				2,
-				emptyMap(),
+				resultWithoutDrawResults.getNumberOfAllBallotsMap(),
 				singleton(findNomination(election, "Böttger", "Johannes")),
 				new HashSet<>(asList(findNomination(election, "Beck", "Karsten"),
 						findNomination(election, "Böttger", "Volker"),
@@ -397,267 +442,143 @@ class LocalNominationResultTest {
 				resultWithoutDrawResults.getBallots());
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(NOT_ELECTED);
-		// @formatter:on
-
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
 		softAssertions.assertAll();
 	}
 
 	/**
-	 * Test types in case of completely open draws
+	 * Tests nomination results using results of Klein Boden
 	 */
 	@Test
 	@PackagePrivate
-	void testTypeOpenDraws() {
-		final LocalElection election = LocalElectionTest.createElection();
+	void testKleinBoden() {
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
+		final LocalElectionResult result = resultRethwisch.filterByDistrict(LocalElectionTest
+				.findPollingStation(resultRethwisch.getElection(), LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
+
+		final SoftAssertions softAssertions = new SoftAssertions();
+		assertNomination(softAssertions, result, "Beck", "Karsten", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 69, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Breede", "Rolf", 64, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 16, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Böttger", "Volker", 26, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 71, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 12, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Eick", "Ernst", 28, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Gäde", "Henning", 18, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 24, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 10, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kraus", "Michael", 34, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 29, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 46, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 41, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 106, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 11, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 27, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 10, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 37, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Weger", "Marcel", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Winter", "Martin", 14, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 20, NOT_ELECTED, Optional.empty());
+		softAssertions.assertAll();
+	}
+
+	/**
+	 * Tests nomination results using results of Rethwisch
+	 */
+	@Test
+	@PackagePrivate
+	void testRethwisch() {
+		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
+
+		final SoftAssertions softAssertions = new SoftAssertions();
+		assertNomination(softAssertions, result, "Beck", "Karsten", 181, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 220, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Breede", "Rolf", 146, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 121, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Böttger", "Volker", 195, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 219, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 64, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Eick", "Ernst", 112, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Henning", 151, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 160, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 37, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kraus", "Michael", 116, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 75, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 115, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 150, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 191, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 328, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 59, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 85, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 73, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 105, LIST, Optional.of(LIST));
+		assertNomination(softAssertions, result, "Weger", "Marcel", 183, DIRECT, Optional.of(DIRECT));
+		assertNomination(softAssertions, result, "Winter", "Martin", 87, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 53, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		softAssertions.assertAll();
+	}
+
+	/**
+	 * Tests nomination results using results of Rethwischdorf
+	 */
+	@Test
+	@PackagePrivate
+	void testRethwischdorf() {
+		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
 		final LocalElectionResult result
-				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
+				= resultRethwisch.filterByDistrict(LocalElectionTest.findPollingStation(resultRethwisch.getElection(),
+						LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(LIST_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(DIRECT_DRAW);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(NOT_ELECTED);
-		// @formatter:on
-
-		softAssertions.assertAll();
-	}
-
-	/**
-	 * Test types using results of Rethwisch
-	 */
-	@Test
-	@PackagePrivate
-	void testTypeRethwisch() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
-		final LocalElection election = result.getElection();
-
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Bernhardt", "Christian")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Dohrendorf", "Martina")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Dohrendorf", "Thomas")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Efrom", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Feddern", "Axel")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Feddern", "Hartmut")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gräpel", "Carola")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Hartz", "Catrin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Klein", "Erik")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schwarz", "Rupert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Topel", "Andreas")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getType()).isEqualTo(LIST);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getType()).isEqualTo(DIRECT);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getType()).isEqualTo(NOT_ELECTED);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getType()).isEqualTo(NOT_ELECTED);
-		// @formatter:on
-
-		softAssertions.assertAll();
-	}
-
-	/**
-	 * Test votes using results of Klein Boden
-	 */
-	@Test
-	@PackagePrivate
-	void testVotesKleinBoden() {
-		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
-		final LocalElection election = resultRethwisch.getElection();
-		final LocalElectionResult result = resultRethwisch.filterByDistrict(
-				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
-
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(57);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(69);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(64);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(16);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(26);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(71);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(12);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(28);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(18);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(24);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(10);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(34);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(29);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(46);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(41);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(57);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(106);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(11);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(27);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(10);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(37);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(57);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(14);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(20);
-		// @formatter:on
-
-		softAssertions.assertAll();
-	}
-
-	/**
-	 * Test votes using results of Rethwisch
-	 */
-	@Test
-	@PackagePrivate
-	void testVotesRethwisch() {
-		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
-		final LocalElection election = result.getElection();
-
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(181);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(220);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(146);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(121);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(195);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(219);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(64);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(112);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(151);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(160);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(37);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(116);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(75);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(115);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(150);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(191);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(328);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(59);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(85);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(73);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(105);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(183);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(87);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(53);
-		// @formatter:on
-
-		softAssertions.assertAll();
-	}
-
-	/**
-	 * Test votes using results of Rethwischdorf
-	 */
-	@Test
-	@PackagePrivate
-	void testVotesRethwischdorf() {
-		final LocalElectionResult resultRethwisch = PollingStationResultFilesTest.readResultsRethwisch();
-		final LocalElection election = resultRethwisch.getElection();
-		final LocalElectionResult result = resultRethwisch.filterByDistrict(
-				LocalElectionTest.findPollingStation(election, LocalElectionTest.POLLING_STATION_NAME_RETHWISCHDORF));
-
-		final SoftAssertions softAssertions = new SoftAssertions();
-		final Map<LocalNomination, LocalNominationResult> nominationResults
-				= getAndAssertNominationResults(softAssertions, result, true);
-
-		// @formatter:off
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Beck", "Karsten")).getNumberOfVotes()).isEqualTo(124);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Behnk", "Sönke")).getNumberOfVotes()).isEqualTo(151);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Breede", "Rolf")).getNumberOfVotes()).isEqualTo(82);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Johannes")).getNumberOfVotes()).isEqualTo(105);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Böttger", "Volker")).getNumberOfVotes()).isEqualTo(169);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eggers", "Dirk")).getNumberOfVotes()).isEqualTo(148);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ehlert", "Armin")).getNumberOfVotes()).isEqualTo(52);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Eick", "Ernst")).getNumberOfVotes()).isEqualTo(84);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Henning")).getNumberOfVotes()).isEqualTo(133);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Gäde", "Jan-Hendrik")).getNumberOfVotes()).isEqualTo(136);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Jögimar", "Helga")).getNumberOfVotes()).isEqualTo(27);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kraus", "Michael")).getNumberOfVotes()).isEqualTo(82);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kröger", "Dirk")).getNumberOfVotes()).isEqualTo(46);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "König", "Eva-Maria")).getNumberOfVotes()).isEqualTo(69);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Kühn", "Steffen")).getNumberOfVotes()).isEqualTo(109);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Motzkus", "Dietrich")).getNumberOfVotes()).isEqualTo(134);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Poppinga", "Jens")).getNumberOfVotes()).isEqualTo(222);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Sauer", "Joachim")).getNumberOfVotes()).isEqualTo(48);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Schöning", "Mathias")).getNumberOfVotes()).isEqualTo(58);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Stapelfeldt", "Albert")).getNumberOfVotes()).isEqualTo(63);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Wahl", "Joachim")).getNumberOfVotes()).isEqualTo(68);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Weger", "Marcel")).getNumberOfVotes()).isEqualTo(126);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Winter", "Martin")).getNumberOfVotes()).isEqualTo(73);
-		softAssertions.assertThat(nominationResults.get(findNomination(election, "Ziebarth", "Angelika")).getNumberOfVotes()).isEqualTo(33);
-		// @formatter:on
-
+		assertNomination(softAssertions, result, "Beck", "Karsten", 124, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 151, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Breede", "Rolf", 82, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 105, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Böttger", "Volker", 169, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 148, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 52, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Eick", "Ernst", 84, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Gäde", "Henning", 133, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 136, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 27, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kraus", "Michael", 82, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 46, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 69, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 109, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 134, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 222, DIRECT, Optional.empty());
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 48, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 58, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 63, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 68, LIST, Optional.empty());
+		assertNomination(softAssertions, result, "Weger", "Marcel", 126, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Winter", "Martin", 73, NOT_ELECTED, Optional.empty());
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 33, NOT_ELECTED, Optional.empty());
 		softAssertions.assertAll();
 	}
 }

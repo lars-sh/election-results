@@ -1,8 +1,6 @@
 package de.larssh.election.germany.schleswigholstein.local.cli;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,12 +12,9 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.jar.Attributes.Name;
 
-import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.file.AwgWebsiteFiles;
@@ -219,10 +214,6 @@ public class LocalElectionResultCli implements IVersionProvider {
 			throws InterruptedException, IOException {
 		// Read full result
 		final LocalElectionResult fullResult = result.read();
-		final Map<District<?>, OptionalInt> numberOfAllBallotsPerDistrict = fullResult.getElection()
-				.getAllDistricts()
-				.stream()
-				.collect(toMap(identity(), fullResult::getNumberOfAllBallots));
 
 		// Calculate the loop arguments
 		// Double values are used to be as close to the percentage values as possible
@@ -244,7 +235,7 @@ public class LocalElectionResultCli implements IVersionProvider {
 			// Create partial result and write the presentation file
 			final LocalElectionResult partialResult = new LocalElectionResult(fullResult.getElection(),
 					fullResult.getSainteLagueScale(),
-					numberOfAllBallotsPerDistrict,
+					fullResult.getNumberOfAllBallotsMap(),
 					fullResult.getDirectDrawResults(),
 					fullResult.getListDrawResults(),
 					fullResult.getBallots()

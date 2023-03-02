@@ -398,6 +398,20 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * In case this number is larger than the size of the list of ballots for the
 	 * district, not all ballots were evaluated, yet.
 	 *
+	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 */
+	@JsonIgnore
+	public Map<District<?>, OptionalInt> getNumberOfAllBallotsMap() {
+		return unmodifiableMap(numberOfAllBallots);
+	}
+
+	/**
+	 * Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
+	 *
+	 * <p>
+	 * In case this number is larger than the size of the list of ballots for the
+	 * district, not all ballots were evaluated, yet.
+	 *
 	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
