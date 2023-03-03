@@ -459,7 +459,7 @@ public class MetricsFiles {
 			appendFormula(row,
 					Optional.empty(),
 					DATA_FORMAT_PERCENTAGE,
-					"Übersicht[Stimmzettel] / Übersicht[Wahlberechtigte]");
+					"MIN(1, Übersicht[Stimmzettel] / Übersicht[Wahlberechtigte])");
 
 			// ausgezählt
 			appendNumber(row, Optional.empty(), Optional.of(result.getBallots(district).size()));
@@ -468,7 +468,7 @@ public class MetricsFiles {
 			appendFormula(row,
 					Optional.empty(),
 					DATA_FORMAT_PERCENTAGE,
-					"Übersicht[ausgezählt] / Übersicht[Stimmzettel]");
+					"MIN(1, Übersicht[ausgezählt] / Übersicht[Stimmzettel])");
 
 			// ungültig
 			appendNumber(row, Optional.empty(), Optional.of(result.getNumberOfInvalidBallots(district)));
@@ -501,7 +501,7 @@ public class MetricsFiles {
 			appendFormula(row,
 					Optional.empty(),
 					DATA_FORMAT_PERCENTAGE,
-					"Übersicht[[#Totals],[Stimmzettel]] / Übersicht[[#Totals],[Wahlberechtigte]]");
+					"MIN(1, Übersicht[[#Totals],[Stimmzettel]] / Übersicht[[#Totals],[Wahlberechtigte]])");
 
 			// ausgezählt
 			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
@@ -512,7 +512,7 @@ public class MetricsFiles {
 			appendFormula(row,
 					Optional.empty(),
 					DATA_FORMAT_PERCENTAGE,
-					"Übersicht[[#Totals],[ausgezählt]] / Übersicht[[#Totals],[Stimmzettel]]");
+					"MIN(1, Übersicht[[#Totals],[ausgezählt]] / Übersicht[[#Totals],[Stimmzettel]])");
 
 			// ungültig
 			columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
