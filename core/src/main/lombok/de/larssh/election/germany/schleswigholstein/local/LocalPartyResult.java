@@ -144,6 +144,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 */
 	public int getNumberOfCertainSeats() {
 		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()) {
+			// TODO: All nominations need at least one vote!
 			return getNumberOfSeats();
 		}
 		return Math.max(getCertainDirectNominationResults().size(), getNumberOfCertainListSeats());
@@ -185,7 +186,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		final long numberOfAllPossibleVotes = getElectionResult().getNumberOfVotes()
 				+ (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
 						* Math.min(getElection().getNumberOfVotesPerBallot(),
-								getElection().getNominations(getParty()).size());
+								getElection().getDirectNominations(getParty()).size());
 		if (numberOfAllPossibleVotes == 0) {
 			return 0;
 		}
@@ -228,7 +229,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 		final int numberOfPossiblyMissingVotes
 				= (numberOfAllBallots.getAsInt() - getElectionResult().getBallots().size())
 						* Math.min(getElection().getNumberOfVotesPerBallot(),
-								getElection().getNominations(getParty()).size());
+								getElection().getDirectNominations(getParty()).size());
 		if (numberOfPossiblyMissingVotes == 0) {
 			return 0;
 		}

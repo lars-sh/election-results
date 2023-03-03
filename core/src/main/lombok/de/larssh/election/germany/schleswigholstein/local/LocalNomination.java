@@ -38,6 +38,8 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
 			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
+	// TODO: find collections/treesets/treemaps, which are ordered by default
+	// LocalNomination order
 
 	/**
 	 * Creates a unique key for the given person and party keys.
@@ -89,9 +91,11 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
 	 */
 	@JsonIgnore
+	@Getter(AccessLevel.NONE)
 	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
-			|| getElection().getNominations(getParty().get())
+			|| getElection().getNominations()
 					.stream()
+					.filter(nomination -> nomination.getParty().equals(getParty()))
 					.limit(getElection().getNumberOfDirectSeats())
 					.anyMatch(this::equals) ? LocalNominationType.DIRECT : LocalNominationType.LIST);
 
@@ -131,7 +135,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	@JsonIgnore
 	public OptionalInt getListPosition() {
-		return Optionals.mapToInt(getParty(), party -> getElection().getNominations(party).indexOf(this) + 1);
+		return Optionals.mapToInt(getParty(), party -> getElection().getListNominations(party).indexOf(this) + 1);
 	}
 
 	/**
@@ -146,12 +150,28 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 		return getParty().map(Party::getKey);
 	}
 
+	@JsonIgnore
+	public boolean isDirectNomination() {
+		return type.get() == LocalNominationType.DIRECT;
+	}
+
+	@JsonIgnore
+	public boolean isListNomination() {
+		return type.get() == LocalNominationType.LIST;
+	}
+
 	/**
-	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
-	 *
-	 * @return Art des Wahlvorschlags
+	 * Arten der Wahlvorschläge (§ 18 GKWG)
 	 */
-	public LocalNominationType getType() {
-		return type.get();
+	private enum LocalNominationType {
+		/**
+		 * Unmittelbarer Wahlvorschlag (§ 18 Absatz 1 GKWG)
+		 */
+		DIRECT,
+
+		/**
+		 * Listenwahlvorschlag (§ 18 Absatz 2 GKWG)
+		 */
+		LIST;
 	}
 }

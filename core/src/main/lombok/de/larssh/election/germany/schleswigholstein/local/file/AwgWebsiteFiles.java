@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
-import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.Finals;
 import de.larssh.utils.OptionalInts;
@@ -221,8 +220,7 @@ public class AwgWebsiteFiles {
 					.getNominationResults()
 					.values()
 					.stream()
-					.filter(nominationResult -> nominationResult.getNomination()
-							.getType() == LocalNominationType.DIRECT)
+					.filter(nominationResult -> nominationResult.getNomination().isDirectNomination())
 					.map(nominationResult -> String.format("\t\t\t%s => %d",
 							createPhpIdentifier(nominationResult.getNomination().getPerson().getKey()),
 							nominationResult.getNumberOfVotes()))

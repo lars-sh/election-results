@@ -599,12 +599,12 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
-		final List<LocalNomination> nominations = getElection().getNominations();
+		final List<LocalNomination> listNominations = getElection().getListNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
 						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))
 						.reversed()
-						.thenComparing(entry -> nominations.indexOf(entry.getKey())));
+						.thenComparing(entry -> listNominations.indexOf(entry.getKey())));
 	}
 
 	/**
@@ -653,7 +653,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.forEach(nominations::add);
 
 		// others
-		nominations.addAll(getElection().getNominations(party));
+		nominations.addAll(getElection().getListNominations(party));
 
 		return nominations;
 	}

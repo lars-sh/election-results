@@ -33,7 +33,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalDistrict;
 import de.larssh.election.germany.schleswigholstein.local.LocalElection;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
-import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.utils.collection.Maps;
@@ -299,10 +298,9 @@ public class PollingStationResultFiles {
 			}
 
 			final char possiblePartyIndicator = Character.toLowerCase(person.charAt(0));
-			final Set<LocalNomination> nominationsWithPartyPrefix = election.getNominations()
+			final Set<LocalNomination> nominationsWithPartyPrefix = election.getDirectNominations()
 					.stream()
 					.filter(nomination -> nomination.getDistrict().equals(district)
-							&& nomination.getType() == LocalNominationType.DIRECT
 							&& nomination.getParty().isPresent()
 							&& !nomination.getParty().get().getShortName().isEmpty()
 							&& possiblePartyIndicator == Character
@@ -313,11 +311,9 @@ public class PollingStationResultFiles {
 				return nominationsWithPartyPrefix.iterator().next();
 			}
 
-			final Set<LocalNomination> nominations = election.getNominations()
+			final Set<LocalNomination> nominations = election.getDirectNominations()
 					.stream()
-					.filter(nomination -> nomination.getDistrict().equals(district)
-							&& nomination.getType() == LocalNominationType.DIRECT
-							&& matches(nomination, person))
+					.filter(nomination -> nomination.getDistrict().equals(district) && matches(nomination, person))
 					.collect(toSet());
 			if (nominations.isEmpty()) {
 				throw new ElectionException("Cannot find a nomination for \"%s\" in district \"%s\".",
@@ -391,10 +387,9 @@ public class PollingStationResultFiles {
 			final LocalDistrict district = pollingStation.getDistrict();
 
 			return formatNominations(result.getElection()
-					.getNominations(party)
+					.getDirectNominations(party)
 					.stream()
-					.filter(nomination -> nomination.getDistrict().equals(district)
-							&& nomination.getType() == LocalNominationType.DIRECT)
+					.filter(nomination -> nomination.getDistrict().equals(district))
 					.collect(toLinkedHashSet()));
 		}
 

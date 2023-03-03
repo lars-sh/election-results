@@ -147,15 +147,8 @@ public final class LocalBallot implements Ballot<LocalNomination>, Comparable<Lo
 				.distinct()
 				.limit(2)
 				.collect(toList());
-		if (parties.size() != 1) {
-			return Boolean.FALSE;
-		}
-
-		final long directNominationsOfThatParty = getElection().getNominations(parties.get(0))
-				.stream()
-				.filter(nomination -> nomination.getType() == LocalNominationType.DIRECT)
-				.count();
-		return getNominations().size() == directNominationsOfThatParty;
+		return parties.size() == 1
+				&& getNominations().size() == getElection().getDirectNominations(parties.get(0)).size();
 	});
 
 	/**
@@ -201,7 +194,7 @@ public final class LocalBallot implements Ballot<LocalNomination>, Comparable<Lo
 							nomination.getPerson().getGivenName(),
 							election.getName());
 				}
-				if (nomination.getType() != LocalNominationType.DIRECT) {
+				if (!nomination.isDirectNomination()) {
 					throw new ElectionException(
 							"Nomination \"%s, %s\" of election \"%s\" is not a direct nomination. Ballots can contain direct nominations only.",
 							nomination.getPerson().getFamilyName(),

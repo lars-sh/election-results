@@ -231,17 +231,30 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	/** {@inheritDoc} */
 	@Override
 	public List<LocalNomination> getNominations() {
+		// TODO: Merged list
+		// TODO: order by direct nominations first
+		// TODO: cache unless additional elements are added
 		return unmodifiableList(nominations);
 	}
 
-	/**
-	 * Bewerberinnen und Bewerber nach Gruppierung
-	 *
-	 * @param party Gruppierung
-	 * @return the nominations
-	 */
-	public List<LocalNomination> getNominations(final Party party) {
-		return getNominations().stream()
+	@JsonIgnore
+	public List<LocalNomination> getDirectNominations() {
+		return getNominations().stream().filter(LocalNomination::isDirectNomination).collect(toList());
+	}
+
+	public List<LocalNomination> getDirectNominations(final Party party) {
+		return getDirectNominations().stream()
+				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
+				.collect(toList());
+	}
+
+	@JsonIgnore
+	public List<LocalNomination> getListNominations() {
+		return getNominations();
+	}
+
+	public List<LocalNomination> getListNominations(final Party party) {
+		return getListNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
 				.collect(toList());
 	}
@@ -316,7 +329,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@JsonProperty(access = Access.READ_ONLY, index = 6)
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public Set<Party> getParties() {
-		return getNominations().stream()
+		return getDirectNominations().stream()
 				.map(LocalNomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)

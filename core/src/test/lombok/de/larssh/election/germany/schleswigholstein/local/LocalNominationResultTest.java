@@ -110,7 +110,7 @@ class LocalNominationResultTest {
 		for (final LocalNominationResult nominationResult : result.getNominationResults().values()) {
 			assertNomination(softAssertions,
 					nominationResult,
-					nominationResult.getNomination().getType() == LocalNominationType.LIST ? 0 : expectedNumberOfVotes,
+					nominationResult.getNomination().isDirectNomination() ? expectedNumberOfVotes : 0,
 					expectedNominationResultType.apply(nominationResult),
 					expectedCertainResultType.apply(nominationResult));
 		}
@@ -236,9 +236,7 @@ class LocalNominationResultTest {
 	void testAllOneNotStarted() {
 		assertResultTypesForAllNominations("all-one-not-started",
 				1,
-				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? DIRECT_DRAW
-						: NOT_ELECTED,
+				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
 				nominationResult -> Optional.empty());
 	}
 
@@ -251,9 +249,7 @@ class LocalNominationResultTest {
 	void testAllOnePartiallyDone() {
 		assertResultTypesForAllNominations("all-one-partially-done",
 				1,
-				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? DIRECT_DRAW
-						: NOT_ELECTED,
+				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
 				nominationResult -> Optional.empty());
 	}
 
@@ -266,9 +262,7 @@ class LocalNominationResultTest {
 	void testAllOneFinished() {
 		assertResultTypesForAllNominations("all-one-finished",
 				1,
-				nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
-						? DIRECT_DRAW
-						: NOT_ELECTED,
+				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
 				nominationResult -> Optional.of(nominationResult.getType()));
 	}
 

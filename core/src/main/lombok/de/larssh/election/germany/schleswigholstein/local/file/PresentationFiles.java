@@ -27,7 +27,6 @@ import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType;
-import de.larssh.election.germany.schleswigholstein.local.LocalNominationType;
 import de.larssh.election.germany.schleswigholstein.local.LocalPartyResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalPollingStation;
 import de.larssh.election.utils.BigDecimals;
@@ -342,7 +341,7 @@ public class PresentationFiles {
 			return result.getNominationResults()
 					.values()
 					.stream()
-					.filter(nominationResult -> nominationResult.getNomination().getType() == LocalNominationType.DIRECT
+					.filter(nominationResult -> nominationResult.getNomination().isDirectNomination()
 							|| nominationResult.getType() != LocalNominationResultType.NOT_ELECTED)
 					.map(nominationResult -> formatNominationResult(nominationResult, maxNumberOfVotes))
 					.collect(joining());
@@ -528,7 +527,7 @@ public class PresentationFiles {
 					result.getNumberOfVotes(),
 					result.getNumberOfBlockVotings()
 							* Math.min(this.result.getElection().getNumberOfDirectSeatsPerLocalDistrict(),
-									this.result.getElection().getNominations(result.getParty()).size())));
+									this.result.getElection().getDirectNominations(result.getParty()).size())));
 
 			for (final LocalPollingStation pollingStation : this.result.getElection().getPollingStations()) {
 				final long numberOfPartyVotesInPollingStation = result.getBallots()

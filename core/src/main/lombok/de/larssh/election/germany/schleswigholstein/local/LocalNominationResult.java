@@ -172,6 +172,8 @@ public class LocalNominationResult
 			return Boolean.FALSE;
 		}
 
+		// TODO: return false for non-direct nominations?!
+
 		// The number of votes plus possibly remaining ballots need to be at least as
 		// great as the number of votes of the last direct nomination.
 		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
@@ -269,7 +271,7 @@ public class LocalNominationResult
 
 		// The nomination must be part of the nominations of that party without a
 		// certain direct seat and in the position of a possibly certain list seat.
-		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getNominations(party.get())
+		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getListNominations(party.get())
 				.stream()
 				.filter(nomination -> !certainDirectNominationsOfParty.containsKey(nomination))
 				.collect(toList())
@@ -282,7 +284,7 @@ public class LocalNominationResult
 		// Because direct result candidates of that party could still take a seat, their
 		// number needs to be subtracted from the number of possible certain list seats.
 		// The index of the nomination needs to be less than that number.
-		final long numberOfDirectResultCandidatesOfParty = getElection().getNominations(party.get())
+		final long numberOfDirectResultCandidatesOfParty = getElection().getDirectNominations(party.get())
 				.stream()
 				.filter(nomination -> !getNomination().equals(nomination)
 						&& !certainDirectNominationsOfParty.containsKey(nomination)
@@ -342,7 +344,7 @@ public class LocalNominationResult
 
 		// The nomination must be part of the nominations of that party without a
 		// certain direct seat and part of the list result candidates.
-		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getNominations(party.get())
+		final int indexInNominationsOfPartyWithoutCertainDirectResults = getElection().getListNominations(party.get())
 				.stream()
 				.filter(nomination -> !certainDirectNominationResultsOfParty.containsKey(nomination))
 				.collect(toList())
