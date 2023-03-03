@@ -58,7 +58,7 @@ public class LocalNominationResult
 	/**
 	 * Art der Vertreterin oder des Vertreters gem. § 9+10 GKWG
 	 *
-	 * @return Art der Vertreterinn oder des Vertreters
+	 * @return Art der Vertreterin oder des Vertreters
 	 */
 	LocalNominationResultType type;
 
@@ -141,9 +141,6 @@ public class LocalNominationResult
 		// If all ballots were evaluated already, the final result can be returned,
 		// except for direct draws, which might be overwritten by a certain list result.
 		if (getElectionResult().getBallots(district).size() >= numberOfAllBallots.getAsInt()) {
-			if (getType() == LocalNominationResultType.DIRECT_DRAW && isCertainListResult()) {
-				return Optional.of(LocalNominationResultType.LIST);
-			}
 			return Optional.of(getType());
 		}
 

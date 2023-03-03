@@ -515,8 +515,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List
-		for (final LocalNomination nomination : getListResults(votes, sainteLague)) {
-			resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
+		final Set<LocalNomination> directDrawListCandidates = new LinkedHashSet<>();
+		for (final LocalNomination nomination : getListResults(resultTypes, votes, sainteLague)) {
+			if (resultTypes.get(nomination) == LocalNominationResultType.DIRECT_DRAW) {
+				directDrawListCandidates.add(nomination);
+				resultTypes.put(nomination, LocalNominationResultType.LIST);
+			} else {
+				resultTypes.putIfAbsent(nomination, LocalNominationResultType.LIST);
+			}
 		}
 
 		// Result Type: List Draw
@@ -525,6 +531,9 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				getListDrawResults(),
 				LocalNominationResultType.LIST,
 				LocalNominationResultType.LIST_DRAW);
+
+		// Result Type: Direct Draw List
+		putDirectDrawListNominations(resultTypes, directDrawListCandidates);
 
 		// Result Type: List Overhang Seat
 		for (final LocalNomination nomination : getOverhangSeats(resultTypes, votes, sainteLague)) {
@@ -540,6 +549,32 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 						Optional.ofNullable(sainteLague.get(nomination))))
 				.sorted()
 				.collect(toLinkedHashMap(LocalNominationResult::getNomination, identity()));
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @param resultTypes
+	 * @param directDrawListCandidates
+	 */
+	private void putDirectDrawListNominations(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Set<LocalNomination> directDrawListCandidates) {
+		boolean convertListDraw = false;
+		for (final Entry<LocalNomination, LocalNominationResultType> entry : resultTypes.entrySet()) {
+			final LocalNomination nomination = entry.getKey();
+			final LocalNominationResultType resultType = entry.getValue();
+
+			if (directDrawListCandidates.contains(nomination)) {
+				if (resultType == LocalNominationResultType.LIST) {
+					resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW_LIST);
+				} else if (resultType == LocalNominationResultType.LIST_DRAW) {
+					resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW);
+					convertListDraw = true;
+				}
+			} else if (convertListDraw && resultType == LocalNominationResultType.LIST_DRAW) {
+				resultTypes.put(nomination, LocalNominationResultType.DIRECT_DRAW);
+			}
+		}
 	}
 
 	/**
@@ -584,7 +619,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * <p>
 	 * The returned map is ordered by Sainte Laguë value (high to low), the number
-	 * of votes (high to lower) and the nomination key.
+	 * of votes (high to lower), TODO, TODO.
 	 *
 	 * @param votes the number of votes per nomination
 	 * @return the Sainte Laguë value for each nomination
@@ -605,6 +640,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))
 						.reversed()
 						.thenComparing(entry -> listNominations.indexOf(entry.getKey())));
+		// TODO: fall back to the nomination itself
 	}
 
 	/**
@@ -866,20 +902,39 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * <p>
 	 * The returned map is ordered the same as {@code sainteLague}.
 	 *
+	 * @param resultTypes result types per nomination
 	 * @param votes       the number of votes per nomination
 	 * @param sainteLague the Sainte Laguë value per nomination
 	 * @return the elected nominations by list
 	 */
-	private Set<LocalNomination> getListResults(final Map<LocalNomination, Integer> votes,
+	private Set<LocalNomination> getListResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+			final Map<LocalNomination, Integer> votes,
 			final Map<LocalNomination, BigDecimal> sainteLague) {
-		final Set<LocalNomination> directNominationsWithParty = getDirectResults(votes).stream()
-				.filter(nomination -> nomination.getParty().isPresent())
+		final Set<LocalNomination> directNominations = resultTypes.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue() == LocalNominationResultType.DIRECT
+						|| entry.getValue() == LocalNominationResultType.DIRECT_BALANCE_SEAT)
+				.map(Entry::getKey)
 				.collect(toSet());
+		final Set<LocalNomination> directNominationsWithParty
+				= directNominations.stream().filter(nomination -> nomination.getParty().isPresent()).collect(toSet());
+		final Set<LocalNomination> directDrawNominationsWithParty = resultTypes.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue() == LocalNominationResultType.DIRECT_DRAW
+						&& entry.getKey().getParty().isPresent())
+				.map(Entry::getKey)
+				.collect(toSet());
+
 		final int numberOfSeats = getElection().getNumberOfSeats();
+		final int numberOfDirectDrawSeats = getElection().getNumberOfDirectSeats() - directNominations.size();
 
 		final Set<LocalNomination> nominations = new LinkedHashSet<>(numberOfSeats);
 		for (final LocalNomination nomination : sainteLague.keySet()) {
-			if (nominations.size() >= numberOfSeats && nominations.containsAll(directNominationsWithParty)) {
+			if (nominations.size() >= numberOfSeats
+					&& nominations.containsAll(directNominationsWithParty)
+					&& directDrawNominationsWithParty.stream()
+							.filter(nominations::contains)
+							.count() >= numberOfDirectDrawSeats) {
 				return nominations;
 			}
 			nominations.add(nomination);

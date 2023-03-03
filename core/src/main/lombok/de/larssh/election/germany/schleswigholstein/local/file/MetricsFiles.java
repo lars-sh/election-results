@@ -151,7 +151,10 @@ public class MetricsFiles {
 				return "Direkt";
 			}
 			if (type == LocalNominationResultType.DIRECT_DRAW) {
-				return "Los";
+				return "Direktlos";
+			}
+			if (type == LocalNominationResultType.DIRECT_DRAW_LIST) {
+				return "Direktlos mit Liste";
 			}
 			if (type == LocalNominationResultType.DIRECT_BALANCE_SEAT) {
 				return "Mehrsitz";
@@ -160,7 +163,7 @@ public class MetricsFiles {
 				return "Liste";
 			}
 			if (type == LocalNominationResultType.LIST_DRAW) {
-				return "Los";
+				return "Listenlos";
 			}
 			if (type == LocalNominationResultType.LIST_OVERHANG_SEAT) {
 				return "Überhang";

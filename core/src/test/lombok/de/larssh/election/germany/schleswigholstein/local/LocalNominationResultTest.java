@@ -4,6 +4,7 @@ import static de.larssh.election.germany.schleswigholstein.local.LocalElectionTe
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.DIRECT;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.DIRECT_BALANCE_SEAT;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.DIRECT_DRAW;
+import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.DIRECT_DRAW_LIST;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.LIST;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.LIST_DRAW;
 import static de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType.LIST_OVERHANG_SEAT;
@@ -32,6 +33,37 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 @NoArgsConstructor
 class LocalNominationResultTest {
+	// TODO: Test with difference between result type and certain type
+	/**
+	 * Looks up a nomination result and asserts its number of votes, nomination
+	 * result type and certain result type. This method is meant to be used for
+	 * finished results. Therefore the expected certain result type is based on
+	 * {@code expectedNominationResultType}.
+	 *
+	 * @param softAssertions               the {@link SoftAssertions} instance to
+	 *                                     use for asserting
+	 * @param result                       the election result to lookup the
+	 *                                     nomination in
+	 * @param familyName                   the nomination's family name
+	 * @param givenName                    the nomination's given name
+	 * @param expectedNumberOfVotes        the expected number of votes
+	 * @param expectedNominationResultType the expected nomination result type
+	 */
+	private static void assertNomination(final SoftAssertions softAssertions,
+			final LocalElectionResult result,
+			final String familyName,
+			final String givenName,
+			final int expectedNumberOfVotes,
+			final LocalNominationResultType expectedNominationResultType) {
+		assertNomination(softAssertions,
+				result,
+				familyName,
+				givenName,
+				expectedNumberOfVotes,
+				expectedNominationResultType,
+				Optional.of(expectedNominationResultType));
+	}
+
 	/**
 	 * Looks up a nomination result and asserts its number of votes, nomination
 	 * result type and certain result type.
@@ -115,6 +147,24 @@ class LocalNominationResultTest {
 					expectedCertainResultType.apply(nominationResult));
 		}
 		softAssertions.assertAll();
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @param nominationResult
+	 * @return
+	 */
+	private static LocalNominationResultType getExpectedAllOneNominationResultType(
+			final LocalNominationResult nominationResult) {
+		if (!nominationResult.getNomination().isDirectNomination()) {
+			return NOT_ELECTED;
+		}
+		return nominationResult.getNomination().getListPosition().orElse(Integer.MAX_VALUE) < 4
+				// TODO: &&
+				// !nominationResult.getNomination().getPerson().getFamilyName().equals("Kraus")
+				? DIRECT_DRAW_LIST
+				: DIRECT_DRAW;
 	}
 
 	/**
@@ -236,7 +286,7 @@ class LocalNominationResultTest {
 	void testAllOneNotStarted() {
 		assertResultTypesForAllNominations("all-one-not-started",
 				1,
-				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
+				LocalNominationResultTest::getExpectedAllOneNominationResultType,
 				nominationResult -> Optional.empty());
 	}
 
@@ -249,7 +299,7 @@ class LocalNominationResultTest {
 	void testAllOnePartiallyDone() {
 		assertResultTypesForAllNominations("all-one-partially-done",
 				1,
-				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
+				LocalNominationResultTest::getExpectedAllOneNominationResultType,
 				nominationResult -> Optional.empty());
 	}
 
@@ -262,7 +312,7 @@ class LocalNominationResultTest {
 	void testAllOneFinished() {
 		assertResultTypesForAllNominations("all-one-finished",
 				1,
-				nominationResult -> nominationResult.getNomination().isDirectNomination() ? DIRECT_DRAW : NOT_ELECTED,
+				LocalNominationResultTest::getExpectedAllOneNominationResultType,
 				nominationResult -> Optional.of(nominationResult.getType()));
 	}
 
@@ -276,52 +326,40 @@ class LocalNominationResultTest {
 				Paths.get("../LocalNominationResult-balance-and-overhang-seats.txt"));
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions,
-				result,
-				"Beck",
-				"Karsten",
-				0,
-				LIST_OVERHANG_SEAT,
-				Optional.of(LIST_OVERHANG_SEAT));
-		assertNomination(softAssertions, result, "Behnk", "Sönke", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Bernhardt", "Christian", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Breede", "Rolf", 12, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 20, LIST, Optional.of(LIST));
-		assertNomination(softAssertions,
-				result,
-				"Böttger",
-				"Volker",
-				19,
-				LIST_OVERHANG_SEAT,
-				Optional.of(LIST_OVERHANG_SEAT));
-		assertNomination(softAssertions, result, "Dohrendorf", "Martina", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Dohrendorf", "Thomas", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Efrom", "Joachim", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 0, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Ehlert", "Armin", 24, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Eick", "Ernst", 26, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Feddern", "Axel", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Feddern", "Hartmut", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gräpel", "Carola", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Henning", 17, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 21, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Hartz", "Catrin", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Jögimar", "Helga", 25, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Klein", "Erik", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kraus", "Michael", 13, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kröger", "Dirk", 27, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "König", "Eva-Maria", 10, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kühn", "Steffen", 15, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Poppinga", "Jens", 100, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Sauer", "Joachim", 22, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schwarz", "Rupert", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schöning", "Mathias", 11, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 16, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Topel", "Andreas", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 14, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Weger", "Marcel", 0, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Winter", "Martin", 18, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Beck", "Karsten", 0, LIST_OVERHANG_SEAT);
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Bernhardt", "Christian", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Breede", "Rolf", 12, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 20, LIST);
+		assertNomination(softAssertions, result, "Böttger", "Volker", 19, LIST_OVERHANG_SEAT);
+		assertNomination(softAssertions, result, "Dohrendorf", "Martina", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Dohrendorf", "Thomas", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Efrom", "Joachim", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 0, LIST);
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 24, DIRECT);
+		assertNomination(softAssertions, result, "Eick", "Ernst", 26, DIRECT);
+		assertNomination(softAssertions, result, "Feddern", "Axel", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Feddern", "Hartmut", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gräpel", "Carola", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Henning", 17, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 21, LIST);
+		assertNomination(softAssertions, result, "Hartz", "Catrin", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 25, DIRECT);
+		assertNomination(softAssertions, result, "Klein", "Erik", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kraus", "Michael", 13, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 27, DIRECT);
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 10, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 15, LIST);
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 100, DIRECT);
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 22, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schwarz", "Rupert", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 11, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 16, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Topel", "Andreas", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 14, LIST);
+		assertNomination(softAssertions, result, "Weger", "Marcel", 0, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Winter", "Martin", 18, NOT_ELECTED);
 		assertNomination(softAssertions,
 				result,
 				"Ziebarth",
@@ -343,30 +381,30 @@ class LocalNominationResultTest {
 				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
-		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
-		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
-		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
-		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT);
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT);
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT);
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT);
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED);
 		softAssertions.assertAll();
 	}
 
@@ -389,30 +427,30 @@ class LocalNominationResultTest {
 				resultWithoutDrawResults.getBallots());
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Eick", "Ernst", 5, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW, Optional.of(LIST_DRAW));
-		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST);
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT);
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT);
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, LIST);
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT);
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, LIST_DRAW);
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT);
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT);
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT);
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, LIST);
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED);
 		softAssertions.assertAll();
 	}
 
@@ -436,30 +474,30 @@ class LocalNominationResultTest {
 				resultWithoutDrawResults.getBallots());
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Kraus", "Michael", 4, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW, Optional.of(DIRECT_DRAW));
-		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST);
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT);
+		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST);
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW_LIST);
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW_LIST);
+		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT);
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST);
+		assertNomination(softAssertions, result, "Kraus", "Michael", 4, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 6, DIRECT);
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 6, DIRECT);
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 6, DIRECT);
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED);
 		softAssertions.assertAll();
 	}
 
@@ -474,7 +512,7 @@ class LocalNominationResultTest {
 				.findPollingStation(resultRethwisch.getElection(), LocalElectionTest.POLLING_STATION_NAME_KLEIN_BODEN));
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions, result, "Beck", "Karsten", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Beck", "Karsten", 57, DIRECT_DRAW_LIST, Optional.empty());
 		assertNomination(softAssertions, result, "Behnk", "Sönke", 69, DIRECT, Optional.empty());
 		assertNomination(softAssertions, result, "Breede", "Rolf", 64, DIRECT, Optional.empty());
 		assertNomination(softAssertions, result, "Böttger", "Johannes", 16, NOT_ELECTED, Optional.empty());
@@ -489,13 +527,13 @@ class LocalNominationResultTest {
 		assertNomination(softAssertions, result, "Kröger", "Dirk", 29, LIST, Optional.empty());
 		assertNomination(softAssertions, result, "König", "Eva-Maria", 46, NOT_ELECTED, Optional.empty());
 		assertNomination(softAssertions, result, "Kühn", "Steffen", 41, LIST, Optional.empty());
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 57, DIRECT_DRAW_LIST, Optional.empty());
 		assertNomination(softAssertions, result, "Poppinga", "Jens", 106, DIRECT, Optional.empty());
 		assertNomination(softAssertions, result, "Sauer", "Joachim", 11, NOT_ELECTED, Optional.empty());
 		assertNomination(softAssertions, result, "Schöning", "Mathias", 27, NOT_ELECTED, Optional.empty());
 		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 10, NOT_ELECTED, Optional.empty());
 		assertNomination(softAssertions, result, "Wahl", "Joachim", 37, LIST, Optional.empty());
-		assertNomination(softAssertions, result, "Weger", "Marcel", 57, DIRECT_DRAW, Optional.empty());
+		assertNomination(softAssertions, result, "Weger", "Marcel", 57, DIRECT_DRAW_LIST, Optional.empty());
 		assertNomination(softAssertions, result, "Winter", "Martin", 14, NOT_ELECTED, Optional.empty());
 		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 20, NOT_ELECTED, Optional.empty());
 		softAssertions.assertAll();
@@ -510,30 +548,30 @@ class LocalNominationResultTest {
 		final LocalElectionResult result = PollingStationResultFilesTest.readResultsRethwisch();
 
 		final SoftAssertions softAssertions = new SoftAssertions();
-		assertNomination(softAssertions, result, "Beck", "Karsten", 181, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Behnk", "Sönke", 220, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Breede", "Rolf", 146, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 121, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Böttger", "Volker", 195, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 219, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Ehlert", "Armin", 64, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Eick", "Ernst", 112, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Henning", 151, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 160, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Jögimar", "Helga", 37, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kraus", "Michael", 116, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kröger", "Dirk", 75, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "König", "Eva-Maria", 115, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Kühn", "Steffen", 150, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 191, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Poppinga", "Jens", 328, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Sauer", "Joachim", 59, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Schöning", "Mathias", 85, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 73, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 105, LIST, Optional.of(LIST));
-		assertNomination(softAssertions, result, "Weger", "Marcel", 183, DIRECT, Optional.of(DIRECT));
-		assertNomination(softAssertions, result, "Winter", "Martin", 87, NOT_ELECTED, Optional.of(NOT_ELECTED));
-		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 53, NOT_ELECTED, Optional.of(NOT_ELECTED));
+		assertNomination(softAssertions, result, "Beck", "Karsten", 181, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Behnk", "Sönke", 220, DIRECT);
+		assertNomination(softAssertions, result, "Breede", "Rolf", 146, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 121, LIST);
+		assertNomination(softAssertions, result, "Böttger", "Volker", 195, DIRECT);
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 219, DIRECT);
+		assertNomination(softAssertions, result, "Ehlert", "Armin", 64, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Eick", "Ernst", 112, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Henning", 151, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 160, LIST);
+		assertNomination(softAssertions, result, "Jögimar", "Helga", 37, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kraus", "Michael", 116, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kröger", "Dirk", 75, LIST);
+		assertNomination(softAssertions, result, "König", "Eva-Maria", 115, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Kühn", "Steffen", 150, LIST);
+		assertNomination(softAssertions, result, "Motzkus", "Dietrich", 191, DIRECT);
+		assertNomination(softAssertions, result, "Poppinga", "Jens", 328, DIRECT);
+		assertNomination(softAssertions, result, "Sauer", "Joachim", 59, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Schöning", "Mathias", 85, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 73, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 105, LIST);
+		assertNomination(softAssertions, result, "Weger", "Marcel", 183, DIRECT);
+		assertNomination(softAssertions, result, "Winter", "Martin", 87, NOT_ELECTED);
+		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 53, NOT_ELECTED);
 		softAssertions.assertAll();
 	}
 
