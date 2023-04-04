@@ -162,14 +162,17 @@ public class LocalNominationResult
 	 */
 	@Getter(AccessLevel.NONE)
 	Supplier<Boolean> directResultCandidate = lazy(() -> {
+		// The only chance to be a direct candidate is to have a direct nomination.
+		if (!getNomination().isDirectNomination()) {
+			return Boolean.FALSE;
+		}
+
 		// The number of all ballots is required to calculate the number of direct
 		// result candidates.
 		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
 		if (!numberOfAllBallots.isPresent()) {
 			return Boolean.FALSE;
 		}
-
-		// TODO: return false for non-direct nominations?!
 
 		// The number of votes plus possibly remaining ballots need to be at least as
 		// great as the number of votes of the last direct nomination.

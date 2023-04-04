@@ -36,10 +36,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 * Comparator by election, party and nomination order
 	 */
 	private static final Comparator<LocalNomination> COMPARATOR = Comparator.comparing(LocalNomination::getElection)
-			.thenComparing(LocalNomination::getParty, Optionals.<Party>comparator())
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
-	// TODO: find collections/treesets/treemaps, which are ordered by default
-	// LocalNomination order
 
 	/**
 	 * Creates a unique key for the given person and party keys.

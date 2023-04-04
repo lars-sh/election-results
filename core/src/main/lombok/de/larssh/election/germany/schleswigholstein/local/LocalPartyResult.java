@@ -144,7 +144,6 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 */
 	public int getNumberOfCertainSeats() {
 		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()) {
-			// TODO: All nominations need at least one vote!
 			return getNumberOfSeats();
 		}
 		return Math.max(getCertainDirectNominationResults().size(), getNumberOfCertainListSeats());

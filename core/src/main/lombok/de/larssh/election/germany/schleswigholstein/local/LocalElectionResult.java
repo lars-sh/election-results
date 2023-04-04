@@ -516,7 +516,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 
 		// Result Type: List
 		final Set<LocalNomination> directDrawListCandidates = new LinkedHashSet<>();
-		for (final LocalNomination nomination : getListResults(resultTypes, votes, sainteLague)) {
+		for (final LocalNomination nomination : getListResults(resultTypes, sainteLague)) {
 			if (resultTypes.get(nomination) == LocalNominationResultType.DIRECT_DRAW) {
 				directDrawListCandidates.add(nomination);
 				resultTypes.put(nomination, LocalNominationResultType.LIST);
@@ -618,8 +618,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * Calculates the Sainte Laguë value for each nomination.
 	 *
 	 * <p>
-	 * The returned map is ordered by Sainte Laguë value (high to low), the number
-	 * of votes (high to lower), TODO, TODO.
+	 * The returned map is ordered by Sainte Laguë value (high to low) and the number
+	 * of votes (high to lower).
 	 *
 	 * @param votes the number of votes per nomination
 	 * @return the Sainte Laguë value for each nomination
@@ -634,13 +634,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toLinkedHashMap());
 
 		// Sort
-		final List<LocalNomination> listNominations = getElection().getListNominations();
 		return Maps.sort(sainteLague,
 				Comparator.<Entry<LocalNomination, BigDecimal>, BigDecimal>comparing(Entry::getValue)
 						.thenComparing(entry -> votes.getOrDefault(entry.getKey(), 0))
 						.reversed()
-						.thenComparing(entry -> listNominations.indexOf(entry.getKey())));
-		// TODO: fall back to the nomination itself
+						.thenComparing(Entry::getKey));
 	}
 
 	/**
@@ -903,12 +901,10 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * The returned map is ordered the same as {@code sainteLague}.
 	 *
 	 * @param resultTypes result types per nomination
-	 * @param votes       the number of votes per nomination
 	 * @param sainteLague the Sainte Laguë value per nomination
 	 * @return the elected nominations by list
 	 */
 	private Set<LocalNomination> getListResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
-			final Map<LocalNomination, Integer> votes,
 			final Map<LocalNomination, BigDecimal> sainteLague) {
 		final Set<LocalNomination> directNominations = resultTypes.entrySet()
 				.stream()

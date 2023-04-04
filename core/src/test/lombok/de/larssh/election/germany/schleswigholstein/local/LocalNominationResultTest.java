@@ -161,8 +161,6 @@ class LocalNominationResultTest {
 			return NOT_ELECTED;
 		}
 		return nominationResult.getNomination().getListPosition().orElse(Integer.MAX_VALUE) < 4
-				// TODO: &&
-				// !nominationResult.getNomination().getPerson().getFamilyName().equals("Kraus")
 				? DIRECT_DRAW_LIST
 				: DIRECT_DRAW;
 	}
@@ -254,6 +252,10 @@ class LocalNominationResultTest {
 	/**
 	 * Tests nomination results in case no ballot was evaluated and the election
 	 * evaluation is partially done.
+	 *
+	 * <p>
+	 * Remark: Andreas Topel is the twelves nomination of the CDU and therefore
+	 * certain not to be elected.
 	 */
 	@Test
 	@PackagePrivate
@@ -261,7 +263,9 @@ class LocalNominationResultTest {
 		assertResultTypesForAllNominations("all-zero-partially-done",
 				0,
 				nominationResult -> NOT_ELECTED,
-				nominationResult -> Optional.empty());
+				nominationResult -> nominationResult.getNomination().getPerson().getFamilyName().equals("Topel")
+						? Optional.of(NOT_ELECTED)
+						: Optional.empty());
 	}
 
 	/**
