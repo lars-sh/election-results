@@ -160,7 +160,7 @@ class LocalNominationResultTest {
 		if (!nominationResult.getNomination().isDirectNomination()) {
 			return NOT_ELECTED;
 		}
-		return nominationResult.getNomination().getListPosition().orElse(Integer.MAX_VALUE) < 4
+		return nominationResult.getNomination().getListPosition().orElse(Integer.MAX_VALUE) < 3
 				? DIRECT_DRAW_LIST
 				: DIRECT_DRAW;
 	}

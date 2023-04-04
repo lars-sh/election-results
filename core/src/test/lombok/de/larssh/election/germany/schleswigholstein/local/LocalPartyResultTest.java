@@ -50,10 +50,10 @@ class LocalPartyResultTest {
 		softAssertions.assertThat(partyResults.get(fwr).getNumberOfBlockVotings()).isZero();
 
 		// Certain Seats
-		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(3);
-		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(3);
-		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(3);
-		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(3);
+		softAssertions.assertThat(partyResults.get(cdu).getNumberOfCertainSeats()).isEqualTo(2);
+		softAssertions.assertThat(partyResults.get(spd).getNumberOfCertainSeats()).isEqualTo(2);
+		softAssertions.assertThat(partyResults.get(awg).getNumberOfCertainSeats()).isEqualTo(2);
+		softAssertions.assertThat(partyResults.get(fwr).getNumberOfCertainSeats()).isEqualTo(2);
 
 		softAssertions.assertAll();
 	}

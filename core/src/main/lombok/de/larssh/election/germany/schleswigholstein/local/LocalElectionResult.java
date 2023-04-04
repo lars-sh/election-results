@@ -618,8 +618,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * Calculates the Sainte Laguë value for each nomination.
 	 *
 	 * <p>
-	 * The returned map is ordered by Sainte Laguë value (high to low) and the number
-	 * of votes (high to lower).
+	 * The returned map is ordered by Sainte Laguë value (high to low) and the
+	 * number of votes (high to lower).
 	 *
 	 * @param votes the number of votes per nomination
 	 * @return the Sainte Laguë value for each nomination
@@ -925,15 +925,17 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		final int numberOfDirectDrawSeats = getElection().getNumberOfDirectSeats() - directNominations.size();
 
 		final Set<LocalNomination> nominations = new LinkedHashSet<>(numberOfSeats);
-		for (final LocalNomination nomination : sainteLague.keySet()) {
+		for (final Entry<LocalNomination, BigDecimal> entry : sainteLague.entrySet()) {
 			if (nominations.size() >= numberOfSeats
 					&& nominations.containsAll(directNominationsWithParty)
 					&& directDrawNominationsWithParty.stream()
 							.filter(nominations::contains)
 							.count() >= numberOfDirectDrawSeats) {
-				return nominations;
+				return nominations.stream()
+						.filter(n -> sainteLague.get(n).compareTo(entry.getValue()) > 0)
+						.collect(toLinkedHashSet());
 			}
-			nominations.add(nomination);
+			nominations.add(entry.getKey());
 		}
 		return nominations;
 	}
