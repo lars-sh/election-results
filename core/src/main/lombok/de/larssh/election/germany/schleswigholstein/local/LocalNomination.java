@@ -147,11 +147,21 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 		return getParty().map(Party::getKey);
 	}
 
+	/**
+	 * Unmittelbarer Wahlvorschlag (§ 18 Absatz 1 GKWG)
+	 *
+	 * @return {@code true} if direct nomination, else {@code false}
+	 */
 	@JsonIgnore
 	public boolean isDirectNomination() {
 		return type.get() == LocalNominationType.DIRECT;
 	}
 
+	/**
+	 * Listenwahlvorschlag (§ 18 Absatz 2 GKWG)
+	 *
+	 * @return {@code true} if direct nomination, else {@code false}
+	 */
 	@JsonIgnore
 	public boolean isListNomination() {
 		return type.get() == LocalNominationType.LIST;

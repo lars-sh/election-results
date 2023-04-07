@@ -144,6 +144,15 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	Supplier<Set<District<?>>> allDistricts = lazy(() -> getDistrict().getAllChildren());
 
 	/**
+	 * Collects all {@link LocalPollingStation}s of this election.
+	 */
+	Supplier<Set<LocalPollingStation>> pollingStations = lazy(() -> getDistrict().getChildren()
+			.stream()
+			.map(LocalDistrict::getChildren)
+			.flatMap(Set::stream)
+			.collect(toLinkedHashSet()));
+
+	/**
 	 * Wahl
 	 *
 	 * @param parsable JSON delegate
@@ -176,11 +185,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@JsonIgnore
 	public Set<LocalPollingStation> getPollingStations() {
-		return getDistrict().getChildren()
-				.stream()
-				.map(LocalDistrict::getChildren)
-				.flatMap(Set::stream)
-				.collect(toLinkedHashSet());
+		return pollingStations.get();
 	}
 
 	/** {@inheritDoc} */
@@ -231,28 +236,47 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	/** {@inheritDoc} */
 	@Override
 	public List<LocalNomination> getNominations() {
-		// TODO: Merged list
-		// TODO: order by direct nominations first
-		// TODO: cache unless additional elements are added
 		return unmodifiableList(nominations);
 	}
 
+	/**
+	 * Unmittelbare Wahlvorschläge (§ 18 Absatz 1 GKWG)
+	 *
+	 * @return Unmittelbare Wahlvorschläge
+	 */
 	@JsonIgnore
 	public List<LocalNomination> getDirectNominations() {
 		return getNominations().stream().filter(LocalNomination::isDirectNomination).collect(toList());
 	}
 
+	/**
+	 * Unmittelbare Wahlvorschläge (§ 18 Absatz 1 GKWG) der {@link Party}
+	 *
+	 * @param party the party
+	 * @return Unmittelbare Wahlvorschläge der {@link Party}
+	 */
 	public List<LocalNomination> getDirectNominations(final Party party) {
 		return getDirectNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
 				.collect(toList());
 	}
 
+	/**
+	 * Listenwahlvorschläge (§ 18 Absatz 2 GKWG) der {@link Party}
+	 *
+	 * @return Listenwahlvorschläge der {@link Party}
+	 */
 	@JsonIgnore
 	public List<LocalNomination> getListNominations() {
 		return getNominations();
 	}
 
+	/**
+	 * Listenwahlvorschläge (§ 18 Absatz 2 GKWG) der {@link Party}
+	 *
+	 * @param party the party
+	 * @return Listenwahlvorschläge der {@link Party}
+	 */
 	public List<LocalNomination> getListNominations(final Party party) {
 		return getListNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())

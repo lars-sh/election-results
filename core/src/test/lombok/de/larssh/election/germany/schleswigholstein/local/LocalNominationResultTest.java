@@ -123,6 +123,7 @@ class LocalNominationResultTest {
 	 * using {@code testKind} evaluated against the supplied expected values.
 	 *
 	 * @param testKind                     the test kind, used for the file name
+	 * @param expectedNumberOfVotes        the expected number of votes
 	 * @param expectedNominationResultType a function taking the currently tested
 	 *                                     nomination result and returning the
 	 *                                     expected nomination result type

@@ -70,6 +70,15 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 			.collect(toList())));
 
 	/**
+	 * Determines the party's direct nomination results, which are certain.
+	 */
+	Supplier<Map<LocalNomination, LocalNominationResult>> certainDirectNominationResults
+			= lazy(() -> getNominationResults().entrySet()
+					.stream()
+					.filter(entry -> entry.getValue().isCertainDirectResult())
+					.collect(toLinkedHashMap()));
+
+	/**
 	 * Anzahl der Blockstimmen für diese politische Partei oder Wählerguppe
 	 */
 	Supplier<Integer> numberOfBlockVotings
@@ -156,10 +165,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 */
 	@PackagePrivate
 	Map<LocalNomination, LocalNominationResult> getCertainDirectNominationResults() {
-		return getNominationResults().entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().isCertainDirectResult())
-				.collect(toLinkedHashMap());
+		return certainDirectNominationResults.get();
 	}
 
 	/**
@@ -207,6 +213,10 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	/**
 	 * Calculates the maximum number of nominations, which are a candidate for
 	 * {@link LocalNominationResultType#LIST}.
+	 *
+	 * <p>
+	 * Remark: As a small inaccuracy this method does not take care of possible
+	 * overhang seats.
 	 *
 	 * @return the maximum number of list result candidates
 	 */

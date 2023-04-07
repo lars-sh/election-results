@@ -84,49 +84,13 @@ public class LocalNominationResult
 			.collect(toList())));
 
 	/**
-	 * Determines if the nomination's result is a certain
-	 * {@link LocalNominationResultType#DIRECT}.
-	 */
-	@ToString.Exclude
-	@Getter(AccessLevel.NONE)
-	Supplier<Boolean> certainDirectResult = lazy(() -> {
-		// In case of no votes there's no election
-		if (getNumberOfVotes() < 1) {
-			return Boolean.FALSE;
-		}
-
-		// The number of all ballots of the nomination's district is required to
-		// calculate the number of remaining ballots in that district.
-		final LocalDistrict district = getNomination().getDistrict();
-		final OptionalInt numberOfAllBallotsOfDistrict = getElectionResult().getNumberOfAllBallots(district);
-		if (!numberOfAllBallotsOfDistrict.isPresent()) {
-			return Boolean.FALSE;
-		}
-
-		// The number of votes of the last direct nomination (excluding the current
-		// nomination) is used as comparison value.
-		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
-				.values()
-				.stream()
-				.filter(nominationResult -> !equals(nominationResult))
-				.filter(nominationResult -> nominationResult.getNomination().getDistrict().equals(district))
-				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
-				.mapToInt(LocalNominationResult::getNumberOfVotes)
-				.findFirst()
-				.orElse(0);
-
-		// The number of already evaluated ballots of the nomination's district is
-		// required to calculate the number of remaining ballots in that district.
-		final int numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots(district).size();
-		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
-				+ Math.max(numberOfAllBallotsOfDistrict.getAsInt(), numberOfEvaluatedBallotsOfDistrict)
-				- numberOfEvaluatedBallotsOfDistrict;
-	});
-
-	/**
 	 * Determines if the nomination's election is certain and returns the guaranteed
 	 * {@link LocalNominationResultType}. In case no result type is certain empty is
 	 * returned.
+	 *
+	 * <p>
+	 * Remark: As a small inaccuracy this method does not take care of possible
+	 * overhang seats.
 	 */
 	@ToString.Exclude
 	Supplier<Optional<LocalNominationResultType>> certainResultType = lazy(() -> {
@@ -173,6 +137,10 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType}. In case no result type is certain empty is
 	 * returned.
 	 *
+	 * <p>
+	 * Remark: As a small inaccuracy this method does not take care of possible
+	 * overhang seats.
+	 *
 	 * @return the guaranteed result type or empty
 	 */
 	public Optional<LocalNominationResultType> getCertainResultType() {
@@ -205,7 +173,37 @@ public class LocalNominationResult
 	 */
 	@PackagePrivate
 	boolean isCertainDirectResult() {
-		return certainDirectResult.get();
+		// In case of no votes there's no election
+		if (getNumberOfVotes() < 1) {
+			return false;
+		}
+
+		// The number of all ballots of the nomination's district is required to
+		// calculate the number of remaining ballots in that district.
+		final LocalDistrict district = getNomination().getDistrict();
+		final OptionalInt numberOfAllBallotsOfDistrict = getElectionResult().getNumberOfAllBallots(district);
+		if (!numberOfAllBallotsOfDistrict.isPresent()) {
+			return false;
+		}
+
+		// The number of votes of the last direct nomination (excluding the current
+		// nomination) is used as comparison value.
+		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
+				.values()
+				.stream()
+				.filter(nominationResult -> !equals(nominationResult)
+						&& nominationResult.getNomination().getDistrict().equals(district))
+				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
+				.mapToInt(LocalNominationResult::getNumberOfVotes)
+				.findFirst()
+				.orElse(0);
+
+		// The number of already evaluated ballots of the nomination's district is
+		// required to calculate the number of remaining ballots in that district.
+		final int numberOfEvaluatedBallotsOfDistrict = getElectionResult().getBallots(district).size();
+		return getNumberOfVotes() > numberOfVotesOfLastDirectNomination
+				+ Math.max(numberOfAllBallotsOfDistrict.getAsInt(), numberOfEvaluatedBallotsOfDistrict)
+				- numberOfEvaluatedBallotsOfDistrict;
 	}
 
 	/**
@@ -263,6 +261,10 @@ public class LocalNominationResult
 	 * Determines if the nomination's result is a certain
 	 * {@link LocalNominationResultType.NOT_ELECTED}.
 	 *
+	 * <p>
+	 * Remark: As a small inaccuracy this method does not take care of possible
+	 * overhang seats.
+	 *
 	 * @return {@code true} if the nomination's result is a certain list result,
 	 *         else {@code false}
 	 */
@@ -312,8 +314,8 @@ public class LocalNominationResult
 	 * {@link LocalNominationResultType#LIST}.
 	 *
 	 * <p>
-	 * Remark: As a quite small inaccuracy this method does not take care of
-	 * possible overhang seats.
+	 * Remark: As a small inaccuracy this method does not take care of possible
+	 * overhang seats.
 	 *
 	 * @return {@code true} if the nomination is a candidate for a list result or
 	 *         {@code false}

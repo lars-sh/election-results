@@ -399,11 +399,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * In case this number is larger than the size of the list of ballots for the
 	 * district, not all ballots were evaluated, yet.
 	 *
+	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	@JsonIgnore
-	public Map<District<?>, OptionalInt> getNumberOfAllBallotsMap() {
-		return unmodifiableMap(numberOfAllBallots);
+	public OptionalInt getNumberOfAllBallots(final District<?> district) {
+		return numberOfAllBallots.get(district);
 	}
 
 	/**
@@ -413,11 +413,11 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * In case this number is larger than the size of the list of ballots for the
 	 * district, not all ballots were evaluated, yet.
 	 *
-	 * @param district Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 * @return Anzahl aller Stimmzettel nach Wahlgebiet, Wahlkreis oder Wahlbezirk
 	 */
-	public OptionalInt getNumberOfAllBallots(final District<?> district) {
-		return numberOfAllBallots.get(district);
+	@JsonIgnore
+	public Map<District<?>, OptionalInt> getNumberOfAllBallotsMap() {
+		return unmodifiableMap(numberOfAllBallots);
 	}
 
 	/**
@@ -502,7 +502,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 							.collect(toLinkedHashMap(identity(), nomination -> LocalNominationResultType.DIRECT));
 
 			// Result Type: Direct Draw
-			directDrawNominations.addAll(getDrawResults(localResultTypes,
+			directDrawNominations.addAll(getDrawResultsAndUpdate(localResultTypes,
 					localVotes,
 					getDirectDrawResults(district),
 					LocalNominationResultType.DIRECT));
@@ -521,7 +521,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 		}
 
 		// Result Type: List Draw
-		for (final LocalNomination nomination : getDrawResults(resultTypes,
+		for (final LocalNomination nomination : getDrawResultsAndUpdate(resultTypes,
 				sainteLague,
 				getListDrawResults(),
 				LocalNominationResultType.LIST)) {
@@ -586,8 +586,8 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
-	 * Puts nominations with either draw results or open draws to
-	 * {@code resultTypes}.
+	 * Returns a set of nominations for open draws, removes those from
+	 * {@code resultTypes} and puts {@code currentResultType} for closed draws.
 	 *
 	 * <p>
 	 * The number of e.g. votes of a draw are given by the last nomination of
@@ -597,17 +597,16 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * <p>
 	 * {@code drawResults} must neither contain more nominations than possible draw
 	 * seats, nor invalid nominations. In addition it does not need to contain a
-	 * draw result for all open draws or even any draw result. In such cases one of
-	 * the draw {@link LocalNominationResultType} is put to {@code resultTypes}
-	 * according to {@code currentResultTypeDraw}.
+	 * draw result for all open draws or any draw result.
 	 *
 	 * @param resultTypes       result types per nomination
 	 * @param values            the number of e.g. votes per nomination
 	 * @param drawResults       optional draws results to take into account
 	 * @param currentResultType the original result type, which might need draws
-	 * @return TODO
+	 * @return the nominations with an open draw
 	 */
-	private Set<LocalNomination> getDrawResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
+	private Set<LocalNomination> getDrawResultsAndUpdate(
+			final Map<LocalNomination, LocalNominationResultType> resultTypes,
 			final Map<LocalNomination, ? extends Number> values,
 			final Set<LocalNomination> drawResults,
 			final LocalNominationResultType currentResultType) {
@@ -631,15 +630,13 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				.collect(toSet());
 
 		// If all affected nominations are part of "resultType" there is no draw needed.
-		if (affectedNominations.stream()
-				.allMatch(nomination -> resultTypes.containsKey(nomination)
-						&& resultTypes.get(nomination) == currentResultType)) {
+		if (affectedNominations.stream().map(resultTypes::get).allMatch(currentResultType::equals)) {
 			return emptySet();
 		}
 
 		// Removing the affected nominations to start from scratch
 		final int numberOfPossibleSeats = resultTypes.size();
-		resultTypes.keySet().removeAll(affectedNominations); // TODO
+		resultTypes.keySet().removeAll(affectedNominations);
 
 		// Add positive draw results
 		validateDrawResults(affectedNominations,
@@ -649,7 +646,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 				drawResults,
 				currentResultType);
 		for (final LocalNomination drawResult : drawResults) {
-			resultTypes.put(drawResult, currentResultType); // TODO
+			resultTypes.put(drawResult, currentResultType);
 			affectedNominations.remove(drawResult);
 		}
 
@@ -665,7 +662,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 * draw seats. In addition each nomination must be part of the draw by value and
 	 * nomination.
 	 *
-	 * @param resultTypes           set of affected nominations
+	 * @param affectedNominations   set of affected nominations
 	 * @param values                the number of e.g. votes per nomination
 	 * @param valueOfLastNomination the number of e.g. votes of nominations of the
 	 *                              draw
@@ -847,7 +844,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	 *
 	 * @param resultTypes           result types per nomination
 	 * @param sainteLague           the Sainte Laguë value per nomination
-	 * @param directDrawNominations TODO
+	 * @param directDrawNominations direct draw nominations
 	 * @return the elected nominations by list
 	 */
 	private Set<LocalNomination> getListResults(final Map<LocalNomination, LocalNominationResultType> resultTypes,
@@ -875,9 +872,7 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 					&& directDrawResultsWithParty.stream()
 							.filter(listResults::contains)
 							.count() >= numberOfDirectDrawSeats) {
-				return listResults.stream()
-						// .filter(n -> sainteLague.get(n).compareTo(entry.getValue()) > 0)
-						.collect(toLinkedHashSet());
+				return listResults;
 			}
 			listResults.add(entry.getKey());
 		}
@@ -885,11 +880,14 @@ public final class LocalElectionResult implements ElectionResult<LocalBallot, Lo
 	}
 
 	/**
-	 * TODO
+	 * Returns a map of the direct draw nominations and their result type. If a
+	 * direct draw result is also a list result
+	 * {@link LocalNominationResultType#DIRECT_DRAW_LIST} is used, else
+	 * {@link LocalNominationResultType#DIRECT_DRAW}.
 	 *
 	 * @param resultTypes           result types per nomination
-	 * @param directDrawNominations candidates
-	 * @return TODO
+	 * @param directDrawNominations direct draw nominations
+	 * @return the direct draw nominations and their result type
 	 */
 	private Map<LocalNomination, LocalNominationResultType> getDirectDrawListResults(
 			final Map<LocalNomination, LocalNominationResultType> resultTypes,
