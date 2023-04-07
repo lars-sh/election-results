@@ -156,41 +156,6 @@ public class LocalNominationResult
 		return Optional.empty();
 	});
 
-	/**
-	 * Determines if the nomination is a candidate for
-	 * {@link LocalNominationResultType#DIRECT}.
-	 */
-	@Getter(AccessLevel.NONE)
-	Supplier<Boolean> directResultCandidate = lazy(() -> {
-		// The only chance to be a direct candidate is to have a direct nomination.
-		if (!getNomination().isDirectNomination()) {
-			return Boolean.FALSE;
-		}
-
-		// The number of all ballots is required to calculate the number of direct
-		// result candidates.
-		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
-		if (!numberOfAllBallots.isPresent()) {
-			return Boolean.FALSE;
-		}
-
-		// The number of votes plus possibly remaining ballots need to be at least as
-		// great as the number of votes of the last direct nomination.
-		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
-				.values()
-				.stream()
-				.filter(nominationResult -> nominationResult.getNomination()
-						.getDistrict()
-						.equals(getNomination().getDistrict()))
-				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
-				.mapToInt(LocalNominationResult::getNumberOfVotes)
-				.findFirst()
-				.orElse(0);
-		return getNumberOfVotes()
-				+ numberOfAllBallots.getAsInt()
-				- getElectionResult().getBallots().size() >= numberOfVotesOfLastDirectNomination;
-	});
-
 	/** {@inheritDoc} */
 	@Override
 	public int compareTo(@Nullable final LocalNominationResult nominationResult) {
@@ -313,12 +278,42 @@ public class LocalNominationResult
 	 *         {@code false}
 	 */
 	private boolean isDirectResultCandidate() {
-		return directResultCandidate.get();
+		// The only chance to be a direct candidate is to have a direct nomination.
+		if (!getNomination().isDirectNomination()) {
+			return false;
+		}
+
+		// The number of all ballots is required to calculate the number of direct
+		// result candidates.
+		final OptionalInt numberOfAllBallots = getElectionResult().getNumberOfAllBallots();
+		if (!numberOfAllBallots.isPresent()) {
+			return false;
+		}
+
+		// The number of votes plus possibly remaining ballots need to be at least as
+		// great as the number of votes of the last direct nomination.
+		final int numberOfVotesOfLastDirectNomination = getElectionResult().getNominationResults()
+				.values()
+				.stream()
+				.filter(nominationResult -> nominationResult.getNomination()
+						.getDistrict()
+						.equals(getNomination().getDistrict()))
+				.skip(getElection().getNumberOfDirectSeatsPerLocalDistrict() - 1)
+				.mapToInt(LocalNominationResult::getNumberOfVotes)
+				.findFirst()
+				.orElse(0);
+		return getNumberOfVotes()
+				+ numberOfAllBallots.getAsInt()
+				- getElectionResult().getBallots().size() >= numberOfVotesOfLastDirectNomination;
 	}
 
 	/**
 	 * Determines if the nomination is a candidate for
 	 * {@link LocalNominationResultType#LIST}.
+	 *
+	 * <p>
+	 * Remark: As a quite small inaccuracy this method does not take care of
+	 * possible overhang seats.
 	 *
 	 * @return {@code true} if the nomination is a candidate for a list result or
 	 *         {@code false}

@@ -1,4 +1,4 @@
-* Anzahl Stimmzettel: 25
+* Anzahl Stimmzettel: 50
 
 1 Poppinga,Jens
 1 Eggers,Dirk

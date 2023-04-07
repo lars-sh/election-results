@@ -230,7 +230,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 						* Math.min(getElection().getNumberOfVotesPerBallot(),
 								getElection().getDirectNominations(getParty()).size());
 		if (numberOfPossiblyMissingVotes == 0) {
-			return 0;
+			return getNumberOfSeats();
 		}
 
 		// Determine the minimum percentage for the chance to get one seat ("untere

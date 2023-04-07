@@ -19,9 +19,9 @@ public enum LocalNominationResultType {
 	DIRECT(true),
 
 	/**
-	 * Loskandidat für Direktmandat (§ 9 Absatz 5 Satz 2 GKWG)
+	 * Mehrsitz (§ 10 Absatz 4 GKWG)
 	 */
-	DIRECT_DRAW(false),
+	DIRECT_BALANCE_SEAT(true),
 
 	/**
 	 * Loskandidat für Direktmandat (§ 9 Absatz 5 Satz 2 GKWG) mit sicherem
@@ -30,24 +30,24 @@ public enum LocalNominationResultType {
 	DIRECT_DRAW_LIST(true),
 
 	/**
-	 * Mehrsitz (§ 10 Absatz 4 GKWG)
-	 */
-	DIRECT_BALANCE_SEAT(true),
-
-	/**
 	 * Listenmandat (§ 10 Absatz 2 Satz 2 GKWG)
 	 */
 	LIST(true),
 
 	/**
-	 * Loskandidat für Listenmandat (§ 10 Absatz 2 Satz 3 GKWG)
-	 */
-	LIST_DRAW(false),
-
-	/**
 	 * Überhangmandat (§ 10 Absatz 5 GKWG)
 	 */
 	LIST_OVERHANG_SEAT(true),
+
+	/**
+	 * Loskandidat für Direktmandat (§ 9 Absatz 5 Satz 2 GKWG)
+	 */
+	DIRECT_DRAW(false),
+
+	/**
+	 * Loskandidat für Listenmandat (§ 10 Absatz 2 Satz 3 GKWG)
+	 */
+	LIST_DRAW(false),
 
 	/**
 	 * Not elected

@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @PackagePrivate
 @NoArgsConstructor
 class LocalNominationResultTest {
-	// TODO: Test with difference between result type and certain type
 	/**
 	 * Looks up a nomination result and asserts its number of votes, nomination
 	 * result type and certain result type. This method is meant to be used for
@@ -150,10 +149,12 @@ class LocalNominationResultTest {
 	}
 
 	/**
-	 * TODO
+	 * Determines the expected nomination result types for the test data set
+	 * "all-one".
 	 *
-	 * @param nominationResult
-	 * @return
+	 * @param nominationResult the nomination result to determine the expected
+	 *                         nomination result type for
+	 * @return the expected nomination result type
 	 */
 	private static LocalNominationResultType getExpectedAllOneNominationResultType(
 			final LocalNominationResult nominationResult) {
@@ -304,7 +305,10 @@ class LocalNominationResultTest {
 		assertResultTypesForAllNominations("all-one-partially-done",
 				1,
 				LocalNominationResultTest::getExpectedAllOneNominationResultType,
-				nominationResult -> Optional.empty());
+				nominationResult -> asList("Christian", "Andreas", "Hartmut")
+						.contains(nominationResult.getNomination().getPerson().getGivenName())
+								? Optional.of(NOT_ELECTED)
+								: Optional.empty());
 	}
 
 	/**
@@ -388,11 +392,11 @@ class LocalNominationResultTest {
 		assertNomination(softAssertions, result, "Beck", "Karsten", 4, LIST_DRAW);
 		assertNomination(softAssertions, result, "Behnk", "Sönke", 2, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Breede", "Rolf", 3, NOT_ELECTED);
-		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Böttger", "Johannes", 5, DIRECT_DRAW_LIST);
 		assertNomination(softAssertions, result, "Böttger", "Volker", 4, LIST_DRAW);
-		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Eggers", "Dirk", 5, DIRECT_DRAW_LIST);
 		assertNomination(softAssertions, result, "Ehlert", "Armin", 3, NOT_ELECTED);
-		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Eick", "Ernst", 5, DIRECT_DRAW_LIST);
 		assertNomination(softAssertions, result, "Gäde", "Henning", 2, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Gäde", "Jan-Hendrik", 6, DIRECT);
 		assertNomination(softAssertions, result, "Jögimar", "Helga", 4, LIST_DRAW);
@@ -405,7 +409,7 @@ class LocalNominationResultTest {
 		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED);
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW_LIST);
 		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED);
@@ -418,7 +422,7 @@ class LocalNominationResultTest {
 	 */
 	@Test
 	@PackagePrivate
-	void testPartiallyClosedDraws1() { // TODO: Finish
+	void testPartiallyClosedDraws1() {
 		final LocalElection election = LocalElectionTest.createElection();
 		final LocalElectionResult resultWithoutDrawResults
 				= readResultKleinBoden(election, Paths.get("../LocalNominationResult-draws.txt"));
@@ -498,7 +502,7 @@ class LocalNominationResultTest {
 		assertNomination(softAssertions, result, "Sauer", "Joachim", 1, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Schöning", "Mathias", 2, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Stapelfeldt", "Albert", 1, NOT_ELECTED);
-		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW); // TODO
+		assertNomination(softAssertions, result, "Wahl", "Joachim", 5, DIRECT_DRAW_LIST);
 		assertNomination(softAssertions, result, "Weger", "Marcel", 1, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Winter", "Martin", 3, NOT_ELECTED);
 		assertNomination(softAssertions, result, "Ziebarth", "Angelika", 2, NOT_ELECTED);
