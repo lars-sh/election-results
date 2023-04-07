@@ -150,23 +150,23 @@ public class MetricsFiles {
 			if (type == LocalNominationResultType.DIRECT) {
 				return "Direkt";
 			}
-			if (type == LocalNominationResultType.DIRECT_DRAW) {
-				return "Direktlos";
+			if (type == LocalNominationResultType.DIRECT_BALANCE_SEAT) {
+				return "Mehrsitz";
 			}
 			if (type == LocalNominationResultType.DIRECT_DRAW_LIST) {
 				return "Direktlos mit Liste";
 			}
-			if (type == LocalNominationResultType.DIRECT_BALANCE_SEAT) {
-				return "Mehrsitz";
-			}
 			if (type == LocalNominationResultType.LIST) {
 				return "Liste";
 			}
-			if (type == LocalNominationResultType.LIST_DRAW) {
-				return "Listenlos";
-			}
 			if (type == LocalNominationResultType.LIST_OVERHANG_SEAT) {
 				return "Überhang";
+			}
+			if (type == LocalNominationResultType.DIRECT_DRAW) {
+				return "Direktlos";
+			}
+			if (type == LocalNominationResultType.LIST_DRAW) {
+				return "Listenlos";
 			}
 			return "";
 		}

@@ -86,15 +86,15 @@ ol {
 	vertical-align: middle;
 }
 .nomination-result.type-direct + *,
-.nomination-result.type-direct_draw + *,
+.nomination-result.type-direct_balance_seat + *,
 .nomination-result.type-direct_draw_list + *,
-.nomination-result.type-direct_balance_seat + * {
+.nomination-result.type-direct_draw + * {
 	border-top: 1em solid transparent;
 }
 .nomination-result.type-direct,
-.nomination-result.type-direct_draw,
+.nomination-result.type-direct_balance_seat,
 .nomination-result.type-direct_draw_list,
-.nomination-result.type-direct_balance_seat {
+.nomination-result.type-direct_draw {
 	border-top: 0;
 }
 .nomination-result > .name {
@@ -102,8 +102,8 @@ ol {
 	width: 0;
 }
 .nomination-result.certain-direct > .name,
-.nomination-result.certain-direct_draw_list > .name,
 .nomination-result.certain-direct_balance_seat > .name,
+.nomination-result.certain-direct_draw_list > .name,
 .nomination-result.certain-list > .name,
 .nomination-result.certain-list_overhang_seat > .name,
 .footer > .legend > .certain {
@@ -129,8 +129,8 @@ ol {
 .footer > .legend > .direct::before {
 	content: "\25cf";
 }
-.nomination-result.type-direct_draw > .type::before,
 .nomination-result.type-direct_draw_list > .type::before,
+.nomination-result.type-direct_draw > .type::before,
 .nomination-result.type-list_draw > .type::before {
 	content: "L";
 }
