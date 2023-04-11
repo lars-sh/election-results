@@ -1,11 +1,8 @@
 package de.larssh.election.germany.schleswigholstein.local;
 
-import static de.larssh.utils.Finals.lazy;
-
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +12,6 @@ import de.larssh.election.germany.schleswigholstein.Nomination;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.Person;
 import de.larssh.utils.Optionals;
-import de.larssh.utils.annotations.PackagePrivate;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
@@ -39,18 +35,6 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 			.thenComparing(nomination -> nomination.getElection().getNominations().indexOf(nomination));
 
 	/**
-	 * Creates a unique key for the given person and party keys.
-	 *
-	 * @param personKey the key of a person
-	 * @param partyKey  the key of a party
-	 * @return unique key for the given person and party keys
-	 */
-	@PackagePrivate
-	static String createKey(final String personKey, final Optional<String> partyKey) {
-		return Keys.escape(personKey, " (", partyKey.orElse(""), ")");
-	}
-
-	/**
 	 * Wahl
 	 *
 	 * @return Wahl
@@ -68,15 +52,6 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	LocalDistrict district;
 
 	/**
-	 * Politische Partei, Wählergruppe oder empty für unabhängige Bewerberinnen und
-	 * Bewerber
-	 *
-	 * @return Politische Partei, Wählergruppe oder empty
-	 */
-	@EqualsAndHashCode.Include
-	Optional<Party> party;
-
-	/**
 	 * Bewerberin oder Bewerber
 	 *
 	 * @return Bewerberin oder Bewerber
@@ -85,16 +60,13 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	Person person;
 
 	/**
-	 * Art des Wahlvorschlags (§ 18 Absätze 1+2 GKWG)
+	 * Politische Partei, Wählergruppe oder empty für unabhängige Bewerberinnen und
+	 * Bewerber
+	 *
+	 * @return Politische Partei, Wählergruppe oder empty
 	 */
-	@JsonIgnore
-	@Getter(AccessLevel.NONE)
-	Supplier<LocalNominationType> type = lazy(() -> !getParty().isPresent()
-			|| getElection().getNominations()
-					.stream()
-					.filter(nomination -> nomination.getParty().equals(getParty()))
-					.limit(getElection().getNumberOfDirectSeats())
-					.anyMatch(this::equals) ? LocalNominationType.DIRECT : LocalNominationType.LIST);
+	@EqualsAndHashCode.Include
+	Optional<Party> party;
 
 	/** {@inheritDoc} */
 	@Override
@@ -121,7 +93,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	@JsonIgnore
 	public String getKey() {
-		return createKey(getPerson().getKey(), getParty().map(Party::getKey));
+		return Keys.escape(getPerson().getKey(), " (", getParty().map(Party::getKey).orElse(""), ")");
 	}
 
 	/**
@@ -154,7 +126,7 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	@JsonIgnore
 	public boolean isDirectNomination() {
-		return type.get() == LocalNominationType.DIRECT;
+		return getElection().getDirectNominations().contains(this);
 	}
 
 	/**
@@ -164,21 +136,6 @@ public class LocalNomination implements Nomination<LocalNomination>, Comparable<
 	 */
 	@JsonIgnore
 	public boolean isListNomination() {
-		return type.get() == LocalNominationType.LIST;
-	}
-
-	/**
-	 * Arten der Wahlvorschläge (§ 18 GKWG)
-	 */
-	private enum LocalNominationType {
-		/**
-		 * Unmittelbarer Wahlvorschlag (§ 18 Absatz 1 GKWG)
-		 */
-		DIRECT,
-
-		/**
-		 * Listenwahlvorschlag (§ 18 Absatz 2 GKWG)
-		 */
-		LIST;
+		return getElection().getListNominations().contains(this);
 	}
 }

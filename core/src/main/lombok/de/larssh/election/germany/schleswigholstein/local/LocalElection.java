@@ -4,6 +4,7 @@ import static de.larssh.utils.Collectors.toLinkedHashSet;
 import static de.larssh.utils.Collectors.toMap;
 import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -132,6 +134,16 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	DistrictValueMap numberOfEligibleVoters = new DistrictValueMap(this);
 
 	/**
+	 * Unmittelbare Wahlvorschläge (§ 18 Absatz 1 GKWG)
+	 */
+	@ToString.Exclude
+	Supplier<Set<LocalNomination>> directNominations = lazy(() -> unmodifiableSet(getParties().stream()
+			.flatMap(party -> getNominations().stream()
+					.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
+					.limit(getNumberOfDirectSeats()))
+			.collect(toLinkedHashSet())));
+
+	/**
 	 * Bewerberinnen und Bewerber
 	 */
 	@ToString.Exclude
@@ -223,7 +235,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	public LocalNomination createNomination(final LocalDistrict district,
 			final Person person,
 			final Optional<Party> party) {
-		final LocalNomination nomination = new LocalNomination(this, district, party, person);
+		final LocalNomination nomination = new LocalNomination(this, district, person, party);
 		if (nominations.contains(nomination)) {
 			throw new ElectionException("Nomination \"%s\" for district \"%s\" cannot be added twice.",
 					nomination.getKey(),
@@ -245,8 +257,8 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Unmittelbare Wahlvorschläge
 	 */
 	@JsonIgnore
-	public List<LocalNomination> getDirectNominations() {
-		return getNominations().stream().filter(LocalNomination::isDirectNomination).collect(toList());
+	public Set<LocalNomination> getDirectNominations() {
+		return directNominations.get();
 	}
 
 	/**
@@ -255,10 +267,10 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @param party the party
 	 * @return Unmittelbare Wahlvorschläge der {@link Party}
 	 */
-	public List<LocalNomination> getDirectNominations(final Party party) {
+	public Set<LocalNomination> getDirectNominations(final Party party) {
 		return getDirectNominations().stream()
 				.filter(nomination -> nomination.getParty().filter(party::equals).isPresent())
-				.collect(toList());
+				.collect(toLinkedHashSet());
 	}
 
 	/**
@@ -267,7 +279,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Listenwahlvorschläge der {@link Party}
 	 */
 	@JsonIgnore
-	public List<LocalNomination> getListNominations() {
+	public Collection<LocalNomination> getListNominations() {
 		return getNominations();
 	}
 
@@ -353,7 +365,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	@JsonProperty(access = Access.READ_ONLY, index = 6)
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public Set<Party> getParties() {
-		return getDirectNominations().stream()
+		return getNominations().stream()
 				.map(LocalNomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)

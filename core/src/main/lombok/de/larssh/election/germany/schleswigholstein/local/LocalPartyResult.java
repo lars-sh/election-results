@@ -152,8 +152,9 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 	 * @return the number of certain seats of this party
 	 */
 	public int getNumberOfCertainSeats() {
-		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()) {
-			return getNumberOfSeats();
+		if (getElection().getNominations().size() <= getElection().getNumberOfSeats()
+				|| getElection().getNominations().stream().map(LocalNomination::getParty).distinct().count() == 1) {
+			return Math.min(getElection().getNominations().size(), getNominationResults().size());
 		}
 		return Math.max(getCertainDirectNominationResults().size(), getNumberOfCertainListSeats());
 	}
