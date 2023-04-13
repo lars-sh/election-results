@@ -392,7 +392,7 @@ public class PresentationFiles {
 			result.getNomination().getListPosition().ifPresent(listPosition -> {
 				builder.append(String.format("\nListenposition %d der %s",
 						listPosition,
-						result.getNomination().getParty().orElseThrow().getShortName()));
+						result.getNomination().getParty().get().getShortName()));
 			});
 			result.getSainteLagueValue()
 					.map(sainteLagueValue -> String.format(Locale.GERMAN,
