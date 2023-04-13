@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.Party;
 import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
+import de.larssh.election.germany.schleswigholstein.local.LocalDistrictType;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResultType;
@@ -178,9 +179,10 @@ public class PresentationFiles {
 			writer.write(String.format(TEMPLATE.get(),
 					refreshRate.map(Duration::toMillis).orElse(0L),
 					result.getElection().getDate(),
+					Strings.toLowerCaseAscii(result.getElection().getDistrict().getType().toString()),
 					formatPollingStations(),
 					formatNominationResults(),
-					formatPartyResults(),
+					result.getElection().getDistrict().getType() == LocalDistrictType.KREIS ? "" : formatPartyResults(),
 					LocalDateTime.now(TIME_ZONE)));
 		}
 
@@ -355,6 +357,7 @@ public class PresentationFiles {
 		 * @return the formatted nomination result
 		 */
 		private String formatNominationResult(final LocalNominationResult result, final int maxNumberOfVotes) {
+			final int numberOfBallots = this.result.getBallots(result.getNomination().getDistrict()).size();
 			return String.format(Locale.ROOT,
 					TEMPLATE_NOMINATION_RESULT.get(),
 					Strings.toLowerCaseAscii(result.getType().toString()),
@@ -363,9 +366,13 @@ public class PresentationFiles {
 							.orElse("uncertain"),
 					encodeXml(formatNominationResultTitle(result)),
 					encodeXml(result.getNomination().getPerson().getKey()),
+					encodeXml(result.getNomination().getParty().map(Party::getShortName).orElse("unabhängig")),
 					result.getNumberOfVotes(),
-					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.BLACK).toHex(),
-					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.WHITE).toHex(),
+					String.format(Locale.GERMAN,
+							"%.1f",
+							BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), numberOfBallots, 1)),
+					result.getNomination().getParty().map(Party::getBackgroundColor).orElse(Color.WHITE).toHex(),
+					result.getNomination().getParty().map(Party::getFontColor).orElse(Color.BLACK).toHex(),
 					BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), maxNumberOfVotes, 1));
 		}
 
@@ -382,12 +389,11 @@ public class PresentationFiles {
 					"Anteil: %.1f\u202f%%",
 					BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), numberOfBallots, 1)));
 
-			result.getNomination()
-					.getParty()
-					.map(party -> String.format("\nListenposition %d der %s",
-							result.getNomination().getListPosition().getAsInt(),
-							party.getShortName()))
-					.ifPresent(builder::append);
+			result.getNomination().getListPosition().ifPresent(listPosition -> {
+				builder.append(String.format("\nListenposition %d der %s",
+						listPosition,
+						result.getNomination().getParty().orElseThrow().getShortName()));
+			});
 			result.getSainteLagueValue()
 					.map(sainteLagueValue -> String.format(Locale.GERMAN,
 							"\nSainte-Laguë-Höchstzahl: %." + sainteLagueValue.scale() + "f",

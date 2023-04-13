@@ -98,6 +98,7 @@ ol {
 	border-top: 0;
 }
 .nomination-result > .name {
+	padding-right: 0.5em;
 	text-align: right;
 	width: 0;
 }
@@ -113,8 +114,11 @@ ol {
 .footer > .legend > .certain-not_elected {
 	opacity: 60%%;
 }
+.nomination-result > .name > .party,
+.nomination-result > .votes > * > .percentage {
+	display: none;
+}
 .nomination-result > .type {
-	padding-left: 0.5em;
 	padding-right: 0.5em;
 	text-align: center;
 	width: 0;
@@ -225,6 +229,19 @@ ol {
 	line-height: normal;
 }
 
+/* Election Type KREIS */
+.election-type_kreis .footer > .legend,
+.election-type_kreis .nomination-result > .type {
+	display: none;
+}
+.election-type_kreis .nomination-results {
+	grid-column: 2 / 4;
+}
+.election-type_kreis .nomination-result > .name > .party,
+.nomination-result > .votes > * > .percentage {
+	display: unset;
+}
+
 @media (max-width: 1024px) {
 	.footer::before, .footer > .timestamp {
 		grid-row: 2;
@@ -303,7 +320,7 @@ if (REFRESH_RATIO_MS > 0 && window === window.parent) {
 		//]]></script>
 		<title>Kommunalwahl %tY</title>
 	</head>
-	<body>
+	<body class="election-type_%s">
 		<ol class="polling-stations">%s</ol>
 		<ol class="nomination-results">%s
 		</ol>

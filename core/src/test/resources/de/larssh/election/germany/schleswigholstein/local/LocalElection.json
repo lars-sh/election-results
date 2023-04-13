@@ -36,13 +36,13 @@
 		{
 			"type": "POLITICAL_PARTY",
 			"shortName": "CDU",
-			"name": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch",
+			"name": "Christlich Demokratische Union Deutschlands",
 			"backgroundColor": "#333333",
 			"fontColor": "#ffffff"
 		}, {
 			"type": "POLITICAL_PARTY",
 			"shortName": "SPD",
-			"name": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch",
+			"name": "Sozialdemokratische Partei Deutschlands",
 			"backgroundColor": "#ed1c24",
 			"fontColor": "#ffffff"
 		}, {
@@ -62,7 +62,7 @@
 	"nominations": [
 		{
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Poppinga",
 				"givenName": "Jens",
@@ -74,7 +74,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Eggers",
 				"givenName": "Dirk",
@@ -86,7 +86,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Beck",
 				"givenName": "Karsten",
@@ -98,7 +98,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Motzkus",
 				"givenName": "Dietrich",
@@ -110,7 +110,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Behnk",
 				"givenName": "Sönke",
@@ -122,7 +122,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Weger",
 				"givenName": "Marcel",
@@ -134,7 +134,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Gräpel",
 				"givenName": "Carola",
@@ -146,7 +146,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Schwarz",
 				"givenName": "Rupert",
@@ -158,7 +158,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Klein",
 				"givenName": "Erik",
@@ -170,7 +170,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Dohrendorf",
 				"givenName": "Martina",
@@ -182,7 +182,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Bernhardt",
 				"givenName": "Christian",
@@ -194,7 +194,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Christlich Demokratische Union Deutschlands, Ortsverband Rethwisch (CDU)",
+			"party": "Christlich Demokratische Union Deutschlands (CDU)",
 			"person": {
 				"familyName": "Topel",
 				"givenName": "Andreas",
@@ -206,7 +206,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Kröger",
 				"givenName": "Dirk",
@@ -218,7 +218,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Eick",
 				"givenName": "Ernst",
@@ -230,7 +230,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Jögimar",
 				"givenName": "Helga",
@@ -242,7 +242,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Ehlert",
 				"givenName": "Armin",
@@ -254,7 +254,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Ziebarth",
 				"givenName": "Angelika",
@@ -266,7 +266,7 @@
 			}
 		}, {
 			"district": "Rethwisch",
-			"party": "Sozialdemokratische Partei Deutschlands, Ortsverband Rethwisch (SPD)",
+			"party": "Sozialdemokratische Partei Deutschlands (SPD)",
 			"person": {
 				"familyName": "Sauer",
 				"givenName": "Joachim",
