@@ -360,10 +360,14 @@ public class PresentationFiles {
 			final int numberOfBallots = this.result.getBallots(result.getNomination().getDistrict()).size();
 			return String.format(Locale.ROOT,
 					TEMPLATE_NOMINATION_RESULT.get(),
-					Strings.toLowerCaseAscii(result.getType().toString()),
-					result.getCertainResultType()
-							.map(certain -> "certain-" + Strings.toLowerCaseAscii(certain.toString()))
-							.orElse("uncertain"),
+					result.getElectionResult().getElection().getDistrict().getType() == LocalDistrictType.KREIS
+							? ""
+							: Strings.toLowerCaseAscii(result.getType().toString()),
+					result.getElectionResult().getElection().getDistrict().getType() == LocalDistrictType.KREIS
+							? ""
+							: result.getCertainResultType()
+									.map(certain -> "certain-" + Strings.toLowerCaseAscii(certain.toString()))
+									.orElse("uncertain"),
 					encodeXml(formatNominationResultTitle(result)),
 					encodeXml(result.getNomination().getPerson().getKey()),
 					encodeXml(result.getNomination().getParty().map(Party::getShortName).orElse("unabhängig")),
