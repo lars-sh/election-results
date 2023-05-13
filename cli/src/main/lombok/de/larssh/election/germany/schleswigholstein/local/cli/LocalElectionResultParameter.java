@@ -121,6 +121,7 @@ public class LocalElectionResultParameter {
 	 * @throws InterruptedException if interrupted while watching for file changes
 	 * @throws IOException          on IO error
 	 */
+	@SuppressWarnings({ "resource", "checkstyle:SuppressWarnings" })
 	public void watch(final Consumer<LocalElectionResult> handler) throws InterruptedException, IOException {
 		try (FilesWatchService fileWatchService = new FilesWatchService()) {
 			fileWatchService.register(getElectionPath(), ENTRY_CREATE, ENTRY_MODIFY);
@@ -132,6 +133,8 @@ public class LocalElectionResultParameter {
 			while (true) {
 				try (FileWatchResult fileWatchResult = fileWatchService.watch()) {
 					handler.accept(read());
+				} catch (final IOException e) {
+					e.printStackTrace(getCommandSpec().commandLine().getErr());
 				}
 			}
 		}
