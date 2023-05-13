@@ -17,7 +17,6 @@
 		<parent-pom.create-dependabot-yml>false</parent-pom.create-dependabot-yml>
 		<parent-pom.create-github-workflow-yml>false</parent-pom.create-github-workflow-yml>
 		<parent-pom.create-readme-md>false</parent-pom.create-readme-md>
-
 		<jar.manifest.mainClass>de.larssh.election.germany.schleswigholstein.local.cli.LocalElectionResultCli</jar.manifest.mainClass>
 		<shade.packageDependenciesPhase>package</shade.packageDependenciesPhase>
 	</properties>
