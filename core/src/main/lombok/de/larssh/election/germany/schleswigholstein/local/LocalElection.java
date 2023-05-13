@@ -6,7 +6,6 @@ import static de.larssh.utils.Finals.lazy;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -364,12 +362,13 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@JsonProperty(access = Access.READ_ONLY, index = 6)
 	@SuppressWarnings("checkstyle:MagicNumber")
-	public Set<Party> getParties() {
+	public List<Party> getParties() {
 		return getNominations().stream()
 				.map(LocalNomination::getParty)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.collect(toCollection(TreeSet::new));
+				.distinct()
+				.collect(toList());
 	}
 
 	/**

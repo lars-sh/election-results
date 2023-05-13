@@ -39,7 +39,7 @@ public class LocalPartyResult implements PartyResult<LocalBallot>, Comparable<Lo
 					.reversed()
 					.thenComparing(LocalPartyResult::getNumberOfVotes)
 					.reversed()
-					.thenComparing(LocalPartyResult::getParty);
+					.thenComparing(result -> result.getElection().getParties().indexOf(result.getParty()));
 
 	/**
 	 * Wahlergebnis
