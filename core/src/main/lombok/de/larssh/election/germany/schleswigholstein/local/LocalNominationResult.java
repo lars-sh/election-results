@@ -40,6 +40,7 @@ public class LocalNominationResult
 			= Comparator.<LocalNominationResult, Election<?, ?>>comparing(LocalNominationResult::getElection)
 					.reversed()
 					.thenComparing(LocalNominationResult::getNumberOfVotes)
+					.thenComparing(result -> result.getSainteLagueValue().orElse(BigDecimal.ZERO))
 					.reversed()
 					.thenComparing(LocalNominationResult::getNomination);
 

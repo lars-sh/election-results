@@ -599,7 +599,7 @@ public class MetricsFiles {
 			// Sitze
 			appendFormula(row,
 					optionalParty,
-					"COUNTIFS(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]], Kandidierende[Mandat], \"<>\")");
+					"COUNTIF(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]]) - COUNTIFS(Kandidierende[Gruppierung], Gruppierungen[[#This Row],[Gruppierung]], Kandidierende[Mandat], \"\")");
 		}
 
 		/**
