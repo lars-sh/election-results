@@ -297,6 +297,32 @@ public class PollingStationResultFiles {
 						district.getName());
 			}
 
+			final Set<LocalNomination> parties = election.getDirectNominations()
+					.stream()
+					.filter(nomination -> nomination.getDistrict().equals(district)
+							&& nomination.getParty().isPresent()
+							&& !nomination.getParty().get().getShortName().isEmpty()
+							&& getSimplifiedString(nomination.getParty().get().getShortName())
+									.equals(getSimplifiedString(person)))
+					.limit(2)
+					.collect(toSet());
+			if (parties.size() == 1) {
+				return parties.iterator().next();
+			}
+
+			final Set<LocalNomination> exactNames = election.getDirectNominations()
+					.stream()
+					.filter(nomination -> nomination.getDistrict().equals(district)
+							&& (getSimplifiedString(nomination.getPerson().getGivenName())
+									.equals(getSimplifiedString(person))
+									|| getSimplifiedString(nomination.getPerson().getFamilyName())
+											.equals(getSimplifiedString(person))))
+					.limit(2)
+					.collect(toSet());
+			if (exactNames.size() == 1) {
+				return exactNames.iterator().next();
+			}
+
 			final char possiblePartyIndicator = Character.toLowerCase(person.charAt(0));
 			final Set<LocalNomination> nominationsWithPartyPrefix = election.getDirectNominations()
 					.stream()
@@ -306,6 +332,7 @@ public class PollingStationResultFiles {
 							&& possiblePartyIndicator == Character
 									.toLowerCase(nomination.getParty().get().getShortName().charAt(0))
 							&& matches(nomination, person.substring(1)))
+					.limit(2)
 					.collect(toSet());
 			if (nominationsWithPartyPrefix.size() == 1) {
 				return nominationsWithPartyPrefix.iterator().next();
