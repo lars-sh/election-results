@@ -113,15 +113,21 @@ public class LocalElectionResultCli implements IVersionProvider {
 	/**
 	 * Creates an Excel spreadsheet (XLSX) with metrics of the election result.
 	 *
-	 * @param result the result
-	 * @param output the path to write to
+	 * @param result   the result
+	 * @param output   the path to write to
+	 * @param extended if {@code true} additional metrics on ballot basis are
+	 *                 included
 	 * @throws IOException on IO error
 	 */
 	@Command(description = "Creates an Excel spreadsheet (XLSX) with metrics of the election results.")
 	public void metrics(@Mixin final LocalElectionResultParameter result,
-			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE) final Path output) throws IOException {
+			@Parameters(paramLabel = "FILE", description = DESCRIPTION_FILE) final Path output,
+			@Option(names = "--extended",
+					defaultValue = "false",
+					description = "Adds additional metrics on ballot basis") final boolean extended)
+			throws IOException {
 		try (OutputStream outputStream = Files.newOutputStream(output)) {
-			MetricsFiles.write(result.read(), outputStream);
+			MetricsFiles.write(result.read(), outputStream, extended);
 		}
 	}
 

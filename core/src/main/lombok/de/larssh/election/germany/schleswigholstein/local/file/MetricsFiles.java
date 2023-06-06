@@ -1,17 +1,22 @@
 package de.larssh.election.germany.schleswigholstein.local.file;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.summingInt;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -41,6 +46,7 @@ import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Keys;
 import de.larssh.election.germany.schleswigholstein.Party;
+import de.larssh.election.germany.schleswigholstein.local.LocalBallot;
 import de.larssh.election.germany.schleswigholstein.local.LocalElectionResult;
 import de.larssh.election.germany.schleswigholstein.local.LocalNomination;
 import de.larssh.election.germany.schleswigholstein.local.LocalNominationResult;
@@ -63,10 +69,13 @@ public class MetricsFiles {
 	 *
 	 * @param result       the election result to to write
 	 * @param outputStream the metrics file output stream
+	 * @param extended     if {@code true} additional metrics on ballot basis are
+	 *                     included
 	 * @throws IOException on IO error
 	 */
-	public static void write(final LocalElectionResult result, final OutputStream outputStream) throws IOException {
-		new MetricsFileWriter(result, outputStream).write();
+	public static void write(final LocalElectionResult result, final OutputStream outputStream, final boolean extended)
+			throws IOException {
+		new MetricsFileWriter(result, outputStream, extended).write();
 	}
 
 	/**
@@ -202,6 +211,14 @@ public class MetricsFiles {
 		OutputStream outputStream;
 
 		/**
+		 * Adds additional metrics on ballot basis
+		 *
+		 * @return {@code true} if additional metrics on ballot basis are included, else
+		 *         {@code false}
+		 */
+		boolean extended;
+
+		/**
 		 * Cache to simplify reusing {@link CellStyle} instances
 		 */
 		Map<String, CellStyle> cellStyleCache = new HashMap<>();
@@ -218,11 +235,14 @@ public class MetricsFiles {
 		 *
 		 * @param result       the {@link LocalElectionResult} to create metrics of
 		 * @param outputStream the {@link OutputStream} to write to
+		 * @param extended     if {@code true} additional metrics on ballot basis are
+		 *                     included
 		 */
 		@PackagePrivate
-		MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream) {
+		MetricsFileWriter(final LocalElectionResult result, final OutputStream outputStream, final boolean extended) {
 			this.result = result;
 			this.outputStream = outputStream;
+			this.extended = extended;
 
 			dataFormatSainteLague = result.getSainteLagueScale() == 0
 					? "0"
@@ -324,6 +344,21 @@ public class MetricsFiles {
 		}
 
 		/**
+		 * Determines if the votes of {@code ballot} contain at least one nomination
+		 * relating {@code party}.
+		 *
+		 * @param ballot the ballot to search in
+		 * @param party  the party to look for
+		 * @return {@code true} if {@code ballot} contains at least one nomination of
+		 *         {@code party}, else {@code false}
+		 */
+		private static boolean containsParty(final LocalBallot ballot, final Party party) {
+			return ballot.getNominations()
+					.stream()
+					.anyMatch(nomination -> nomination.getParty().map(party::equals).orElse(Boolean.FALSE));
+		}
+
+		/**
 		 * Returns a {@link CellStyle} instance with the coloring of {@code party} and
 		 * {@code dataFormat}. Cell styles are cached and reused.
 		 *
@@ -383,6 +418,10 @@ public class MetricsFiles {
 				writeParties(workbook.createSheet("Gruppierungen"));
 				writeBlockVotes(workbook.createSheet("Blockstimmen"));
 				writeNominations(workbook.createSheet("Kandidierende"));
+				if (extended) {
+					writeVotes(workbook.createSheet("Stimmen"));
+					writeBallots(workbook.createSheet("Stimmzettel"));
+				}
 
 				// Auto Size Columns
 				workbook.sheetIterator().forEachRemaining(sheet -> {
@@ -774,6 +813,179 @@ public class MetricsFiles {
 
 			// Mandat
 			appendString(row, party, getDisplayValue(nominationResult.getType()));
+		}
+
+		/**
+		 * Adds a row with vote metrics of a {@code party} to the sheet "Stimmen"
+		 *
+		 * @param row   the row to write to
+		 * @param party the party
+		 */
+		private void writeVote(final Row row, final Party party) {
+			appendString(row, Optional.of(party), party.getShortName());
+			for (final Party column : result.getPartyResults().keySet()) {
+				final long numberOfBallots = result.getBallots()
+						.stream()
+						.filter(ballot -> containsParty(ballot, party))
+						.flatMap(ballot -> ballot.getNominations().stream())
+						.filter(ballot -> ballot.getParty().map(column::equals).orElse(Boolean.FALSE))
+						.count();
+				appendNumber(row, Optional.of(party), Optional.of(numberOfBallots));
+			}
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					final long numberOfBallots = result.getBallots()
+							.stream()
+							.filter(ballot -> ballot.getNominations().contains(nomination)
+									&& containsParty(ballot, party))
+							.count();
+					appendNumber(row, Optional.of(party), Optional.of(numberOfBallots));
+				}
+			}
+		}
+
+		/**
+		 * Adds a row with vote metrics of a {@code nomination} to the sheet "Stimmen"
+		 *
+		 * @param row        the row to write to
+		 * @param nomination the nomination
+		 */
+		private void writeVote(final Row row, final LocalNomination nomination) {
+			appendString(row,
+					nomination.getParty(),
+					String.format("%s, %s",
+							nomination.getPerson().getFamilyName(),
+							nomination.getPerson().getGivenName()));
+			for (final Party party : result.getPartyResults().keySet()) {
+				final long numberOfBallots = result.getBallots()
+						.stream()
+						.filter(ballot -> ballot.getNominations().contains(nomination))
+						.flatMap(ballot -> ballot.getNominations().stream())
+						.filter(ballot -> ballot.getParty().map(party::equals).orElse(Boolean.FALSE))
+						.count();
+				appendNumber(row, nomination.getParty(), Optional.of(numberOfBallots));
+			}
+			for (final LocalNomination column : result.getNominationResults().keySet()) {
+				if (column.isDirectNomination()) {
+					final long numberOfBallots = result.getBallots()
+							.stream()
+							.filter(ballot -> ballot.getNominations().contains(nomination)
+									&& ballot.getNominations().contains(column))
+							.count();
+					appendNumber(row, nomination.getParty(), Optional.of(numberOfBallots));
+				}
+			}
+		}
+
+		/**
+		 * Adds the sheet "Stimmen"
+		 *
+		 * @param sheet the sheet to write to
+		 */
+		private void writeVotes(final Sheet sheet) {
+			// Header
+			final Row row = appendRow(sheet);
+			appendStrings(row, "Stimmen");
+			for (final Party party : result.getPartyResults().keySet()) {
+				appendString(row, Optional.empty(), party.getShortName());
+			}
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					appendString(row,
+							Optional.empty(),
+							String.format("%s, %s",
+									nomination.getPerson().getFamilyName(),
+									nomination.getPerson().getGivenName()));
+				}
+			}
+
+			// Content
+			for (final Party party : result.getPartyResults().keySet()) {
+				writeVote(appendRow(sheet), party);
+			}
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					writeVote(appendRow(sheet), nomination);
+				}
+			}
+
+			// Table
+			sheet.createFreezePane(1, 1);
+			createTable(sheet, "Stimmen");
+		}
+
+		/**
+		 * Adds a row with ballot metrics to the sheet "Stimmzettel"
+		 *
+		 * @param row    the row to write to
+		 * @param ballot the ballot to add
+		 * @param count  the number of times this ballot was voted
+		 */
+		private void writeBallot(final Row row, final Set<LocalNomination> ballot, final Integer count) {
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					appendNumber(row, nomination.getParty(), Optional.of(ballot.contains(nomination) ? count : 0));
+				}
+			}
+		}
+
+		/**
+		 * Adds the sheet "Stimmzettel"
+		 *
+		 * @param sheet the sheet to write to
+		 */
+		private void writeBallots(final Sheet sheet) {
+			// Header
+			final Row row = appendRow(sheet);
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					appendString(row,
+							nomination.getParty(),
+							String.format("%s, %s",
+									nomination.getPerson().getFamilyName(),
+									nomination.getPerson().getGivenName()));
+				}
+			}
+
+			// Content
+			final Map<Set<LocalNomination>, Integer> ballots = result.getBallots()
+					.stream()
+					.filter(LocalBallot::isValid)
+					.collect(groupingBy(LocalBallot::getNominations, summingInt(ballot -> 1)));
+			ballots.entrySet()
+					.stream()
+					.sorted(Comparator.comparing(Entry::getValue))
+					.forEach(entry -> writeBallot(appendRow(sheet), entry.getKey(), entry.getValue()));
+
+			// Table
+			sheet.createFreezePane(0, 1);
+			final XSSFTable table = createTable(sheet, "Stimmzettel");
+
+			// Totals Row
+			table.setDataRowCount(table.getDataRowCount() + 1);
+			writeBallotsTotalsRow(appendRow(sheet), table.getCTTable());
+		}
+
+		/**
+		 * Adds a total row to the sheet "Stimmzettel"
+		 *
+		 * @param row   the row to write to
+		 * @param table the Excel table to update
+		 */
+		private void writeBallotsTotalsRow(final Row row, final CTTable table) {
+			table.setTotalsRowCount(1);
+			final Iterator<CTTableColumn> columns = table.getTableColumns().getTableColumnList().iterator();
+
+			for (final LocalNomination nomination : result.getNominationResults().keySet()) {
+				if (nomination.isDirectNomination()) {
+					columns.next().setTotalsRowFunction(STTotalsRowFunction.CUSTOM);
+					appendFormula(row,
+							nomination.getParty(),
+							String.format("SUBTOTAL(9, Stimmzettel[%s, %s])",
+									nomination.getPerson().getFamilyName(),
+									nomination.getPerson().getGivenName()));
+				}
+			}
 		}
 	}
 }
