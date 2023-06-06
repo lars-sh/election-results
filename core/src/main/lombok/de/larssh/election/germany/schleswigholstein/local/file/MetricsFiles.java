@@ -42,6 +42,7 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STTotalsRowFunction;
 
+import de.larssh.election.germany.schleswigholstein.Ballot;
 import de.larssh.election.germany.schleswigholstein.Color;
 import de.larssh.election.germany.schleswigholstein.District;
 import de.larssh.election.germany.schleswigholstein.Keys;
@@ -63,6 +64,8 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 @SuppressWarnings("PMD.ExcessiveImports")
+@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
+		justification = "using generic Optional<Number> functionality")
 public class MetricsFiles {
 	/**
 	 * Formats and writes {@code result} to {@code outputStream}.
@@ -352,7 +355,7 @@ public class MetricsFiles {
 		 * @return {@code true} if {@code ballot} contains at least one nomination of
 		 *         {@code party}, else {@code false}
 		 */
-		private static boolean containsParty(final LocalBallot ballot, final Party party) {
+		private static boolean containsParty(final Ballot<?> ballot, final Party party) {
 			return ballot.getNominations()
 					.stream()
 					.anyMatch(nomination -> nomination.getParty().map(party::equals).orElse(Boolean.FALSE));
@@ -483,8 +486,6 @@ public class MetricsFiles {
 		 * @param row      the row to write to
 		 * @param district the district
 		 */
-		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
-				justification = "need to match generics")
 		private void writeOverviewOfDistrict(final Row row, final District<?> district) {
 			// Wahlbezirk
 			appendStrings(row, district.getName());
@@ -592,8 +593,6 @@ public class MetricsFiles {
 		 * @param row   the row to write to
 		 * @param party the party
 		 */
-		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
-				justification = "need to match generics")
 		private void writeParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -676,8 +675,6 @@ public class MetricsFiles {
 		 * @param row   the row to write to
 		 * @param party the party
 		 */
-		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
-				justification = "need to match generics")
 		private void writeBlockVotesOfParty(final Row row, final Party party) {
 			final Optional<Party> optionalParty = Optional.of(party);
 
@@ -767,8 +764,6 @@ public class MetricsFiles {
 		 * @param row              the row to write to
 		 * @param nominationResult the nomination's results
 		 */
-		@SuppressFBWarnings(value = "OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED",
-				justification = "need to match generics")
 		private void writeNomination(final Row row, final LocalNominationResult nominationResult) {
 			final LocalNomination nomination = nominationResult.getNomination();
 			final Optional<Party> party = nomination.getParty();
