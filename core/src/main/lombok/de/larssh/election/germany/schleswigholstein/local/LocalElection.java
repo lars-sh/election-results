@@ -184,6 +184,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 * @return Wahlgebiet, Wahlkreise und Wahlbezirke
 	 */
 	@JsonIgnore
+	@SuppressWarnings("java:S1452")
 	public Set<District<?>> getAllDistricts() {
 		return allDistricts.get();
 	}
@@ -376,7 +377,7 @@ public class LocalElection implements Election<LocalDistrictRoot, LocalNominatio
 	 */
 	@Getter
 	@SuppressWarnings("PMD.DataClass")
-	private static class ParsableLocalElection {
+	private static final class ParsableLocalElection {
 		/**
 		 * Wahlgebiet
 		 */
