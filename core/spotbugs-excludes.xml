@@ -21,4 +21,10 @@
 		<Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
 		<Class name="de.larssh.election.germany.schleswigholstein.local.file.PollingStationResultFiles$PollingStationResultFileReader" />
 	</Match>
+
+	<!-- HTML entities handled -->
+	<Match>
+		<Bug pattern="POTENTIAL_XML_INJECTION" />
+		<Class name="de.larssh.election.germany.schleswigholstein.local.file.PresentationFiles$PresentationFileWriter" />
+	</Match>
 </FindBugsFilter>

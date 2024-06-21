@@ -97,7 +97,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	 * Wahlgebiet (§ 2 GKWG)
 	 */
 	@Getter
-	private static class ParsableLocalDistrictRoot {
+	private static final class ParsableLocalDistrictRoot {
 		/**
 		 * Name des Wahlgebiets
 		 *
@@ -163,7 +163,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	 * Wahlkreis (§ 15 GKWG)
 	 */
 	@Getter
-	private static class ParsableLocalDistrict {
+	private static final class ParsableLocalDistrict {
 		/**
 		 * Name des Wahlkreises
 		 *
@@ -225,7 +225,7 @@ public class LocalDistrictRoot extends District<LocalDistrict> {
 	 * Wahlbezirk (§ 16 GKWG)
 	 */
 	@Getter
-	private static class ParsableLocalPollingStation {
+	private static final class ParsableLocalPollingStation {
 		/**
 		 * Name des Wahlbezirks
 		 *

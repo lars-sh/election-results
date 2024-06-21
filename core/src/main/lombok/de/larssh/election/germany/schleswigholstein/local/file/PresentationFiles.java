@@ -393,11 +393,11 @@ public class PresentationFiles {
 					"Anteil: %.1f\u202f%%",
 					BigDecimals.divideOrZero(HUNDRED * result.getNumberOfVotes(), numberOfBallots, 1)));
 
-			result.getNomination().getListPosition().ifPresent(listPosition -> {
-				builder.append(String.format("\nListenposition %d der %s",
-						listPosition,
-						result.getNomination().getParty().get().getShortName()));
-			});
+			result.getNomination()
+					.getListPosition()
+					.ifPresent(listPosition -> builder.append(String.format("\nListenposition %d der %s",
+							listPosition,
+							result.getNomination().getParty().get().getShortName())));
 			result.getSainteLagueValue()
 					.map(sainteLagueValue -> String.format(Locale.GERMAN,
 							"\nSainte-Laguë-Höchstzahl: %." + sainteLagueValue.scale() + "f",
