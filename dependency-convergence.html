@@ -95,41 +95,23 @@
 <td>3</td></tr>
 <tr class="b">
 <th>Number of dependencies (NOD):</th>
-<td>42</td></tr>
+<td>43</td></tr>
 <tr class="a">
 <th>Number of unique artifacts (NOA):</th>
-<td>48</td></tr>
+<td>44</td></tr>
 <tr class="b">
 <th>Number of version-conflicting artifacts (NOC):</th>
-<td>6</td></tr>
+<td>1</td></tr>
 <tr class="a">
 <th>Number of SNAPSHOT artifacts (NOS):</th>
 <td>0</td></tr>
 <tr class="b">
 <th>Convergence (NOD/NOA):</th>
-<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>87 %</b></td></tr>
+<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>97 %</b></td></tr>
 <tr class="a">
 <th>Ready for release (100% convergence and no SNAPSHOTS):</th>
 <td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>Error</b><br />You do not have 100% convergence.</td></tr></table></section><section>
 <h3><a name="Dependencies_used_in_modules"></a>Dependencies used in modules</h3><section>
-<h4><a name="commons-io:commons-io"></a>commons-io:commons-io</h4>
-<table border="0" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
-<td>
-<table border="0" class="table table-striped">
-<tr class="b">
-<td width="25%">2.15.0</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;commons-io:commons-io:jar:2.15.0:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;\-&#160;commons-io:commons-io:jar:2.15.0:compile<br /></li><br /></ol></td></tr>
-<tr class="a">
-<td width="25%">2.16.1</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;commons-io:commons-io:jar:2.16.1:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br />&#160;&#160;&#160;\-&#160;commons-io:commons-io:jar:2.16.1:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
 <h4><a name="net.bytebuddy:byte-buddy"></a>net.bytebuddy:byte-buddy</h4>
 <table border="0" class="table table-striped">
 <tr class="a">
@@ -149,79 +131,7 @@
 <ol style="list-style-type: decimal">
 <li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;org.assertj:assertj-core:jar:3.26.0:test<br />&#160;&#160;&#160;\-&#160;net.bytebuddy:byte-buddy:jar:1.14.16:test<br /></li><br />
 <li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.assertj:assertj-core:jar:3.26.0:test<br />&#160;&#160;&#160;\-&#160;net.bytebuddy:byte-buddy:jar:1.14.16:test<br /></li><br />
-<li>de.lars-sh.election-results:election-results-parent:pom:0.9.0-SNAPSHOT<br />\-&#160;org.assertj:assertj-core:jar:3.26.0:test<br />&#160;&#160;&#160;\-&#160;net.bytebuddy:byte-buddy:jar:1.14.16:test<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
-<h4><a name="org.apache.logging.log4j:log4j-api"></a>org.apache.logging.log4j:log4j-api</h4>
-<table border="0" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
-<td>
-<table border="0" class="table table-striped">
-<tr class="b">
-<td width="25%">2.21.1</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;+-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.0:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;|&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.21.1:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.21.1:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;+-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.0:compile<br />&#160;&#160;&#160;|&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.21.1:compile<br />&#160;&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.21.1:compile<br /></li><br /></ol></td></tr>
-<tr class="a">
-<td width="25%">2.23.1</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;+-&#160;org.apache.logging.log4j:log4j-core:jar:2.23.1:compile<br />&#160;&#160;&#160;|&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.23.1:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.23.1:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />+-&#160;org.apache.logging.log4j:log4j-core:jar:2.23.1:compile<br />|&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.23.1:compile<br />\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br />&#160;&#160;&#160;\-&#160;org.apache.logging.log4j:log4j-api:jar:2.23.1:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
-<h4><a name="org.apache.poi:poi"></a>org.apache.poi:poi</h4>
-<table border="0" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
-<td>
-<table border="0" class="table table-striped">
-<tr class="b">
-<td width="25%">5.2.5</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.poi:poi:jar:5.2.5:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi:jar:5.2.5:compile<br /></li><br /></ol></td></tr>
-<tr class="a">
-<td width="25%">5.3.0</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi:jar:5.3.0:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
-<h4><a name="org.apache.poi:poi-ooxml-lite"></a>org.apache.poi:poi-ooxml-lite</h4>
-<table border="0" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
-<td>
-<table border="0" class="table table-striped">
-<tr class="b">
-<td width="25%">5.2.5</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml-lite:jar:5.2.5:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml-lite:jar:5.2.5:compile<br /></li><br /></ol></td></tr>
-<tr class="a">
-<td width="25%">5.3.0</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml-lite:jar:5.3.0:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml-lite:jar:5.3.0:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
-<h4><a name="org.apache.xmlbeans:xmlbeans"></a>org.apache.xmlbeans:xmlbeans</h4>
-<table border="0" class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
-<td>
-<table border="0" class="table table-striped">
-<tr class="b">
-<td width="25%">5.2.0</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.0:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />\-&#160;org.apache.poi:poi-ooxml:jar:5.2.5:compile<br />&#160;&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.0:compile<br /></li><br /></ol></td></tr>
-<tr class="a">
-<td width="25%">5.2.1</td>
-<td>
-<ol style="list-style-type: decimal">
-<li>de.lars-sh.election-results:election-results-cli:jar:0.9.0-SNAPSHOT<br />\-&#160;de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT:compile<br />&#160;&#160;&#160;+-&#160;org.apache.poi:poi-ooxml-lite:jar:5.3.0:compile<br />&#160;&#160;&#160;|&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.1:compile<br />&#160;&#160;&#160;\-&#160;org.apache.poi:poi-ooxml-full:jar:5.3.0:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.1:compile<br /></li><br />
-<li>de.lars-sh.election-results:election-results-core:jar:0.9.0-SNAPSHOT<br />+-&#160;org.apache.poi:poi-ooxml-lite:jar:5.3.0:compile<br />|&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.1:compile<br />\-&#160;org.apache.poi:poi-ooxml-full:jar:5.3.0:compile<br />&#160;&#160;&#160;\-&#160;org.apache.xmlbeans:xmlbeans:jar:5.2.1:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section></section>
+<li>de.lars-sh.election-results:election-results-parent:pom:0.9.0-SNAPSHOT<br />\-&#160;org.assertj:assertj-core:jar:3.26.0:test<br />&#160;&#160;&#160;\-&#160;net.bytebuddy:byte-buddy:jar:1.14.16:test<br /></li><br /></ol></td></tr></table></td></tr></table></section></section>
         </main>
       </div>
     </div>
