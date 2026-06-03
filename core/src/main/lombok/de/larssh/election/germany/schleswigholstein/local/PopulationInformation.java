@@ -51,7 +51,7 @@ public class PopulationInformation {
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	private static PopulationInformation createKreisangehoerigeGemeinde() {
-		return new PopulationInformation(LocalDistrictType.KREIS,
+		return new PopulationInformation(LocalDistrictType.KREISANGEHOERIGE_GEMEINDE,
 				(NavigableMap<Integer, Integer>) Maps.builder(new TreeMap<Integer, Integer>()) //
 						.put(2500, 1)
 						.put(5000, 2)
